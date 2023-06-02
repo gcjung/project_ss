@@ -1,0 +1,151 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
+using System;
+using Unity.VisualScripting;
+
+public class PlayerController : MonoBehaviour
+{
+    [SerializeField]
+    private Bullet projectilePrefab;
+    public static PlayerState CurrentPlayerState { get; private set; } = PlayerState.Idle;
+
+    private List<MonsterController> enemyList = new List<MonsterController>();
+
+    private Animator playerAnimator;
+
+    private Transform target;
+
+    private float projectileSpeed = 5.0f;
+
+    private ObjectPool<Bullet> bulletPool;
+
+    private Player player;
+
+    public bool IsBulletCol { get; set; } = false;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.TryGetComponent<MonsterController>(out var monster))
+        {
+            enemyList.Add(monster);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.TryGetComponent<MonsterController>(out var enemy))
+        {
+            if ((enemyList.Count - 1) == 0)
+            {
+                StartCoroutine(DelayChangeState(enemy));
+            }
+            else
+            {
+                enemyList.Remove(enemy);
+            }           
+        }
+    }
+
+    void Start()
+    {
+        playerAnimator = transform.GetComponent<Animator>();
+
+        bulletPool = new ObjectPool<Bullet>(projectilePrefab, 30, this.transform);
+
+        if (TryGetComponent<Player>(out var value))
+        {
+            player = value;
+        }           
+    }
+
+    void Update()
+    {
+        switch (CurrentPlayerState)
+        {
+            case PlayerState.Idle:
+                if (!CanSeeTarget())
+                {
+                    CurrentPlayerState = PlayerState.Moving;                   
+                }
+                else
+                {
+                    CurrentPlayerState = PlayerState.Idle;
+
+                    ResetAllTriggers();
+                    playerAnimator.SetTrigger("Idle");
+                }
+                break;
+            case PlayerState.Moving:
+                if (CanSeeTarget())
+                {
+                    CurrentPlayerState = PlayerState.Attacking;
+                }
+                else
+                {
+                    playerAnimator.SetTrigger("Run");
+                }
+                break;
+            case PlayerState.Attacking:
+                if (CanSeeTarget())
+                {
+                    playerAnimator.SetTrigger("Attack");
+                }
+                else
+                {
+                    CurrentPlayerState = PlayerState.Moving;
+                }
+                break;
+            case PlayerState.Dead:
+                playerAnimator.SetTrigger("Dead");
+                break;
+        }
+    }
+
+    private bool CanSeeTarget()
+    {
+        if (enemyList.Count == 0)
+            return false;
+        else
+            return true;
+    }
+
+    
+    public void ShootProjectile()
+    {
+        target = enemyList[0].transform;
+
+        Vector2 direction = (target.position - transform.position).normalized;
+
+        Bullet bullet = bulletPool.GetObjectPool();
+        bullet.transform.localScale = projectilePrefab.transform.localScale;
+        bullet.CashingDamage(player.Attack);
+        bullet.Rigid.velocity = direction * projectileSpeed;      
+    }
+
+    public void SetCurrentPlayerState(PlayerState state)
+    {
+        CurrentPlayerState = state;
+    }
+
+    private IEnumerator DelayChangeState(MonsterController enemy)
+    {
+        float delayTime = 2.0f;
+
+        yield return CommonIEnumerator.IETimeout(
+            onStart: () => { SetCurrentPlayerState(PlayerState.Idle); },
+            onFinish: () => { enemyList.Remove(enemy); }, delayTime);
+    }
+
+    private void ResetAllTriggers()
+    {
+        foreach (var param in playerAnimator.parameters)
+        {
+            if (param.type == AnimatorControllerParameterType.Trigger)
+            {
+                playerAnimator.ResetTrigger(param.name);
+            }
+        }
+    }
+}

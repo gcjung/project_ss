@@ -1,0 +1,35 @@
+ManifestFileVersion: 0
+CRC: 3480494079
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 0dd9c222556b880d569a84181c8923cb
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9f6028859c0796631fd9d16b09611983
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 50
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 92345eae69295cc4f830ffe22a3f47ea, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 212
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Prefab/(TEST)projectile.prefab
+Dependencies: []
