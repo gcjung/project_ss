@@ -15,7 +15,8 @@ public class MainScene : MonoBehaviour
     [SerializeField] private SpriteRenderer mapTwo;
 
     [Header("Enter Boss Room")]
-    [SerializeField] private SpriteRenderer fadeImage;
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private UpSidePanel upSidePanel;
     private float fadeInTime = 1f;
     private float fadeOutTime = 1f;
     private float delayTime = 1f;
@@ -28,7 +29,7 @@ public class MainScene : MonoBehaviour
         {
             if (value)
             {
-                if (MonsterSpawner.WaveCount == 5 && (PlayerController.CurrentPlayerState == PlayerState.Moving))
+                if (MonsterSpawner.WaveCount == 5)
                 {
                     isStageClear = value;
                     EnterBossStage();
@@ -69,8 +70,8 @@ public class MainScene : MonoBehaviour
         {
             IsStageClear = false;
 
-            fadeImage = Instantiate(fadeImage, transform);
-            //fadeImage.transform.SetAsFirstSibling();
+            fadeImage = Instantiate(fadeImage, upSidePanel.transform);
+            fadeImage.transform.SetAsFirstSibling();
             FadeIn();
         }
     }
@@ -82,6 +83,6 @@ public class MainScene : MonoBehaviour
 
     public void FadeOut()
     {
-        //fadeImage.DOFade(0f, fadeOutTime).OnComplete(() => Destroy(fadeImage));
+
     }
 }

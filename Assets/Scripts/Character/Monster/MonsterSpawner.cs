@@ -32,12 +32,7 @@ public class MonsterSpawner : MonoBehaviour
         slider.onValueChanged.AddListener(OnSliderValueChanged);
         slider.interactable = false;
     }
-    public void StartSpawn()
-    {
-        if (!IsSpawning)
-            StartCoroutine(SpawnMonster());
-    }
-    public IEnumerator SpawnMonster()
+    private IEnumerator SpawnMonster()
     {
         IsSpawning = true;
 
@@ -61,27 +56,27 @@ public class MonsterSpawner : MonoBehaviour
 
         if (Mathf.Abs(value - 0.2f) <= errorRange && WaveCount == 0)
         {
-            WaveCount++;
-            StartSpawn();
+            WaveCount++;    // 1
+            StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Abs(value - 0.4f) <= errorRange && WaveCount == 1)
         {
-            WaveCount++;
-            StartSpawn();
+            WaveCount++;    // 2
+            StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Abs(value - 0.6f) <= errorRange && WaveCount == 2)
         {
-            WaveCount++;
-            StartSpawn();
+            WaveCount++;    // 3
+            StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Abs(value - 0.8f) <= errorRange && WaveCount == 3)
         {
-            WaveCount++;
-            StartSpawn();
+            WaveCount++;    // 4
+            StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Abs(value - 1.0f) <= errorRange && WaveCount == 4)
         {
-            WaveCount++;
+            WaveCount++;    // 5
             FinishWave();
         }
     }

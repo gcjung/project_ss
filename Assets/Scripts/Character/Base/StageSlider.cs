@@ -8,8 +8,7 @@ public class StageSlider : MonoBehaviour
     [SerializeField]
     private MonsterSpawner spawner;
 
-    [SerializeField]
-    private UpSidePanel upSidePanel;
+    
 
     private Slider slider;
 
