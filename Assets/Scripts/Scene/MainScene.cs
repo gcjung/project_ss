@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using DG.Tweening;
 public class MainScene : MonoBehaviour
 {
     [Header("Create Player")]
@@ -12,7 +13,29 @@ public class MainScene : MonoBehaviour
     private Sprite mapSprite;
     [SerializeField] private SpriteRenderer mapOne;
     [SerializeField] private SpriteRenderer mapTwo;
-    
+
+    [Header("Enter Boss Room")]
+    [SerializeField] private SpriteRenderer fadeImage;
+    private float fadeInTime = 1f;
+    private float fadeOutTime = 1f;
+    private float delayTime = 1f;
+
+    private bool isStageClear = false;
+    public bool IsStageClear
+    {
+        get { return isStageClear; }
+        set
+        {
+            if (value)
+            {
+                if (MonsterSpawner.WaveCount == 5 && (PlayerController.CurrentPlayerState == PlayerState.Moving))
+                {
+                    isStageClear = value;
+                    EnterBossStage();
+                }
+            }
+        }
+    }
     public static bool IsPlayer { get; private set; } = false;
     private IEnumerator Start()
     {
@@ -32,12 +55,33 @@ public class MainScene : MonoBehaviour
         var _playerCharacter = Instantiate(playerCharacter, transform);
         _playerCharacter.transform.position = playerSpawnPoint.position;
         _playerCharacter.AddComponent<Player>();
-        //_playerCharacter.AddComponent<PlayerController>();  //AddComponent 순서 중요
+        _playerCharacter.AddComponent<PlayerController>();
         IsPlayer = true;
-
 
         mapSprite = Resources.Load<Sprite>("Sprite/Map001"); //맵 세팅
         mapOne.sprite = mapSprite;
         mapTwo.sprite = mapSprite;
+    }
+
+    public void EnterBossStage()
+    {
+        if (isStageClear)
+        {
+            IsStageClear = false;
+
+            fadeImage = Instantiate(fadeImage, transform);
+            //fadeImage.transform.SetAsFirstSibling();
+            FadeIn();
+        }
+    }
+
+    public void FadeIn()
+    {
+        fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("FadeOut", delayTime));
+    }
+
+    public void FadeOut()
+    {
+        //fadeImage.DOFade(0f, fadeOutTime).OnComplete(() => Destroy(fadeImage));
     }
 }
