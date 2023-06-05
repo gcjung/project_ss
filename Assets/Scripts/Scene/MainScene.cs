@@ -71,17 +71,17 @@ public class MainScene : MonoBehaviour
             IsStageClear = false;
 
             fadeImage = Instantiate(fadeImage, upSidePanel.transform);
-            fadeImage.transform.SetAsFirstSibling();
+            //fadeImage.transform.SetAsFirstSibling();
             FadeIn();
         }
     }
 
     public void FadeIn()
     {
-        fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("FadeOut", delayTime));
+        fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("VersusSetting", delayTime));
     }
 
-    public void FadeOut()
+    public void VersusSetting()
     {
 
     }

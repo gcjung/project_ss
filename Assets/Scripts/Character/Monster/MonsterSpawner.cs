@@ -12,6 +12,11 @@ public class MonsterSpawner : MonoBehaviour
     private Monster monster;
     private ObjectPool<Monster> monsterPool;
 
+    [Header("Monster Spawn Point")]
+    [SerializeField] private Transform spawnPoint1;
+    [SerializeField] private Transform spawnPoint2;
+    [SerializeField] private Transform spawnPoint3;
+
     private bool IsSpawning { get; set; } = false;
 
     public static int WaveCount { get; private set; } = 0;
@@ -39,9 +44,15 @@ public class MonsterSpawner : MonoBehaviour
         int monsterCount = 0;
         float spawnTime = 1.5f;
 
-        while (monsterCount < 9)
+        while (monsterCount < 6)
         {
-            monsterPool.GetObjectPool().transform.localScale = monster.transform.localScale;
+            int randomIndex = Random.Range(1, 4);
+            Transform spawnPoint = GetSpawnPoint(randomIndex);
+
+            //monsterPool.GetObjectPool().transform.localScale = monster.transform.localScale;
+            var _monster = monsterPool.GetObjectPool();
+            _monster.transform.localScale = monster.transform.localScale;
+            _monster.transform.position = spawnPoint.position;
 
             yield return new WaitForSeconds(spawnTime);
 
@@ -78,6 +89,20 @@ public class MonsterSpawner : MonoBehaviour
         {
             WaveCount++;    // 5
             FinishWave();
+        }
+    }
+    private Transform GetSpawnPoint(int index)
+    {
+        switch (index)
+        {
+            case 1:
+                return spawnPoint1;
+            case 2:
+                return spawnPoint2;
+            case 3:
+                return spawnPoint3;
+            default:
+                return null;
         }
     }
     public void FinishWave()
