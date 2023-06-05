@@ -8,8 +8,6 @@ public class StageSlider : MonoBehaviour
     [SerializeField]
     private MonsterSpawner spawner;
 
-    
-
     private Slider slider;
 
     public Coroutine waveCoroutine;
