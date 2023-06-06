@@ -12,6 +12,7 @@ public class MonsterSpawner : MonoBehaviour
     private Monster monster;
     private Monster bossMonster;
     private ObjectPool<Monster> monsterPool;
+    private ObjectPool<Monster> bossMonsterPool;
 
     [Header("Monster Spawn Point")]
     [SerializeField] private Transform spawnPoint1;
@@ -24,13 +25,17 @@ public class MonsterSpawner : MonoBehaviour
 
     private void Start()
     {
-        monster = Resources.Load<Monster>("Monster/ch008");
-
+        monster = Resources.Load<Monster>("Monster/ch008");     //일반몬스터 세팅        
         var _monster = Instantiate(monster, transform);
         _monster.gameObject.AddComponent<MonsterController>();
         _monster.gameObject.SetActive(false);
-
         monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+
+        bossMonster = Resources.Load<Monster>("Monster/ch009");     //보스몬스터 세팅
+        var _bossMonster = Instantiate(bossMonster, transform);
+        _bossMonster.gameObject.AddComponent<MonsterController>();
+        _bossMonster.gameObject.SetActive(false);
+        bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
 
         mainScene = transform.parent.GetComponent<MainScene>();
 
@@ -61,6 +66,14 @@ public class MonsterSpawner : MonoBehaviour
         }
 
         IsSpawning = false;
+    }
+    public void SpawnBossMonster()
+    {
+        slider.gameObject.SetActive(false);
+
+        var _bossMonster = bossMonsterPool.GetObjectPool();
+        _bossMonster.transform.localScale = bossMonster.transform.localScale;
+        _bossMonster.transform.position = spawnPoint2.position;
     }
     public void OnSliderValueChanged(float value)
     {

@@ -26,7 +26,9 @@ public class StageSlider : MonoBehaviour
     }
     private void OnDisable()
     {
-        StopCoroutine(waveCoroutine);
+        if(waveCoroutine!=null)
+            StopCoroutine(waveCoroutine);
+
         waveCoroutine = null;
     }
     private void Awake()

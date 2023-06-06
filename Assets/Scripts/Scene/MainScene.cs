@@ -25,6 +25,8 @@ public class MainScene : MonoBehaviour
     private float fadeInTime = 1f;
     private float delayTime = 1f;
 
+    private MonsterSpawner spawner;
+
     private bool isStageClear = false;
     public bool IsStageClear
     {
@@ -50,6 +52,8 @@ public class MainScene : MonoBehaviour
            predicate: () => { return GlobalManager.Instance.Initialized; },
            onFinish: () => { Init(); }
         );
+
+        spawner = FindChildComponent<MonsterSpawner>(transform);
     }
 
     private void Init()
@@ -124,5 +128,29 @@ public class MainScene : MonoBehaviour
         Destroy(playerPref);
         Destroy(vsImage.gameObject);
         Destroy(fadeImage.gameObject);
+
+        spawner.SpawnBossMonster();
+    }
+    T FindChildComponent<T>(Transform parent) where T : Component
+    {
+        T foundComponent = null;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+
+            T component = child.GetComponent<T>();
+            if (component != null)
+            {
+                foundComponent = component;
+                break;
+            }
+
+            foundComponent = FindChildComponent<T>(child);
+            if (foundComponent != null)
+                break;
+        }
+
+        return foundComponent;
     }
 }
