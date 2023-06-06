@@ -4,6 +4,10 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using DG.Tweening;
+using Firebase.Auth;
+using UnityEngine.SocialPlatforms;
+using GooglePlayGames;
+
 public class StartScene : MonoBehaviour
 {
     [Header("Start Loading Image")]
@@ -26,6 +30,8 @@ public class StartScene : MonoBehaviour
 
         canvasGroup = logoPanel.GetComponent<CanvasGroup>();
         canvasGroup.alpha = 0f;
+
+        GPGS.Instance.LoginGoogleAccount();
     }
 
     private IEnumerator Start()
@@ -61,4 +67,85 @@ public class StartScene : MonoBehaviour
 
         Instantiate(startPanel, loadingCanvas.transform);
     }
+
+
+    #region 테스트용
+    // 테스트
+    public string log1;
+    public string log2;
+    public string log3;
+    public void logtest(string str1 = "", string str2 = "", string str3 = "")
+    {
+        if (!string.IsNullOrEmpty(str1))
+            log1 = str1;
+        if (!string.IsNullOrEmpty(str2))
+            log2 = str2;
+        if (!string.IsNullOrEmpty(str3))
+            log3 = str3;
+    }
+    void OnGUI()
+    {
+        GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one * 2);
+
+        if (GUILayout.Button("ClearLog"))
+        {
+            log1 = "";
+            log2 = "";
+        }
+        //if (GUILayout.Button("플레이스토어 로그인"))
+        //{
+        //    Social.localUser.Authenticate((bool success) => {
+        //        // handle success or failure
+        //        if (success)
+        //        {
+        //            log1 = $"{success}, authCode : {PlayGamesPlatform.Instance.GetServerAuthCode()}";
+        //        }
+        //        else { }
+
+        //    });
+        //}
+        //if (GUILayout.Button("플레이스토어 로그아웃"))
+        //{
+        //    GPGS.Instance.LogoutPlayGames();
+        //}
+
+        if (GUILayout.Button("로그인 Check"))
+        {
+            
+            
+            if (FirebaseAuthManager.Instance.isCurrentUserLoggedin())
+            {
+                log1 = $"파이어베이스 연동 OK, uid : {FirebaseAuth.DefaultInstance.CurrentUser.UserId}";
+            }
+            else
+            {
+                log1 = "파이어베이스 연동 NO";
+            }
+
+            ILocalUser storeUser = Social.localUser;
+
+            if (storeUser.authenticated == true)
+            {
+                log2 = $"플레이스토어 로그인 됨, name : {storeUser.userName}, 로그인상태 : {storeUser.authenticated}";
+            }
+            else
+            {
+                log2 = "플레이스토어 로그인 안됨";
+            }
+            ILocalUser googleUser = PlayGamesPlatform.Instance.localUser;
+            if (googleUser.authenticated == true)
+            {
+                log3 = $"구글 로그인 됨, name : {googleUser.userName}, 로그인상태 : {googleUser.authenticated}";
+            }
+            else
+            {
+                log3 = "구글 로그인 안됨";
+            }
+        }
+
+        GUILayout.Label(log1);
+        GUILayout.Label(log2);
+        GUILayout.Label(log3);
+    }
+    #endregion 테스트용
 }
