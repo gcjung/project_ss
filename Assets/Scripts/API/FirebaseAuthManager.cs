@@ -35,28 +35,6 @@ public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
         else
             return true;
     }
-    //public override void Awake()
-    //{
-    //    base.Awake();
-
-    //    auth = FirebaseAuth.DefaultInstance;
-    //    GPGS.Instance.Init();
-    //}
-
-    //private void Start()
-    //{
-    //    GPGS.Instance.LoginPlayGames(success => 
-    //    {
-    //        if (success)
-    //        {
-    //            SignInFirebaseWithPlayGames();
-    //        }
-    //        else    // 게스트(익명)로그인
-    //        {
-    //            SigninFirebaseWithAnonymous();
-    //        }
-    //    });
-    //}
 
     public void SigninFirebaseWithAnonymous(Action action = null)
     {
