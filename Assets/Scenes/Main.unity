@@ -1515,8 +1515,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerSpawnPoint: {fileID: 1447943316}
-  mapOne: {fileID: 1820378810}
-  mapTwo: {fileID: 587764934}
+  map1: {fileID: 1820378810}
+  map2: {fileID: 587764934}
   fadeImage: {fileID: 1187355897327120250, guid: 6914bad92f8ea064aabceb985d55e6e3, type: 3}
   upSidePanel: {fileID: 1249786170}
   vsImage: {fileID: -1250306742949942494, guid: c5bf3d997ef6bb24abf6b1d087045766, type: 3}

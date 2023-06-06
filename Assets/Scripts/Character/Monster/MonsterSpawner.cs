@@ -10,6 +10,7 @@ public class MonsterSpawner : MonoBehaviour
     private MainScene mainScene;
 
     private Monster monster;
+    private Monster bossMonster;
     private ObjectPool<Monster> monsterPool;
 
     [Header("Monster Spawn Point")]

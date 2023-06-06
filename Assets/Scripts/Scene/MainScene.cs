@@ -10,8 +10,8 @@ public class MainScene : MonoBehaviour
     private GameObject playerCharacter;
 
     [Header("Change Map Sprite")]   
-    [SerializeField] private SpriteRenderer mapOne;
-    [SerializeField] private SpriteRenderer mapTwo;
+    [SerializeField] private SpriteRenderer map1;
+    [SerializeField] private SpriteRenderer map2;
     private Sprite mapSprite;
 
     [Header("Enter Boss Room")]
@@ -20,8 +20,9 @@ public class MainScene : MonoBehaviour
     [SerializeField] private Image vsImage;
     [SerializeField] private Transform playerPosition;
     [SerializeField] private Transform bossPosition;
+    private GameObject playerPref;
+    private GameObject bossPref;
     private float fadeInTime = 1f;
-    private float fadeOutTime = 1f;
     private float delayTime = 1f;
 
     private bool isStageClear = false;
@@ -63,11 +64,11 @@ public class MainScene : MonoBehaviour
         IsPlayer = true;
 
         mapSprite = Resources.Load<Sprite>("Sprite/Map001"); //¸Ê ¼¼ÆÃ
-        mapOne.sprite = mapSprite;
-        mapTwo.sprite = mapSprite;
+        map1.sprite = mapSprite;
+        map2.sprite = mapSprite;
     }
 
-    public void EnterBossStage()
+    private void EnterBossStage()
     {
         if (isStageClear)
         {
@@ -78,29 +79,31 @@ public class MainScene : MonoBehaviour
             FadeIn();
         }
     }
-    
-    public void FadeIn()
+
+    private void FadeIn()
     {
         fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("VersusSetting", delayTime));
     }
 
-    public void VersusSetting()
+    private void VersusSetting()
     {
         int targetLayer = LayerMask.NameToLayer("Over UI");
 
-        var _vsImage = Instantiate(vsImage, upSidePanel.transform);
+        vsImage = Instantiate(vsImage, upSidePanel.transform);
 
         var player = Resources.Load<GameObject>("Player/ch001");
-        var _player = Instantiate(player, playerPosition);
-        _player.transform.position = playerPosition.position;
-        ChangeLayer(_player, targetLayer);
+        playerPref = Instantiate(player, playerPosition);
+        playerPref.transform.position = playerPosition.position;
+        ChangeLayer(playerPref, targetLayer);
 
         var boss = Resources.Load<GameObject>("Monster/ch009");
-        var _boss = Instantiate(boss, bossPosition);
-        _boss.transform.position = bossPosition.position;
-        ChangeLayer(_boss, targetLayer);
+        bossPref = Instantiate(boss, bossPosition);
+        bossPref.transform.position = bossPosition.position;
+        ChangeLayer(bossPref, targetLayer);
+
+        StartCoroutine(BossBattle());
     }
-    void ChangeLayer(GameObject obj, int layer)
+    private void ChangeLayer(GameObject obj, int layer)
     {
         obj.layer = layer;
 
@@ -109,5 +112,17 @@ public class MainScene : MonoBehaviour
             GameObject childObj = obj.transform.GetChild(i).gameObject;
             ChangeLayer(childObj, layer);
         }
+    }
+
+    private IEnumerator BossBattle()
+    {
+        float delayTime = 2.0f;
+
+        yield return new WaitForSeconds(delayTime);
+
+        Destroy(bossPref);
+        Destroy(playerPref);
+        Destroy(vsImage.gameObject);
+        Destroy(fadeImage.gameObject);
     }
 }
