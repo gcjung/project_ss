@@ -11,12 +11,25 @@ using System;
 public struct Counter
 {
     [FirestoreProperty]
-    int Count { get; set; }
+    public int Count { get; set; }
 
     [FirestoreProperty]
-    int update { get; set; }
+    public int update { get; set; }
 }
 
+[FirestoreData]
+public struct UserData
+{
+    [FirestoreProperty]
+    public int Gold { get; set; }
+
+    [FirestoreProperty]
+    public int Gem { get; set; }
+
+    [FirestoreProperty]
+    public int gem { get; set; }
+    public int gold { get; set; }
+}
 public class DBManager : MonoBehaviour
 {
     CollectionReference userDB;
@@ -28,11 +41,27 @@ public class DBManager : MonoBehaviour
         foreach (DocumentSnapshot document in snapshot.Documents)
         {
             Dictionary<string, object> documentDictionary = document.ToDictionary();
-            Debug.Log("title:  " + documentDictionary["gem"] as string);
-            Debug.Log("title:  " + documentDictionary["gold"] as string);
+            Debug.Log($"{documentDictionary.Count} : " + documentDictionary["gem"] as string);
+            Debug.Log($"{documentDictionary.Count} : " + documentDictionary["gold"] as string);
         }
-    }
 
+        GetData();
+    }
+    void GetData()
+    {
+        db.Collection("UserDB").Document("1k3OVr2MqO3unUy8LIN7").GetSnapshotAsync().ContinueWithOnMainThread(tast =>
+        {
+            DocumentSnapshot snapshots = tast.Result;
+
+            //UserData userData = tast.Result.ConvertTo<UserData>();
+            Dictionary<string, object>  dic = tast.Result.ToDictionary();
+            Debug.Log($"userData.gem : {dic["gem"]}");
+            Debug.Log($"userData.gold : {dic["gold"]}");
+            //Debug.Log($"userData.Gold : {userData.Gold}");
+            //Debug.Log($"userData.Gem : {userData.Gem}");
+        });
+
+    }
 
     FirebaseFirestore db;
     void dataadd()
@@ -44,7 +73,7 @@ public class DBManager : MonoBehaviour
                 { "Last", "Lovelace" },
                 { "Born", 1815 }
             };
-        docRef.SetAsync(user);
+        docRef.SetAsync(user).ContinueWithOnMainThread(t => Debug.Log("데이터 올림"));
     }
 
     void AddUser()
@@ -57,7 +86,12 @@ public class DBManager : MonoBehaviour
 
     void TestAddData()
     {
-        Counter counter =  new Counter();
+        Counter counter = new Counter()
+        {
+            Count = 0
+        };
+
+        
     }
 
    
