@@ -23,6 +23,7 @@ public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
     }
 
     private FirebaseAuth auth;
+    public string UserId => auth.CurrentUser.UserId;
     FirebaseAuthManager()
     {
         auth = FirebaseAuth.DefaultInstance;

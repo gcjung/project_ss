@@ -5,94 +5,90 @@ using Firebase;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using System;
+using System.Threading.Tasks;
+using static UnityEditor.Progress;
 
 
-[FirestoreData]
-public struct Counter
-{
-    [FirestoreProperty]
-    public int Count { get; set; }
-
-    [FirestoreProperty]
-    public int update { get; set; }
-}
 
 [FirestoreData]
-public struct UserData
+public class UserDatas
 {
-    [FirestoreProperty]
-    public int Gold { get; set; }
+    [FirestoreProperty] public int Gold { get; set; }
+    [FirestoreProperty] public int Gem { get; set; }
 
-    [FirestoreProperty]
-    public int Gem { get; set; }
-
-    [FirestoreProperty]
-    public int gem { get; set; }
-    public int gold { get; set; }
 }
-public class DBManager : MonoBehaviour
+
+
+public class DBManager : SingletonObject<DBManager>
 {
-    CollectionReference userDB;
+    public Dictionary<string, object> userObject = new Dictionary<string, object>();
+
+    CollectionReference firebaseUserDB;
+    DocumentReference uidRef;
+    UserDatas userData;
+    public UserDatas UserData => userData;
+
+    public override void Awake()
+    {
+        base.Awake();
+        firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
+        uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
+        
+        userData = new UserDatas();
+    }
     private async void Start()
     {
-        userDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
-
-        QuerySnapshot snapshot = await userDB.GetSnapshotAsync();
-        foreach (DocumentSnapshot document in snapshot.Documents)
+        DocumentSnapshot snapshot = await uidRef.GetSnapshotAsync();
+        if (snapshot.Exists)
         {
-            Dictionary<string, object> documentDictionary = document.ToDictionary();
-            Debug.Log($"{documentDictionary.Count} : " + documentDictionary["gem"] as string);
-            Debug.Log($"{documentDictionary.Count} : " + documentDictionary["gold"] as string);
+            Debug.Log(String.Format("Document data for {0} document:", snapshot.Id));
+            userObject = snapshot.ToDictionary();
+
+            //userData = snapshot.ConvertTo<UserDatas>();
+        }
+        else
+        {
+            await uidRef.SetAsync(userData).ContinueWithOnMainThread(t => {
+                Debug.Log($"처음 접속 시, UserDB 초기화");
+            });
         }
 
-        GetData();
-    }
-    void GetData()
-    {
-        db.Collection("UserDB").Document("1k3OVr2MqO3unUy8LIN7").GetSnapshotAsync().ContinueWithOnMainThread(tast =>
-        {
-            DocumentSnapshot snapshots = tast.Result;
+        //uidRef.Listen(snapshot => {
+        //    Debug.Log("Callback received document snapshot.");
+        //    Debug.Log(String.Format("Document data for {0} document:", snapshot.Id));
+        //    Dictionary<string, object> city = snapshot.ToDictionary();
 
-            //UserData userData = tast.Result.ConvertTo<UserData>();
-            Dictionary<string, object>  dic = tast.Result.ToDictionary();
-            Debug.Log($"userData.gem : {dic["gem"]}");
-            Debug.Log($"userData.gold : {dic["gold"]}");
-            //Debug.Log($"userData.Gold : {userData.Gold}");
-            //Debug.Log($"userData.Gem : {userData.Gem}");
-        });
+        //    foreach (KeyValuePair<string, object> pair in city)
+        //    {
+        //        Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
+        //    }
+        //});
+
 
     }
-
-    FirebaseFirestore db;
-    void dataadd()
+    public async Task<T> GetUserData<T>(string key)
     {
-        DocumentReference docRef = db.Collection("users").Document("alovelace");
-        Dictionary<string, object> user = new Dictionary<string, object>
-            {
-                { "First", "Ada" },
-                { "Last", "Lovelace" },
-                { "Born", 1815 }
-            };
-        docRef.SetAsync(user).ContinueWithOnMainThread(t => Debug.Log("데이터 올림"));
-    }
+        DocumentSnapshot snapshot = await uidRef.GetSnapshotAsync();
 
-    void AddUser()
-    {
-        Dictionary<string, string> test = new Dictionary<string, string>();
-        test.Add("sdfasd", "12312311");
-        DocumentReference docRef = db.Collection("UserDB").Document("1k3OVr2MqO3unUy8LIN7");
-        docRef.SetAsync(test).ContinueWithOnMainThread(x => { Debug.Log($"{x}, 성공"); });
-    }
-
-    void TestAddData()
-    {
-        Counter counter = new Counter()
-        {
-            Count = 0
-        };
-
+        Dictionary<string, object> userData = snapshot.ToDictionary();
+        if (userData.ContainsKey(key))
+            return (T)Convert.ChangeType(userData[key], typeof(T));
         
+        return default(T);
+    }
+    public async void UpdateUserData<T>(string key, T value)
+    {
+        userObject[key] = value;
+
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        { 
+            { key, value }
+        };
+        await uidRef.UpdateAsync(updates).ContinueWithOnMainThread(task =>
+        {
+            Debug.Log($"{key} : {value} Update");
+        });
     }
 
-   
+  
 }
