@@ -131,7 +131,7 @@ public class MainScene : MonoBehaviour
 
         spawner.SpawnBossMonster();
     }
-    T FindChildComponent<T>(Transform parent) where T : Component
+    private T FindChildComponent<T>(Transform parent) where T : Component
     {
         T foundComponent = null;
 
