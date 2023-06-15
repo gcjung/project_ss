@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    public int MaxHp { get; private set; } = 30;
-    public int CurrentHp { get; private set; } = 30;
-    public int Attack { get; private set; } = 1;
+    public double MaxHp { get; private set; } = 30;
+    public double CurrentHp { get; private set; } = 30;
+    public double Attack { get; private set; } = 1;
 
     private MonsterController monsterController;
 
@@ -30,7 +30,7 @@ public class Monster : MonoBehaviour
     {
         CurrentHp = MaxHp;
 
-        if(TryGetComponent<MonsterController>(out var controller ))
+        if (TryGetComponent<MonsterController>(out var controller))
         {
             monsterController = controller;
         }
@@ -38,7 +38,7 @@ public class Monster : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
     }
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(double damageAmount)
     {
         CurrentHp -= damageAmount;
 

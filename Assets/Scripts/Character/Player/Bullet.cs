@@ -6,14 +6,14 @@ public class Bullet : MonoBehaviour
 {
     private Rigidbody2D rigid;
     public Rigidbody2D Rigid { get { return rigid; } set { rigid = value; } }
-    public float Damage { get; private set; }
+    public double Damage { get; private set; }
 
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
     }
-    public void CashingDamage(int damage)
+    public void CashingDamage(double damage)
     {
         Damage = damage;
     }

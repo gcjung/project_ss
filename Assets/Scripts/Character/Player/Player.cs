@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public int MaxHp { get; private set; } = 300;
-    public int CurrentHp { get; private set; }
-    public int Attack { get; private set; } = 15;
+    public double MaxHp { get; private set; } = 300;
+    public double CurrentHp { get; private set; }
+    public double Attack { get; private set; } = 15;
 
     private PlayerController playerController;
 
@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
         playerController = GetComponent<PlayerController>();
     }
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(double damageAmount)
     {
         CurrentHp -= damageAmount;
 
