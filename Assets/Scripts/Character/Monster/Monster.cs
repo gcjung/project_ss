@@ -48,5 +48,6 @@ public class Monster : MonoBehaviour
 
             monsterController.SetCurrentMonsterState(MonsterState.Dead);
         }
+
     }
 }

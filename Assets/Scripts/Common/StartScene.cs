@@ -35,7 +35,8 @@ public class StartScene : MonoBehaviour
     }
 
     private IEnumerator Start()
-    {       
+    {
+        Debug.Log("start@@");
         GlobalManager.Instance.Init();
 
         yield return CommonIEnumerator.IEWaitUntil(
