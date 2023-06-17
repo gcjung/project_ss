@@ -7,7 +7,6 @@ using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
     private Bullet projectilePrefab;
     public static PlayerState CurrentPlayerState { get; private set; } = PlayerState.Idle;
 
@@ -23,7 +22,7 @@ public class PlayerController : MonoBehaviour
 
     private Player player;
 
-    public bool IsBulletCol { get; set; } = false;
+    public bool IsBulletCol { get; set; } = false;  // 이거 왜 만든거임???
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -52,8 +51,12 @@ public class PlayerController : MonoBehaviour
     {
         playerAnimator = transform.GetComponent<Animator>();
 
-        bulletPool = new ObjectPool<Bullet>(projectilePrefab, 30, this.transform);
-
+        projectilePrefab = Resources.Load<Bullet>("ETC/(TEST)projectile");
+        if(projectilePrefab != null)
+        {
+            bulletPool = new ObjectPool<Bullet>(projectilePrefab, 30, this.transform);
+        }
+            
         if (TryGetComponent<Player>(out var value))
         {
             player = value;
