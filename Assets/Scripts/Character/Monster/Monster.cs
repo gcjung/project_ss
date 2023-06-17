@@ -49,5 +49,6 @@ public class Monster : MonoBehaviour
             monsterController.SetCurrentMonsterState(MonsterState.Dead);
         }
 
+        MainScene.Instance.GetGoods(100, 50);
     }
 }

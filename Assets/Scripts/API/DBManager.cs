@@ -19,7 +19,7 @@ public class DBManager : Manager<DBManager>
 {
     Dictionary<string, double> doubleDataDic = new Dictionary<string, double>();
     Dictionary<string, string> stringDataDic = new Dictionary<string, string>();
-
+    
     CollectionReference firebaseUserDB;
     DocumentReference uidRef;
     UserDatas dataTable;
@@ -34,19 +34,7 @@ public class DBManager : Manager<DBManager>
 
         LoadFirebaseData();
     }
-    public override void InitializedFininsh()
-    {
-        //
-    }
-    public override void Init()
-    {
-        if (Ininialized)
-        {
-            return;
-        }
 
-        Ininialized = true;
-    }
     async void LoadFirebaseData()
     {
         DocumentSnapshot snapshot = await uidRef.GetSnapshotAsync();
@@ -190,8 +178,20 @@ public class DBManager : Manager<DBManager>
             Debug.Log($"{key} : {value} Update");
         });
     }
+    public override void InitializedFininsh()
+    {
+        //
+    }
+    public override void Init()
+    {
+        if (Ininialized)
+        {
+            return;
+        }
 
-  
+        Ininialized = true;
+    }
+
 }
 
 

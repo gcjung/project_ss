@@ -14,14 +14,13 @@ public class GlobalManager : SingletonObject<GlobalManager>
     public override void Awake()
     {
         base.Awake();
-    }
+    }   
     public void Init()
     {
         StartCoroutine(nameof(InitManager));
     }
     private IEnumerator InitManager()
     {
-        Debug.Log("start######");
         if (Initialized)
         {
             Debug.Log($"글로벌 매니저 이미 존재함.");
