@@ -13,13 +13,6 @@ public class StartPanel : PanelBase
     [SerializeField] private Transform loginPanel;
     [SerializeField] private Button googleLoginButton;
     [SerializeField] private Button guestLoginButton;
-    //private new void Awake()
-    //{
-    //    base.Awake();
-    //    auth = FirebaseAuth.DefaultInstance;
-    //    loginPanel = transform.Find("LoginPanel");
-    //    button1.onClick.AddListener(() => GlobalManager.Instance.SceneLoadManager.LoadSceneAsync("Main"));
-    //}
 
     public override void InitPanel()
     {

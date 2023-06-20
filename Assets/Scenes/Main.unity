@@ -1010,7 +1010,7 @@ GameObject:
   - component: {fileID: 268569959}
   - component: {fileID: 268569958}
   m_Layer: 5
-  m_Name: Crystal_Text
+  m_Name: Gem_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2253,6 +2253,7 @@ MonoBehaviour:
   vsImage: {fileID: -1250306742949942494, guid: c5bf3d997ef6bb24abf6b1d087045766, type: 3}
   playerPosition: {fileID: 1071568692}
   bossPosition: {fileID: 1424292077}
+  mainUiPanel: {fileID: 972070603}
 --- !u!1 &838461504
 GameObject:
   m_ObjectHideFlags: 0
@@ -5755,7 +5756,7 @@ GameObject:
   - component: {fileID: 1823562344}
   - component: {fileID: 1823562343}
   m_Layer: 5
-  m_Name: Crystal_Image
+  m_Name: Gem_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

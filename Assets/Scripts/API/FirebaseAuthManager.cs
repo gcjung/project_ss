@@ -23,6 +23,7 @@ public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
     }
 
     private FirebaseAuth auth;
+    public string UserId => auth.CurrentUser.UserId;
     FirebaseAuthManager()
     {
         auth = FirebaseAuth.DefaultInstance;
@@ -35,28 +36,6 @@ public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
         else
             return true;
     }
-    //public override void Awake()
-    //{
-    //    base.Awake();
-
-    //    auth = FirebaseAuth.DefaultInstance;
-    //    GPGS.Instance.Init();
-    //}
-
-    //private void Start()
-    //{
-    //    GPGS.Instance.LoginPlayGames(success => 
-    //    {
-    //        if (success)
-    //        {
-    //            SignInFirebaseWithPlayGames();
-    //        }
-    //        else    // 게스트(익명)로그인
-    //        {
-    //            SigninFirebaseWithAnonymous();
-    //        }
-    //    });
-    //}
 
     public void SigninFirebaseWithAnonymous(Action action = null)
     {
@@ -113,7 +92,28 @@ public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
         Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
         auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
         {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SignInWithCredentialAsync was canceled.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
+                return;
+            }
             
+            action?.Invoke();
+        });
+    }
+    /*
+        public void SignInFirebaseWithGoogleAccount(Action action = null)
+    {
+        string idToken = ((PlayGamesLocalUser)PlayGamesPlatform.Instance.localUser).GetIdToken();
+
+        Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
+        auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
+        {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInWithCredentialAsync was canceled.");
@@ -130,6 +130,7 @@ public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
             Debug.LogFormat("User signed in successfully: {0} ({1})", user.DisplayName, user.UserId);
         });
     }
+     */
 
     // 익명계정을 플레이게임즈계정으로 연동시키기
     public void LinkAnonymous2PlayGamesAccount()

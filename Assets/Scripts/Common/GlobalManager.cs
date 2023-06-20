@@ -9,18 +9,19 @@ public class GlobalManager : SingletonObject<GlobalManager>
     //이후 사운드 매니저 사용하고 싶으면 GlobalManager.instance.SoundManager.PlayBgmSound();
     public SoundManager SoundManager { get; set; } = null;
     public SceneLoadManager SceneLoadManager { get; set; } = null;
+    public DBManager DBManager { get; set; } = null;
 
     public override void Awake()
     {
         base.Awake();
-    }
+    }   
     public void Init()
     {
         StartCoroutine(nameof(InitManager));
     }
     private IEnumerator InitManager()
     {
-        if(Initialized)
+        if (Initialized)
         {
             Debug.Log($"글로벌 매니저 이미 존재함.");
             yield break;
@@ -30,17 +31,20 @@ public class GlobalManager : SingletonObject<GlobalManager>
             //클래스 초기화
             SoundManager = SoundManager.CreateManager(transform);
             SceneLoadManager = SceneLoadManager.CreateManager(transform);
+            DBManager = DBManager.CreateManager(transform);
         }
         
         yield return new WaitUntil(() =>
         {
             return true
             && SoundManager.Ininialized
-            && SceneLoadManager.Ininialized;
+            && SceneLoadManager.Ininialized
+            && DBManager.Ininialized;
         });
 
         SoundManager.InitializedFininsh();
         SceneLoadManager.InitializedFininsh();
+        DBManager.InitializedFininsh();
 
         Initialized = true;
     }

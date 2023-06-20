@@ -1,13 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+
 public class MainScene : MonoBehaviour
 {
-    [Header("Create Player")]  
-    [SerializeField] private Transform playerSpawnPoint;
+    private static MainScene instance;
+    public static MainScene Instance
+    {
+        get
+        {
+            if (instance == null)
+                return null;
+
+            return instance;
+        }
+    }
+
+    [Header("Create Player")]
     private GameObject playerCharacter;
+
+    [SerializeField] private Transform playerSpawnPoint;
 
     [Header("Change Map Sprite")]   
     [SerializeField] private SpriteRenderer map1;
@@ -44,6 +59,11 @@ public class MainScene : MonoBehaviour
         }
     }
     public static bool IsPlayer { get; private set; } = false;
+
+
+    [SerializeField] private GameObject mainUiPanel;
+    private TMP_Text goldText;
+    private TMP_Text gemText;
     private IEnumerator Start()
     {
         GlobalManager.Instance.Init();
@@ -54,12 +74,16 @@ public class MainScene : MonoBehaviour
         );
 
         spawner = FindChildComponent<MonsterSpawner>(transform);
+
     }
 
     private void Init()
     {
-        Debug.Log("메인 씬시작");
+        if (instance == null)
+            instance = this;
 
+        Debug.Log("메인 씬시작");
+        
         playerCharacter = Resources.Load<GameObject>("Player/ch001");   //플레이어 캐릭터 세팅
         var _playerCharacter = Instantiate(playerCharacter, transform);
         _playerCharacter.transform.position = playerSpawnPoint.position;
@@ -68,8 +92,10 @@ public class MainScene : MonoBehaviour
         IsPlayer = true;
 
         mapSprite = Resources.Load<Sprite>("Sprite/Map001"); //맵 세팅
-        map1.sprite = mapSprite;
-        map2.sprite = mapSprite;
+
+
+        goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
+        gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
     }
 
     private void EnterBossStage()
@@ -153,4 +179,25 @@ public class MainScene : MonoBehaviour
 
         return foundComponent;
     }
+
+    public void GetGoods(int getGold = 0, int getGem = 0)
+    {
+        if (getGold > 0)
+        {
+            double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData("Gold");
+
+            goldText.text = $"{(currentGold + getGold)}";
+            GlobalManager.Instance.DBManager.UpdateUserData("Gold", currentGold + getGold);
+        }
+
+        if (getGem > 0)
+        {
+            double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData("Gem");
+            gemText.text = $"{(currentGem + getGem)}";
+            GlobalManager.Instance.DBManager.UpdateUserData("Gem", currentGem + getGem);
+        }
+    }
+
+
+
 }

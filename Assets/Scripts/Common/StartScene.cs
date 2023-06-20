@@ -35,7 +35,8 @@ public class StartScene : MonoBehaviour
     }
 
     private IEnumerator Start()
-    {       
+    {
+        Debug.Log("start@@");
         GlobalManager.Instance.Init();
 
         yield return CommonIEnumerator.IEWaitUntil(
@@ -65,15 +66,15 @@ public class StartScene : MonoBehaviour
     {
         Destroy(logoPanel);
 
-        Instantiate(startPanel, loadingCanvas.transform);
+        startPanel = Instantiate(startPanel, loadingCanvas.transform);
     }
 
 
     #region 테스트용
     // 테스트
-    public string log1;
-    public string log2;
-    public string log3;
+    string log1;
+    string log2;
+    string log3;
     public void logtest(string str1 = "", string str2 = "", string str3 = "")
     {
         if (!string.IsNullOrEmpty(str1))
@@ -91,6 +92,7 @@ public class StartScene : MonoBehaviour
         {
             log1 = "";
             log2 = "";
+            startPanel.GetComponent<CanvasGroup>().alpha = 1f;
         }
         //if (GUILayout.Button("플레이스토어 로그인"))
         //{
@@ -111,31 +113,32 @@ public class StartScene : MonoBehaviour
 
         if (GUILayout.Button("로그인 Check"))
         {
-            
-            
+            startPanel.GetComponent<CanvasGroup>().alpha = 0.3f;
+
+
             if (FirebaseAuthManager.Instance.isCurrentUserLoggedin())
             {
-                log1 = $"파이어베이스 연동 OK, uid : {FirebaseAuth.DefaultInstance.CurrentUser.UserId}";
+                log1 = $"파이어베이스 등록 OK, uid : {FirebaseAuth.DefaultInstance.CurrentUser.UserId}";
             }
             else
             {
-                log1 = "파이어베이스 연동 NO";
+                log1 = "파이어베이스 등록 NO";
             }
 
             ILocalUser storeUser = Social.localUser;
 
-            if (storeUser.authenticated == true)
-            {
-                log2 = $"플레이스토어 로그인 됨, name : {storeUser.userName}, 로그인상태 : {storeUser.authenticated}";
-            }
-            else
-            {
-                log2 = "플레이스토어 로그인 안됨";
-            }
+            //if (storeUser.authenticated == true)
+            //{
+            //    log2 = $"플레이스토어 name : {storeUser.userName}, 로그인상태 : {storeUser.authenticated}";
+            //}
+            //else
+            //{
+            //    log2 = "플레이스토어 로그인 안됨";
+            //}
             ILocalUser googleUser = PlayGamesPlatform.Instance.localUser;
             if (googleUser.authenticated == true)
             {
-                log3 = $"구글 로그인 됨, name : {googleUser.userName}, 로그인상태 : {googleUser.authenticated}";
+                log3 = $"구글 name : {googleUser.userName}, 로그인상태 : {googleUser.authenticated}";
             }
             else
             {
