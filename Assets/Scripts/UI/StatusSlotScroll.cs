@@ -75,6 +75,7 @@ public class StatusSlotScroll : MonoBehaviour
                 if (button != null)
                 {
                     button.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].cost) + " G";
+                    //button.transform.GetComponentInChildren<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].cost) + " G";
 
                     button.GetComponent<Button>().onClick.AddListener(slots[i].buttonClick);
                 }
