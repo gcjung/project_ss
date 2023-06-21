@@ -56,7 +56,7 @@ public class StatusSlotScroll : MonoBehaviour
                 var levelText = slot.transform.Find("StatusLevel_Text").gameObject;
                 if (levelText != null)
                 {
-                    levelText.GetComponent<TextMeshProUGUI>().text = "LV" + slots[i].statusLevel.ToString();
+                    levelText.GetComponent<TextMeshProUGUI>().text = $"LV {slots[i].statusLevel}";
                 }
                     
                 var nameText = slot.transform.Find("StatusName_Text").gameObject;
@@ -74,10 +74,14 @@ public class StatusSlotScroll : MonoBehaviour
                 var button = slot.transform.Find("LevelUp_Button").gameObject;
                 if (button != null)
                 {
-                    button.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].cost) + " G";
-                    //button.transform.GetComponentInChildren<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].cost) + " G";
+                    button.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = $"{Utill.BigNumCalculate(slots[i].cost)}  G";
 
-                    button.GetComponent<Button>().onClick.AddListener(slots[i].buttonClick);
+                    var buttonClick = button.GetComponent<Button>();
+                    if (buttonClick != null)
+                    {
+                        buttonClick.onClick.RemoveAllListeners();
+                        buttonClick.onClick.AddListener(slots[i].buttonClick);
+                    }                   
                 }
             }
         }
