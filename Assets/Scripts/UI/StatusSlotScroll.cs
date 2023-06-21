@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 public class StatusSlotScroll : MonoBehaviour
 {
     [Header("Create Slots")]
@@ -18,8 +20,8 @@ public class StatusSlotScroll : MonoBehaviour
         public string statusName;
         public double statusValue;
         public double cost;
-        public event Action buttonClick;
-        public StatusSlot(int statusLevel, string statusName, double statusValue, double cost, Action buttonClick)
+        public UnityAction buttonClick;
+        public StatusSlot(int statusLevel, string statusName, double statusValue, double cost, UnityAction buttonClick)
         {// statusLevel만 데이터테이블에 저장된 값으로 받아와서 계산해주면 됨
             this.statusLevel = statusLevel;
             this.statusName = statusName;
@@ -51,19 +53,31 @@ public class StatusSlotScroll : MonoBehaviour
             {
                 var slot = Instantiate(statusSlot, content);
 
-                var levelText = slot.transform.Find("StatusLevel_Text");
-                levelText.gameObject.GetComponent<TextMeshProUGUI>().text = "LV" + slots[i].statusLevel.ToString();
+                var levelText = slot.transform.Find("StatusLevel_Text").gameObject;
+                if (levelText != null)
+                {
+                    levelText.GetComponent<TextMeshProUGUI>().text = "LV" + slots[i].statusLevel.ToString();
+                }
+                    
+                var nameText = slot.transform.Find("StatusName_Text").gameObject;
+                if (nameText != null)
+                {
+                    nameText.GetComponent<TextMeshProUGUI>().text = slots[i].statusName;
+                }
+                    
+                var valueText = slot.transform.Find("StatusValue_Text").gameObject;
+                if (valueText != null)
+                {
+                    valueText.GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].statusValue);
+                }
+                
+                var button = slot.transform.Find("LevelUp_Button").gameObject;
+                if (button != null)
+                {
+                    button.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].cost) + " G";
 
-                var nameText = slot.transform.Find("StatusName_Text");
-                nameText.gameObject.GetComponent<TextMeshProUGUI>().text = slots[i].statusName;
-
-                var valueText = slot.transform.Find("StatusValue_Text");
-                valueText.gameObject.GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].statusValue);
-
-                var button = slot.transform.Find("LevelUp_Button");
-                button.gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].cost) + " G";
-
-                //button.gameObject.GetComponent<Button>().onClick.AddListener();
+                    button.GetComponent<Button>().onClick.AddListener(slots[i].buttonClick);
+                }
             }
         }
         else
