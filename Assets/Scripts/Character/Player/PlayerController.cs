@@ -119,12 +119,12 @@ public class PlayerController : MonoBehaviour
     {
         target = enemyList[0].transform;
 
-        Vector2 direction = (target.position - transform.position).normalized;
+        Vector3 direction = (target.position - transform.position).normalized;
 
         Bullet bullet = bulletPool.GetObjectPool();
         bullet.transform.localScale = projectilePrefab.transform.localScale;
-        bullet.CashingDamage(player.Attack);
-        bullet.Rigid.velocity = direction * projectileSpeed;      
+        bullet.CashingInfo(player.Attack, direction, projectileSpeed);
+        //bullet.Rigid.velocity = direction * projectileSpeed;      
     }
 
     public void SetCurrentPlayerState(PlayerState state)

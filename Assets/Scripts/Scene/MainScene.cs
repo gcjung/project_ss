@@ -102,6 +102,7 @@ public class MainScene : MonoBehaviour
     {
         if (isStageClear)
         {
+            Debug.Log("보스방 입장");
             IsStageClear = false;
 
             fadeImage = Instantiate(fadeImage, upSidePanel.transform);
