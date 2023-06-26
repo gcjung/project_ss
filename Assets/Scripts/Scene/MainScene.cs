@@ -70,11 +70,14 @@ public class MainScene : MonoBehaviour
 
         yield return CommonIEnumerator.IEWaitUntil(
            predicate: () => { return GlobalManager.Instance.Initialized; },
-           onFinish: () => { Init(); }
+           onFinish: () => 
+           { 
+               Init();
+               InitUIfromDB();
+           }
         );
 
         spawner = FindChildComponent<MonsterSpawner>(transform);
-
     }
 
     private void Init()
@@ -93,9 +96,15 @@ public class MainScene : MonoBehaviour
 
         mapSprite = Resources.Load<Sprite>("Sprite/Map001"); //¸Ê ¼¼ÆÃ
 
-
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
+    }
+
+    private void InitUIfromDB()
+    {
+        Debug.Log("InitUIfromDB");
+        goldText.text = GlobalManager.Instance.DBManager.GetUserDoubleData("Gold").ToString();
+        gemText.text = GlobalManager.Instance.DBManager.GetUserDoubleData("Gem").ToString();
     }
 
     private void EnterBossStage()
@@ -194,6 +203,7 @@ public class MainScene : MonoBehaviour
         if (getGem > 0)
         {
             double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData("Gem");
+            
             gemText.text = $"{(currentGem + getGem)}";
             GlobalManager.Instance.DBManager.UpdateUserData("Gem", currentGem + getGem);
         }

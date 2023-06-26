@@ -9,8 +9,8 @@ using UnityEngine;
 [FirestoreData]
 public class UserDatas
 {
-    [FirestoreProperty] public double Gold { get; set; }
-    [FirestoreProperty] public double Gem { get; set; }
+    //[FirestoreProperty] public double Gold { get; set; }
+    //[FirestoreProperty] public double Gem { get; set; }
 
 }
 
@@ -29,7 +29,6 @@ public class DBManager : Manager<DBManager>
     {
         firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
         uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
-        
         dataTable = new UserDatas();
 
         LoadFirebaseData();
@@ -43,37 +42,40 @@ public class DBManager : Manager<DBManager>
             Debug.Log(String.Format("Document data for {0} document:", snapshot.Id));
 
             Dictionary<string, object> data = snapshot.ToDictionary();
-            foreach (var dic in doubleDataDic)
-            {
-                Debug.Log($"{dic.Key} : {dic.Value}");
-            }
+            //foreach (var dic in data)
+            //{
+            //    Debug.Log($"{dic.Key} : {dic.Value}");
+            //}
 
             foreach (KeyValuePair<string, object> pair in data)
             {
-                if (pair.Value is Int64)
+                
+                if (pair.Value is Double)
                 {
                     doubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
-                    Debug.Log($"### int : {pair.Key}, {pair.Value}");
+                    Debug.Log($"Double : {pair.Key}, {pair.Value}");
+
                 }
                 else if (pair.Value is string)
                 {
                     stringDataDic.Add(pair.Key, (string)pair.Value);
-                    //Debug.Log($"@@@string : {pair.Key}, {pair.Value}");
+                    //Debug.Log($"string : {pair.Key}, {pair.Value}");
                 }
                 else
                 {
                     //Debug.Log($"else : {pair.Key}, {pair.Value}");
                 }
-
             }
         }
         else            // 최초 접속시
         {
-            //await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
-            //{   // 
-            //    Debug.Log($"처음 접속 시, UserDB 초기화");
-            //});
+            await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
+            {   
+                Debug.Log($"처음 접속 시, UserDB 초기화");
+            });
         }
+
+        Ininialized = true;
     }
 
     public double GetUserDoubleData(string key)
@@ -184,12 +186,7 @@ public class DBManager : Manager<DBManager>
     }
     public override void Init()
     {
-        if (Ininialized)
-        {
-            return;
-        }
 
-        Ininialized = true;
     }
 
 }
