@@ -194,18 +194,18 @@ public class MainScene : MonoBehaviour
     {
         if (getGold > 0)
         {
-            double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData("Gold");
+            double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold.ToString());
 
             goldText.text = $"{(currentGold + getGold)}";
-            GlobalManager.Instance.DBManager.UpdateUserData("Gold", currentGold + getGold);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold + getGold);
         }
 
         if (getGem > 0)
         {
-            double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData("Gem");
+            double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem.ToString());
             
             gemText.text = $"{(currentGem + getGem)}";
-            GlobalManager.Instance.DBManager.UpdateUserData("Gem", currentGem + getGem);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem + getGem);
         }
     }
 

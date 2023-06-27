@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Firebase.Firestore;
+
 public class StatusSlotScroll : MonoBehaviour
 {
     [Header("Create Slots")]

@@ -14,11 +14,16 @@ public class UserDatas
 
 }
 
+public enum UserDoubleDataType
+{
+    Gold,
+    Gem,
+}
 
 public class DBManager : Manager<DBManager>
 {
-    Dictionary<string, double> doubleDataDic = new Dictionary<string, double>();
-    Dictionary<string, string> stringDataDic = new Dictionary<string, string>();
+    Dictionary<string, double> userDoubleDataDic = new Dictionary<string, double>();
+    Dictionary<string, string> usesrStringDataDic = new Dictionary<string, string>();
     
     CollectionReference firebaseUserDB;
     DocumentReference uidRef;
@@ -31,10 +36,12 @@ public class DBManager : Manager<DBManager>
         uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
         dataTable = new UserDatas();
 
-        LoadFirebaseData();
+        LoadUserDBFromFirebase();
+
+        //Debug.Log($"테스트 : {UserDoubleDataType.Gold}");
     }
 
-    async void LoadFirebaseData()
+    async void LoadUserDBFromFirebase()
     {
         DocumentSnapshot snapshot = await uidRef.GetSnapshotAsync();
         if (snapshot.Exists)
@@ -52,13 +59,13 @@ public class DBManager : Manager<DBManager>
                 
                 if (pair.Value is Double)
                 {
-                    doubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
+                    userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
                     Debug.Log($"Double : {pair.Key}, {pair.Value}");
 
                 }
                 else if (pair.Value is string)
                 {
-                    stringDataDic.Add(pair.Key, (string)pair.Value);
+                    usesrStringDataDic.Add(pair.Key, (string)pair.Value);
                     //Debug.Log($"string : {pair.Key}, {pair.Value}");
                 }
                 else
@@ -80,33 +87,33 @@ public class DBManager : Manager<DBManager>
 
     public double GetUserDoubleData(string key)
     {
-        if (doubleDataDic.ContainsKey(key))
-            return doubleDataDic[key];
+        if (userDoubleDataDic.ContainsKey(key))
+            return userDoubleDataDic[key];
 
         return default;
     }
     public string GetUserStringData(string key)
     {
-        if (stringDataDic.ContainsKey(key))
-            return stringDataDic[key];
+        if (usesrStringDataDic.ContainsKey(key))
+            return usesrStringDataDic[key];
 
         return default;
     }
     public void UpdateUserData(string key, double value)
     {
-        if (doubleDataDic.ContainsKey(key))
-            doubleDataDic[key] = value;
+        if (userDoubleDataDic.ContainsKey(key))
+            userDoubleDataDic[key] = value;
         else
-            doubleDataDic.Add(key, value);
+            userDoubleDataDic.Add(key, value);
 
         UpdateFirebaseUserData(key, value);
     }
     public void UpdateUserData(string key, string value)
     {
-        if (stringDataDic.ContainsKey(key))
-            stringDataDic[key] = value;
+        if (usesrStringDataDic.ContainsKey(key))
+            usesrStringDataDic[key] = value;
         else
-            stringDataDic.Add(key, value);
+            usesrStringDataDic.Add(key, value);
 
         UpdateFirebaseUserData(key, value);
     }
@@ -119,16 +126,16 @@ public class DBManager : Manager<DBManager>
     {
         if (typeof(T) == typeof(double))
         {
-            if (doubleDataDic.ContainsKey(key))
+            if (userDoubleDataDic.ContainsKey(key))
             {
-                return (T)Convert.ChangeType(doubleDataDic[key], typeof(T));
+                return (T)Convert.ChangeType(userDoubleDataDic[key], typeof(T));
             }
         }
         else
         {
-            if (stringDataDic.ContainsKey(key))
+            if (usesrStringDataDic.ContainsKey(key))
             {
-                return (T)Convert.ChangeType(doubleDataDic[key], typeof(T));
+                return (T)Convert.ChangeType(userDoubleDataDic[key], typeof(T));
             }
         }
         Debug.Log($"{key} default 반환");
@@ -139,16 +146,16 @@ public class DBManager : Manager<DBManager>
         
         if (typeof(T) == typeof(double))
         {
-            if (doubleDataDic.ContainsKey(key))
-                doubleDataDic[key] = (double)Convert.ChangeType(value, typeof(double));
+            if (userDoubleDataDic.ContainsKey(key))
+                userDoubleDataDic[key] = (double)Convert.ChangeType(value, typeof(double));
             else
                 return;
                 //intDataDic.Add(key, (int)Convert.ChangeType(value, typeof(int)));
         }
         else
         {
-            if (stringDataDic.ContainsKey(key))
-                stringDataDic[key] = (string)Convert.ChangeType(value, typeof(string));
+            if (usesrStringDataDic.ContainsKey(key))
+                usesrStringDataDic[key] = (string)Convert.ChangeType(value, typeof(string));
             else
                 return;
                 //stringDataDic.Add(key, (string)Convert.ChangeType(value, typeof(string)));
@@ -188,6 +195,9 @@ public class DBManager : Manager<DBManager>
     {
 
     }
+
+
+    
 
 }
 
