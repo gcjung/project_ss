@@ -77,33 +77,31 @@ public class MonsterSpawner : MonoBehaviour
     }
     public void OnSliderValueChanged(float value)
     {
-        float errorRange = 0.001f;
-
-        if (Mathf.Abs(value - 0.2f) <= errorRange && WaveCount == 0)
+        if (Mathf.Approximately(value, 0.2f) && WaveCount == 0)
         {
             Debug.Log("웨이브1 실행");
             WaveCount++;    // 1
             StartCoroutine(SpawnMonster());
         }
-        else if (Mathf.Abs(value - 0.4f) <= errorRange && WaveCount == 1)
+        else if (Mathf.Approximately(value, 0.4f) && WaveCount == 1)
         {
             Debug.Log("웨이브2 실행");
             WaveCount++;    // 2
             StartCoroutine(SpawnMonster());
         }
-        else if (Mathf.Abs(value - 0.6f) <= errorRange && WaveCount == 2)
+        else if (Mathf.Approximately(value, 0.6f) && WaveCount == 2)
         {
             Debug.Log("웨이브3 실행");
             WaveCount++;    // 3
             StartCoroutine(SpawnMonster());
         }
-        else if (Mathf.Abs(value - 0.8f) <= errorRange && WaveCount == 3)
+        else if (Mathf.Approximately(value, 0.8f) && WaveCount == 3)
         {
             Debug.Log("웨이브4 실행");
             WaveCount++;    // 4
             StartCoroutine(SpawnMonster());
         }
-        else if (Mathf.Abs(value - 1.0f) <= errorRange && WaveCount == 4)
+        else if (Mathf.Approximately(value, 1.0f) && WaveCount == 4)
         {
             Debug.Log("웨이브5 실행");
             WaveCount++;    // 5

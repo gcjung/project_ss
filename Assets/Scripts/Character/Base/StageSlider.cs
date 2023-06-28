@@ -26,7 +26,7 @@ public class StageSlider : MonoBehaviour
     }
     private void OnDisable()
     {
-        if(waveCoroutine!=null)
+        if (waveCoroutine != null)
             StopCoroutine(waveCoroutine);
 
         waveCoroutine = null;
@@ -40,10 +40,10 @@ public class StageSlider : MonoBehaviour
 
     public IEnumerator FilledSlider()
     {
-        float duration = 10.0f;
+        float duration = 2.0f;
         float elapsed = 0.0f;
         float startValue = slider.value;
-        float endValue = 1.0f;
+        float endValue = 0.2f;
 
         while (elapsed < duration)
         {
@@ -53,6 +53,16 @@ public class StageSlider : MonoBehaviour
                 float t = elapsed / duration;
                 float value = Mathf.Lerp(startValue, endValue, t);
                 slider.value = value;
+
+                if (Mathf.Approximately(value, endValue))
+                {
+                    startValue = endValue;
+                    endValue += 0.2f;
+                    elapsed = 0.0f;
+
+                    if (Mathf.Approximately(value, 1.0f))
+                        break;
+                }
             }
             yield return null;
         }
