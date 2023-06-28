@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 public class MonsterSpawner : MonoBehaviour
 {
-    [SerializeField]
-    private Slider slider;
+    [Header("Stage Slider")]
+    [SerializeField] private Slider slider;
 
     private MainScene mainScene;
 
