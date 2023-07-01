@@ -5,8 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using Firebase.Firestore;
+using static GameDataManager;
+using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 public class StatusSlotScroll : MonoBehaviour
 {
@@ -32,19 +33,42 @@ public class StatusSlotScroll : MonoBehaviour
             this.buttonClick += buttonClick;
         }
     }
-    private void Start()
+    private IEnumerator Start()
     {
-        StatusSlot slot1 = new StatusSlot(1, "°ø°Ý·Â", 523, 1, () => Debug.Log("½½¸©1"));
-        StatusSlot slot2 = new StatusSlot(1, "Ã¼·Â", 5233, 1, () => Debug.Log("½½¸©2"));
-        StatusSlot slot3 = new StatusSlot(1, "°ø°Ý¼Óµµ", 52333, 1, () => Debug.Log("½½¸©3"));
-        StatusSlot slot4 = new StatusSlot(1, "Ä¡¸íÅ¸ È®·ü", 5233333, 1, () => Debug.Log("½½¸©4"));
+        yield return CommonIEnumerator.IEWaitUntil(
+           predicate: () => { return GlobalManager.Instance.Initialized; },
+           onFinish: () =>
+           {
+               Init();
+               CreateSlots();
+           });
+    }
 
-        slots.Add(slot1);
-        slots.Add(slot2);
-        slots.Add(slot3);
-        slots.Add(slot4);
+    void Init()
+    {
+        foreach (var data in StatusTemplate.OrderBy(x => x.Value[(int)StatusTemplate_.Order])) 
+        {
+            string statLevelStr = data.Key + "Level";
 
-        CreateSlots();
+            int index = int.Parse(data.Value[(int)StatusTemplate_.Order]) - 1;
+            int statLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(statLevelStr, 1);
+            string typeName = data.Value[(int)StatusTemplate_.TypeName];
+            double statusValue = statLevel * double.Parse(data.Value[(int)StatusTemplate_.Value_Calc]);
+            double costValue = statLevel * double.Parse(data.Value[(int)StatusTemplate_.Cost_Calc]);
+
+            StatusSlot slot = new StatusSlot(statLevel, typeName, statusValue, costValue, () => UpgradeStatus(statLevelStr, index));
+            slots.Add(slot);
+        }
+        
+
+    }
+
+    void UpgradeStatus(string stat, int index)
+    {
+        int level = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(stat, 1);
+
+        //slots[index]
+        GlobalManager.Instance.DBManager.UpdateUserData(stat, level + 1);
     }
 
     private void CreateSlots()
@@ -54,7 +78,7 @@ public class StatusSlotScroll : MonoBehaviour
             for (int i = 0; i < slots.Count; i++)
             {
                 var slot = Instantiate(statusSlot, content);
-
+                
                 var levelText = slot.transform.Find("StatusLevel_Text").gameObject;
                 if (levelText != null)
                 {

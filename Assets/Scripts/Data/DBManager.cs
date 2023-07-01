@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [FirestoreData]
@@ -18,6 +19,10 @@ public enum UserDoubleDataType
 {
     Gold,
     Gem,
+    AttackLevel,
+    AttackSpeedLevel,
+    CriticalLevel,
+    HpLevel,
 }
 
 public class DBManager : Manager<DBManager>
@@ -26,6 +31,7 @@ public class DBManager : Manager<DBManager>
     Dictionary<string, string> usesrStringDataDic = new Dictionary<string, string>();
     
     CollectionReference firebaseUserDB;
+    CollectionReference firebaseGameData;
     DocumentReference uidRef;
     UserDatas dataTable;
     
@@ -33,12 +39,12 @@ public class DBManager : Manager<DBManager>
     public void Awake()
     {
         firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
+        firebaseGameData = FirebaseFirestore.DefaultInstance.Collection("DataTable");
         uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
         dataTable = new UserDatas();
 
         LoadUserDBFromFirebase();
-
-        //Debug.Log($"테스트 : {UserDoubleDataType.Gold}");
+        LoadGameDataFromFirebase();
     }
 
     async void LoadUserDBFromFirebase()
@@ -84,11 +90,80 @@ public class DBManager : Manager<DBManager>
 
         Ininialized = true;
     }
+    async void LoadGameDataFromFirebase()
+    {
+        Query allCitiesQuery = firebaseGameData;
+        await firebaseGameData.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        {
+            QuerySnapshot GameDataQuerySnapshot = task.Result;
+            foreach (DocumentSnapshot documentSnapshot in GameDataQuerySnapshot.Documents)
+            {
+                Debug.Log($"Document data for document : {documentSnapshot.Id} ");
+                Dictionary<string, object> data = documentSnapshot.ToDictionary();
 
-    public double GetUserDoubleData(string key)
+                switch(documentSnapshot.Id)
+                {
+                    case "Monster":
+                        {
+                            foreach (KeyValuePair<string, object> pair in data)
+                            {
+                                Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
+                                GameDataManager.MonsterTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
+                            }
+                            break;
+                        }
+                    case "Status":
+                        {
+                            foreach (KeyValuePair<string, object> pair in data)
+                            {
+                                Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
+                                GameDataManager.StatusTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
+                            }
+                        }
+                        break;
+
+                    default: 
+                        break;
+                }
+
+                //else if (documentSnapshot.Id == "Status")
+                //{
+                //    foreach (KeyValuePair<string, object> pair in data)
+                //    {
+                //        Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
+                //        GameDataManager.StatusTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
+                //    }
+                //}
+
+
+                // Newline to separate entries
+                //Debug.Log("");
+            }
+        });
+
+    }
+
+
+    public double GetUserDoubleData(UserDoubleDataType key_, double defaultValue = 0)
+    {
+        string key = key_.ToString();
+        if (userDoubleDataDic.ContainsKey(key.ToString()))
+            return userDoubleDataDic[key.ToString()];
+
+        return defaultValue;
+    }
+    public double GetUserDoubleData(string key, double defaultValue = 0)
     {
         if (userDoubleDataDic.ContainsKey(key))
             return userDoubleDataDic[key];
+
+        return defaultValue;
+    }
+    public string GetUserStringData(UserDoubleDataType key_)
+    {
+        string key = key_.ToString();
+        if (usesrStringDataDic.ContainsKey(key))
+            return usesrStringDataDic[key];
 
         return default;
     }
@@ -99,12 +174,32 @@ public class DBManager : Manager<DBManager>
 
         return default;
     }
+    public void UpdateUserData(UserDoubleDataType key_, double value)
+    {
+        string key = key_.ToString();
+        if (userDoubleDataDic.ContainsKey(key))
+            userDoubleDataDic[key] = value;
+        else
+            userDoubleDataDic.Add(key, value);
+
+        UpdateFirebaseUserData(key, value);
+    }
     public void UpdateUserData(string key, double value)
     {
         if (userDoubleDataDic.ContainsKey(key))
             userDoubleDataDic[key] = value;
         else
             userDoubleDataDic.Add(key, value);
+
+        UpdateFirebaseUserData(key, value);
+    }
+    public void UpdateUserData(UserDoubleDataType key_, string value)
+    {
+        string key = key_.ToString();
+        if (usesrStringDataDic.ContainsKey(key))
+            usesrStringDataDic[key] = value;
+        else
+            usesrStringDataDic.Add(key, value);
 
         UpdateFirebaseUserData(key, value);
     }
@@ -122,47 +217,47 @@ public class DBManager : Manager<DBManager>
 
 
     #region 제네릭 버전
-    public T GetUserData<T>(string key)
-    {
-        if (typeof(T) == typeof(double))
-        {
-            if (userDoubleDataDic.ContainsKey(key))
-            {
-                return (T)Convert.ChangeType(userDoubleDataDic[key], typeof(T));
-            }
-        }
-        else
-        {
-            if (usesrStringDataDic.ContainsKey(key))
-            {
-                return (T)Convert.ChangeType(userDoubleDataDic[key], typeof(T));
-            }
-        }
-        Debug.Log($"{key} default 반환");
-        return default(T);
-    }
-    public void UpdateUserData<T>(string key, T value)
-    {
+    //public T GetUserData<T>(string key)
+    //{
+    //    if (typeof(T) == typeof(double))
+    //    {
+    //        if (userDoubleDataDic.ContainsKey(key))
+    //        {
+    //            return (T)Convert.ChangeType(userDoubleDataDic[key], typeof(T));
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if (usesrStringDataDic.ContainsKey(key))
+    //        {
+    //            return (T)Convert.ChangeType(userDoubleDataDic[key], typeof(T));
+    //        }
+    //    }
+    //    Debug.Log($"{key} default 반환");
+    //    return default(T);
+    //}
+    //public void UpdateUserData<T>(string key, T value)
+    //{
         
-        if (typeof(T) == typeof(double))
-        {
-            if (userDoubleDataDic.ContainsKey(key))
-                userDoubleDataDic[key] = (double)Convert.ChangeType(value, typeof(double));
-            else
-                return;
-                //intDataDic.Add(key, (int)Convert.ChangeType(value, typeof(int)));
-        }
-        else
-        {
-            if (usesrStringDataDic.ContainsKey(key))
-                usesrStringDataDic[key] = (string)Convert.ChangeType(value, typeof(string));
-            else
-                return;
-                //stringDataDic.Add(key, (string)Convert.ChangeType(value, typeof(string)));
-        }
+    //    if (typeof(T) == typeof(double))
+    //    {
+    //        if (userDoubleDataDic.ContainsKey(key))
+    //            userDoubleDataDic[key] = (double)Convert.ChangeType(value, typeof(double));
+    //        else
+    //            return;
+    //            //intDataDic.Add(key, (int)Convert.ChangeType(value, typeof(int)));
+    //    }
+    //    else
+    //    {
+    //        if (usesrStringDataDic.ContainsKey(key))
+    //            usesrStringDataDic[key] = (string)Convert.ChangeType(value, typeof(string));
+    //        else
+    //            return;
+    //            //stringDataDic.Add(key, (string)Convert.ChangeType(value, typeof(string)));
+    //    }
 
-        UpdateFirebaseUserData(key, value);
-    }
+    //    UpdateFirebaseUserData(key, value);
+    //}
     #endregion 제네릭버전
 
     public async Task<T> GetFirebaseUserData<T>(string key)

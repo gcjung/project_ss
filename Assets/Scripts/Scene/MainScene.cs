@@ -103,8 +103,8 @@ public class MainScene : MonoBehaviour
     private void InitUIfromDB()
     {
         Debug.Log("InitUIfromDB");
-        goldText.text = GlobalManager.Instance.DBManager.GetUserDoubleData("Gold").ToString();
-        gemText.text = GlobalManager.Instance.DBManager.GetUserDoubleData("Gem").ToString();
+        goldText.text = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold).ToString();
+        gemText.text = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem).ToString();
     }
 
     private void EnterBossStage()
@@ -194,7 +194,7 @@ public class MainScene : MonoBehaviour
     {
         if (getGold > 0)
         {
-            double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold.ToString());
+            double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
             goldText.text = $"{(currentGold + getGold)}";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold + getGold);
@@ -202,7 +202,7 @@ public class MainScene : MonoBehaviour
 
         if (getGem > 0)
         {
-            double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem.ToString());
+            double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
             
             gemText.text = $"{(currentGem + getGem)}";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem + getGem);
