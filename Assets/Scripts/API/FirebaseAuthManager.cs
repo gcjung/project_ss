@@ -8,7 +8,7 @@ using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using UnityEngine.SocialPlatforms;
 
-public class FirebaseAuthManager // : SingletonObject<FirebaseAuthManager>
+public class FirebaseAuthManager
 {
     private static FirebaseAuthManager instance;
     public static FirebaseAuthManager Instance
