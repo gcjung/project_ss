@@ -372,7 +372,7 @@ GameObject:
   m_Layer: 0
   m_Name: EnemySpawner
   m_TagString: Untagged
-  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -2361,6 +2361,7 @@ GameObject:
   - component: {fileID: 922524955}
   - component: {fileID: 922524954}
   - component: {fileID: 922524953}
+  - component: {fileID: 922524956}
   m_Layer: 5
   m_Name: SKill_Panel
   m_TagString: Untagged
@@ -2459,6 +2460,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 922524951}
   m_CullTransparentMesh: 1
+--- !u!114 &922524956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922524951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e24d0bd88f6e64da3513c97699c091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  auto: {fileID: 0}
+  skill1: {fileID: 0}
+  skill2: {fileID: 0}
+  skill3: {fileID: 0}
+  skill4: {fileID: 0}
+  skill5: {fileID: 0}
+  skill6: {fileID: 0}
 --- !u!1 &939073719
 GameObject:
   m_ObjectHideFlags: 0
@@ -2471,7 +2491,7 @@ GameObject:
   m_Layer: 0
   m_Name: EnemySpawnPoint_3
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -2712,7 +2732,7 @@ GameObject:
   m_Layer: 0
   m_Name: EnemySpawnPoint_1
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -2743,7 +2763,7 @@ GameObject:
   m_Layer: 0
   m_Name: EnemySpawnPoint_2
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
