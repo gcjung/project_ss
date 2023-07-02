@@ -92,13 +92,12 @@ public class DBManager : Manager<DBManager>
     }
     async void LoadGameDataFromFirebase()
     {
-        Query allCitiesQuery = firebaseGameData;
         await firebaseGameData.GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             QuerySnapshot GameDataQuerySnapshot = task.Result;
             foreach (DocumentSnapshot documentSnapshot in GameDataQuerySnapshot.Documents)
             {
-                Debug.Log($"Document data for document : {documentSnapshot.Id} ");
+                //Debug.Log($"Document data for document : {documentSnapshot.Id} ");
                 Dictionary<string, object> data = documentSnapshot.ToDictionary();
 
                 switch(documentSnapshot.Id)
@@ -107,7 +106,7 @@ public class DBManager : Manager<DBManager>
                         {
                             foreach (KeyValuePair<string, object> pair in data)
                             {
-                                Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
+                                //Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
                                 GameDataManager.MonsterTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
                             }
                             break;
@@ -116,7 +115,7 @@ public class DBManager : Manager<DBManager>
                         {
                             foreach (KeyValuePair<string, object> pair in data)
                             {
-                                Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
+                                //Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
                                 GameDataManager.StatusTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
                             }
                         }

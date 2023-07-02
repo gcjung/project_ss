@@ -13,3 +13,8 @@ public enum MonsterState
     Attacking,
     Dead
 }
+
+public enum MonsterType
+{
+    Skeleton,
+}

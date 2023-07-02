@@ -17,8 +17,10 @@ public class GameDataManager
 
     public enum MonsterTemplate_
     {
-        None,
-
+        None = -1,
+        Hp,
+        Attack,
+        Gold,
 
         Max,
     }

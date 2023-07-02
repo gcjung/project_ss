@@ -23,12 +23,23 @@ public class MonsterSpawner : MonoBehaviour
 
     public static int WaveCount { get; private set; } = 0;
 
-    private void Start()
+    private IEnumerator Start()
     {
-        monster = Resources.Load<Monster>("Monster/ch008");     //일반몬스터 세팅        
+        yield return CommonIEnumerator.IEWaitUntil(
+           predicate: () => { return GlobalManager.Instance.Initialized; },
+           onFinish: () =>
+           {
+               Init();
+           });
+
+    }
+    void Init()
+    {
+        monster = Resources.Load<Monster>("Monster/Skeleton");     //일반몬스터 세팅        
         var _monster = Instantiate(monster, transform);
         _monster.gameObject.AddComponent<MonsterController>();
         _monster.gameObject.SetActive(false);
+        _monster.SetMonsterStat(MonsterType.Skeleton.ToString());
         monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
 
         bossMonster = Resources.Load<Monster>("Monster/ch009");     //보스몬스터 세팅

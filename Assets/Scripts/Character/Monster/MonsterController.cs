@@ -89,7 +89,7 @@ public class MonsterController : MonoBehaviour
     {
         if (PlayerController.CurrentPlayerState != PlayerState.Dead)
         {
-            target.TakeDamage(monster.Attack);
+            target.TakeDamage(monster.attack);
         }
         else
         {

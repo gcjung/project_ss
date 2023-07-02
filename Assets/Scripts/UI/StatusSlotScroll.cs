@@ -59,8 +59,6 @@ public class StatusSlotScroll : MonoBehaviour
             StatusSlot slot = new StatusSlot(statLevel, typeName, statusValue, costValue, () => UpgradeStatus(statLevelStr, index));
             slots.Add(slot);
         }
-        
-
     }
 
     void UpgradeStatus(string stat, int index)

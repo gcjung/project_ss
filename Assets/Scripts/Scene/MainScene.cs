@@ -190,7 +190,7 @@ public class MainScene : MonoBehaviour
         return foundComponent;
     }
 
-    public void GetGoods(int getGold = 0, int getGem = 0)
+    public void GetGoods(double getGold = 0, double getGem = 0)
     {
         if (getGold > 0)
         {

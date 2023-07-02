@@ -1,20 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GameDataManager;
 
 public class Monster : MonoBehaviour
 {
-    public double MaxHp { get; private set; } = 30;
-    public double CurrentHp { get; private set; } = 30;
-    public double Attack { get; private set; } = 1;
+    //public double MaxHp { get; private set; } = 100;
+    //public double CurrentHp { get; private set; } = 100;
+    //public double Attack { get; private set; } = 1;
+    public double maxHp;
+    public double currentHp;
+    public double attack;
+    public double gold;
 
     private MonsterController monsterController;
-
     private BoxCollider2D boxCollider;
 
     private void OnEnable()
     {
-        CurrentHp = MaxHp;
+        currentHp = maxHp;
 
         if (boxCollider != null)
         {
@@ -28,27 +32,31 @@ public class Monster : MonoBehaviour
     }
     private void Awake()
     {
-        CurrentHp = MaxHp;
-
+        boxCollider = GetComponent<BoxCollider2D>();
         if (TryGetComponent<MonsterController>(out var controller))
         {
             monsterController = controller;
         }
-
-        boxCollider = GetComponent<BoxCollider2D>();
     }
+    public void SetMonsterStat(string monsterName)
+    {
+        maxHp = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Hp]);
+        attack = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Attack]);
+        gold = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Gold]);
+
+        currentHp = maxHp;
+    }
+
 
     public void TakeDamage(double damageAmount)
     {
-        CurrentHp -= damageAmount;
-
-        if (CurrentHp <= 0)
+        currentHp -= damageAmount;
+        if (currentHp <= 0)
         {
             boxCollider.enabled = false;
 
             monsterController.SetCurrentMonsterState(MonsterState.Dead);
+            MainScene.Instance.GetGoods(gold);
         }
-
-        MainScene.Instance.GetGoods(100, 50);
     }
 }
