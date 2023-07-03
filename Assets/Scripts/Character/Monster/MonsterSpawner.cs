@@ -19,8 +19,8 @@ public class MonsterSpawner : MonoBehaviour
     [SerializeField] private Transform spawnPoint2;
     [SerializeField] private Transform spawnPoint3;
 
-    private bool IsSpawning { get; set; } = false;
-
+    public static bool IsSpawning { get; set; } = false;
+    public static int MonsterCount { get; private set; } = 0;
     public static int WaveCount { get; private set; } = 0;
 
     private IEnumerator Start()
@@ -57,11 +57,11 @@ public class MonsterSpawner : MonoBehaviour
     private IEnumerator SpawnMonster()
     {
         IsSpawning = true;
+        MonsterCount = 6;
 
-        int monsterCount = 0;
         float spawnTime = 1.5f;
 
-        while (monsterCount < 6)
+        while (MonsterCount != 0)
         {
             int randomIndex = Random.Range(1, 4);
             Transform spawnPoint = GetSpawnPoint(randomIndex);
@@ -71,9 +71,10 @@ public class MonsterSpawner : MonoBehaviour
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
-            yield return new WaitForSeconds(spawnTime);
+            MonsterCount--;
 
-            monsterCount++;
+            yield return new WaitForSeconds(spawnTime);
+           
         }
 
         IsSpawning = false;

@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.TryGetComponent<MonsterController>(out var enemy))
         {
-            if ((enemyList.Count - 1) == 0)
+            if ((enemyList.Count - 1) == 0 && MonsterSpawner.MonsterCount == 0)
             {
                 StartCoroutine(DelayChangeState(enemy));
             }
@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
                 {
                     playerAnimator.SetTrigger("Attack");
                 }
-                else
+                else if(!CanSeeTarget() && !MonsterSpawner.IsSpawning)
                 {
                     CurrentPlayerState = PlayerState.Moving;
                 }
@@ -117,14 +117,21 @@ public class PlayerController : MonoBehaviour
     
     public void ShootProjectile()
     {
-        target = enemyList[0].transform;
+        if (enemyList.Count > 0)
+        {
+            target = enemyList[0].transform;
 
-        Vector3 direction = (target.position - transform.position).normalized;
+            Vector3 direction = (target.position - transform.position).normalized;
 
-        Bullet bullet = bulletPool.GetObjectPool();
-        bullet.transform.localScale = projectilePrefab.transform.localScale;
-        bullet.CashingInfo(player.Attack, direction, projectileSpeed);
-        //bullet.Rigid.velocity = direction * projectileSpeed;      
+            Bullet bullet = bulletPool.GetObjectPool();
+            bullet.transform.localScale = projectilePrefab.transform.localScale;
+            bullet.CashingInfo(player.Attack, direction, projectileSpeed);
+            //bullet.Rigid.velocity = direction * projectileSpeed;      
+        }
+        else
+        {
+            Debug.LogError("적이 없음");
+        }
     }
 
     public void SetCurrentPlayerState(PlayerState state)
