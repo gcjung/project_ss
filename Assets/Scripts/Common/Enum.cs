@@ -13,3 +13,10 @@ public enum MonsterState
     Attacking,
     Dead
 }
+public enum ItemType
+{
+    Weapon,
+    Armor,
+    Ring,
+    Rune
+}

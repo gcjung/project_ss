@@ -9,6 +9,7 @@ public class GlobalManager : SingletonObject<GlobalManager>
     //이후 사운드 매니저 사용하고 싶으면 GlobalManager.instance.SoundManager.PlayBgmSound();
     public SoundManager SoundManager { get; set; } = null;
     public SceneLoadManager SceneLoadManager { get; set; } = null;
+    public ActiveManager ActiveManager { get; set; } = null;
 
     public override void Awake()
     {
@@ -30,17 +31,20 @@ public class GlobalManager : SingletonObject<GlobalManager>
             //클래스 초기화
             SoundManager = SoundManager.CreateManager(transform);
             SceneLoadManager = SceneLoadManager.CreateManager(transform);
+            ActiveManager = ActiveManager.CreateManager(transform);
         }
         
         yield return new WaitUntil(() =>
         {
             return true
             && SoundManager.Ininialized
-            && SceneLoadManager.Ininialized;
+            && SceneLoadManager.Ininialized
+            && ActiveManager.Ininialized;
         });
 
         SoundManager.InitializedFininsh();
         SceneLoadManager.InitializedFininsh();
+        ActiveManager.InitializedFininsh();
 
         Initialized = true;
     }
