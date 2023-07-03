@@ -16,6 +16,7 @@ public class StatusSlotScroll : MonoBehaviour
     [SerializeField] private Transform content;
 
     private List<StatusSlot> slots = new List<StatusSlot>();
+    private List<GameObject> slotObjects = new List<GameObject>();
 
     public class StatusSlot
     {
@@ -50,23 +51,54 @@ public class StatusSlotScroll : MonoBehaviour
         {
             string statLevelStr = data.Key + "Level";
 
+            double val_calc = double.Parse(data.Value[(int)StatusTemplate_.Value_Calc]);
+            double cost_calc = double.Parse(data.Value[(int)StatusTemplate_.Cost_Calc]);
+
             int index = int.Parse(data.Value[(int)StatusTemplate_.Order]) - 1;
             int statLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(statLevelStr, 1);
             string typeName = data.Value[(int)StatusTemplate_.TypeName];
-            double statusValue = statLevel * double.Parse(data.Value[(int)StatusTemplate_.Value_Calc]);
-            double costValue = statLevel * double.Parse(data.Value[(int)StatusTemplate_.Cost_Calc]);
+            double statusValue = statLevel * val_calc;
+            double costValue = statLevel * cost_calc;
 
-            StatusSlot slot = new StatusSlot(statLevel, typeName, statusValue, costValue, () => UpgradeStatus(statLevelStr, index));
+            StatusSlot slot = new StatusSlot(statLevel, typeName, statusValue, costValue,
+                () => UpgradeStatus(statLevelStr, val_calc, cost_calc, index));
             slots.Add(slot);
         }
     }
 
-    void UpgradeStatus(string stat, int index)
+    void UpgradeStatus(string stat, double val_calc, double cost_calc, int index)
     {
         int level = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(stat, 1);
+        var slot = slotObjects[index];
 
-        //slots[index]
-        GlobalManager.Instance.DBManager.UpdateUserData(stat, level + 1);
+        var levelText = slot.transform.Find("StatusLevel_Text").gameObject;
+        if (levelText != null)
+        {
+            level += 1;
+            levelText.GetComponent<TextMeshProUGUI>().text = $"LV {level}";
+        }
+
+        var valueText = slot.transform.Find("StatusValue_Text").gameObject;
+        if (valueText != null)
+        {
+            double value = level * val_calc;
+
+            valueText.GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(value);
+        }
+
+        var button = slot.transform.Find("LevelUp_Button").gameObject;
+        if (button != null)
+        {
+            double cost = level * cost_calc;
+
+            var costText = button.transform.Find("Cost_Text").gameObject;
+            if (costText != null)
+            {
+                costText.GetComponent<TextMeshProUGUI>().text = $"{Utill.BigNumCalculate(cost)}  G";
+            }
+        }
+
+        GlobalManager.Instance.DBManager.UpdateUserData(stat, level);
     }
 
     private void CreateSlots()
@@ -98,7 +130,11 @@ public class StatusSlotScroll : MonoBehaviour
                 var button = slot.transform.Find("LevelUp_Button").gameObject;
                 if (button != null)
                 {
-                    button.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = $"{Utill.BigNumCalculate(slots[i].cost)}  G";
+                    var costText = button.transform.Find("Cost_Text").gameObject;
+                    if(costText!=null)
+                    {
+                        costText.GetComponent<TextMeshProUGUI>().text = $"{Utill.BigNumCalculate(slots[i].cost)}  G";
+                    }
 
                     var buttonClick = button.GetComponent<Button>();
                     if (buttonClick != null)
@@ -107,6 +143,8 @@ public class StatusSlotScroll : MonoBehaviour
                         buttonClick.onClick.AddListener(slots[i].buttonClick);
                     }                   
                 }
+
+                slotObjects.Add(slot);
             }
         }
         else
