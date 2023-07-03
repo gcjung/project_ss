@@ -10,6 +10,7 @@ public class GlobalManager : SingletonObject<GlobalManager>
     public SoundManager SoundManager { get; set; } = null;
     public SceneLoadManager SceneLoadManager { get; set; } = null;
     public DBManager DBManager { get; set; } = null;
+    public GameDataManager GameDataManager { get; set; } = null;
 
     public override void Awake()
     {
@@ -32,6 +33,7 @@ public class GlobalManager : SingletonObject<GlobalManager>
             SoundManager = SoundManager.CreateManager(transform);
             SceneLoadManager = SceneLoadManager.CreateManager(transform);
             DBManager = DBManager.CreateManager(transform);
+            GameDataManager = GameDataManager.CreateManager(transform);
         }
         
         yield return new WaitUntil(() =>
@@ -39,12 +41,14 @@ public class GlobalManager : SingletonObject<GlobalManager>
             return true
             && SoundManager.Ininialized
             && SceneLoadManager.Ininialized
-            && DBManager.Ininialized;
+            && DBManager.Ininialized
+            && GameDataManager.Ininialized;
         });
 
         SoundManager.InitializedFininsh();
         SceneLoadManager.InitializedFininsh();
         DBManager.InitializedFininsh();
+        GameDataManager.InitializedFininsh();
 
         Initialized = true;
     }

@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [FirestoreData]
@@ -44,7 +43,7 @@ public class DBManager : Manager<DBManager>
         dataTable = new UserDatas();
 
         LoadUserDBFromFirebase();
-        LoadGameDataFromFirebase();
+        //LoadGameDataFromFirebase();
     }
 
     async void LoadUserDBFromFirebase()
@@ -55,18 +54,13 @@ public class DBManager : Manager<DBManager>
             Debug.Log(String.Format("Document data for {0} document:", snapshot.Id));
 
             Dictionary<string, object> data = snapshot.ToDictionary();
-            //foreach (var dic in data)
-            //{
-            //    Debug.Log($"{dic.Key} : {dic.Value}");
-            //}
-
             foreach (KeyValuePair<string, object> pair in data)
             {
                 
                 if (pair.Value is Double)
                 {
                     userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
-                    Debug.Log($"Double : {pair.Key}, {pair.Value}");
+                    //Debug.Log($"Double : {pair.Key}, {pair.Value}");
 
                 }
                 else if (pair.Value is string)
