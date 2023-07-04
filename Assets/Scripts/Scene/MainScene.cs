@@ -91,15 +91,19 @@ public class MainScene : MonoBehaviour
 
         SetStage("1-1");    //테스트용
 
-        playerCharacter = Resources.Load<GameObject>("Player/ch001");   //플레이어 캐릭터 세팅
+        SetPlayer("ch001"); //테스트용
+
+        goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
+        gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
+    }
+    public void SetPlayer(string charName)
+    {
+        playerCharacter = Resources.Load<GameObject>($"Player/{charName}");   //플레이어 캐릭터 세팅
         var _playerCharacter = Instantiate(playerCharacter, transform);
         _playerCharacter.transform.position = playerSpawnPoint.position;
         _playerCharacter.AddComponent<Player>();
         _playerCharacter.AddComponent<PlayerController>();
         IsPlayer = true;
-
-        goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
-        gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
     }
     public void SetStage(string stageName)
     {
@@ -113,7 +117,6 @@ public class MainScene : MonoBehaviour
 
         this.monsterName = monsterName; //몬스터 세팅
         this.bossName = bossName;   //보스몬스터 세팅
-
     }
     private void InitUIfromDB()
     {

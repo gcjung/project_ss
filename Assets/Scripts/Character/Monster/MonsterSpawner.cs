@@ -45,6 +45,11 @@ public class MonsterSpawner : MonoBehaviour
 
     private void SetMonster()
     {
+        ClearWaveTrigger();
+
+        if (!slider.IsActive())
+            slider.gameObject.SetActive(true);
+
         monster = Resources.Load<Monster>($"Monster/{mainScene.monsterName}");     //일반몬스터 세팅        
         var _monster = Instantiate(monster, transform);
         _monster.gameObject.AddComponent<MonsterController>();
@@ -59,11 +64,13 @@ public class MonsterSpawner : MonoBehaviour
             monsterPool.ClearPool();
             monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
         }
+        Destroy(_monster);
 
         bossMonster = Resources.Load<Monster>($"Monster/{mainScene.bossName}");     //보스몬스터 세팅
         var _bossMonster = Instantiate(bossMonster, transform);
         _bossMonster.gameObject.AddComponent<MonsterController>();
         _bossMonster.gameObject.SetActive(false);
+        _bossMonster.SetMonsterStat(mainScene.bossName);
         if (bossMonsterPool == null)
         {
             bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
@@ -72,7 +79,8 @@ public class MonsterSpawner : MonoBehaviour
         {
             bossMonsterPool.ClearPool();
             bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
-        }      
+        }
+        Destroy(_bossMonster);
     }
     private IEnumerator SpawnMonster()
     {
