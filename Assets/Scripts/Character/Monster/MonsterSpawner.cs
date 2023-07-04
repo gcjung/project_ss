@@ -25,34 +25,54 @@ public class MonsterSpawner : MonoBehaviour
 
     private IEnumerator Start()
     {
+        mainScene = transform.parent.GetComponent<MainScene>();
+
+        slider = slider.GetComponent<Slider>();
+        slider.onValueChanged.AddListener(OnSliderValueChanged);
+        slider.interactable = false;
+
         yield return CommonIEnumerator.IEWaitUntil(
            predicate: () => { return GlobalManager.Instance.Initialized; },
            onFinish: () =>
            {
                Init();
            });
-
     }
     void Init()
     {
-        monster = Resources.Load<Monster>("Monster/Skeleton");     //일반몬스터 세팅        
+        SetMonster();
+    }
+
+    private void SetMonster()
+    {
+        monster = Resources.Load<Monster>($"Monster/{mainScene.monsterName}");     //일반몬스터 세팅        
         var _monster = Instantiate(monster, transform);
         _monster.gameObject.AddComponent<MonsterController>();
         _monster.gameObject.SetActive(false);
-        _monster.SetMonsterStat(MonsterType.Skeleton.ToString());
-        monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+        _monster.SetMonsterStat(mainScene.monsterName);
+        if (monsterPool == null)   
+        {
+            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+        }
+        else
+        {
+            monsterPool.ClearPool();
+            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+        }
 
-        bossMonster = Resources.Load<Monster>("Monster/ch009");     //보스몬스터 세팅
+        bossMonster = Resources.Load<Monster>($"Monster/{mainScene.bossName}");     //보스몬스터 세팅
         var _bossMonster = Instantiate(bossMonster, transform);
         _bossMonster.gameObject.AddComponent<MonsterController>();
         _bossMonster.gameObject.SetActive(false);
-        bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
-
-        mainScene = transform.parent.GetComponent<MainScene>();
-
-        slider = slider.GetComponent<Slider>();
-        slider.onValueChanged.AddListener(OnSliderValueChanged);
-        slider.interactable = false;
+        if (bossMonsterPool == null)
+        {
+            bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
+        }
+        else
+        {
+            bossMonsterPool.ClearPool();
+            bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
+        }      
     }
     private IEnumerator SpawnMonster()
     {

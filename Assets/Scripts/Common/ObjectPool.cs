@@ -66,4 +66,9 @@ public class ObjectPool<T> where T : MonoBehaviour
     {
         obj.gameObject.SetActive(false);
     }
+
+    public void ClearPool()
+    {
+        pool.Clear();
+    }
 }
