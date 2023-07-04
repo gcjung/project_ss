@@ -9,14 +9,6 @@ using static GameDataManager;
 
 public class GameDataManager : Manager<GameDataManager>
 {
-    [FirestoreData]
-    public class StatusData
-    {
-        //[FirestoreProperty] public double Gold { get; set; }
-        //[FirestoreProperty] public double Gem { get; set; }
-
-    }
-
     public enum MonsterTemplate_
     {
         None = -1,
@@ -29,6 +21,8 @@ public class GameDataManager : Manager<GameDataManager>
     }
     public enum StatusTemplate_
     {
+        None = -1,
+        Type,
         TypeName,
         Order,
         Value_Calc,
@@ -48,8 +42,7 @@ public class GameDataManager : Manager<GameDataManager>
         Ininialized = true;
     }
 
-
-    const string SPLIT = ",";
+    const string COMMA_SPLIT = @"\s*,\s*";
     const string LINE_SPLIT = @"\r\n|\n\r|\n|\r";
 
     public Dictionary<string, string[]> CSVRead(string file)
@@ -60,15 +53,15 @@ public class GameDataManager : Manager<GameDataManager>
         var lines = Regex.Split(data.text, LINE_SPLIT);
         if (lines.Length <= 1) return dic;
 
-        var header = Regex.Split(lines[0], SPLIT);
+        var header = Regex.Split(lines[0], COMMA_SPLIT);
         for (var i = 1; i < lines.Length; i++)
         {
-            var values = Regex.Split(lines[i], SPLIT);
-
+            var values = Regex.Split(Regex.Replace(lines[i], @"\s+", string.Empty), COMMA_SPLIT); // csv 데이터 공백없애기
+            
             if (values.Length < header.Length) continue;
 
             bool isValid = true;
-            for (var j = 0; j < values.Length; j++)
+            for (int j = 0; j < values.Length; j++)
             {
                 if (string.IsNullOrEmpty(values[j]))    // csv에 데이터가 유효한지 확인
                     isValid = false;
@@ -77,11 +70,6 @@ public class GameDataManager : Manager<GameDataManager>
             if (isValid)
             {
                 dic.Add(values[0], values);
-                //string str = $"key : {values[0]}";
-                //for (int j = 0; j < values.Length; j++)
-                //    str += $", value : {values[j]}";
-
-                //Debug.Log($"{str}");
             }
         }
         return dic;

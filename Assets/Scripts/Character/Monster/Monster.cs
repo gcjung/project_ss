@@ -44,14 +44,12 @@ public class Monster : MonoBehaviour
         attack = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Attack]);
         gold = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Gold]);
 
-        Debug.Log($"{maxHp}, {attack}, {gold}");
         currentHp = maxHp;
     }
 
 
     public void TakeDamage(double damageAmount)
     {
-        Debug.Log($"hp : {currentHp}, damage : {damageAmount}, currentHP : {currentHp - damageAmount}");
         currentHp -= damageAmount;
         
         if (currentHp <= 0)
