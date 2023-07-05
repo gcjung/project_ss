@@ -6,27 +6,21 @@ using System;
 using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
-{
-    private Bullet projectilePrefab;
+{ 
     public static PlayerState CurrentPlayerState { get; private set; } = PlayerState.Idle;
-
-    private List<MonsterController> enemyList = new List<MonsterController>();
-
     private Animator playerAnimator;
-
-    private Transform target;
-
-    private float projectileSpeed = 5.0f;
-
-    private ObjectPool<Bullet> bulletPool;
-
     private Player player;
 
-    public bool IsBulletCol { get; set; } = false;  // 이거 왜 만든거임???
+    private List<MonsterController> enemyList = new List<MonsterController>();
+  
+    private Bullet projectilePrefab;    //투사체 세팅
+    private ObjectPool<Bullet> bulletPool;
+    private float projectileSpeed = 5.0f;
+    private Transform target;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.TryGetComponent<MonsterController>(out var monster))
+        if (collision.TryGetComponent<MonsterController>(out var monster))
         {
             enemyList.Add(monster);
         }
@@ -34,16 +28,16 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.TryGetComponent<MonsterController>(out var enemy))
+        if(collision.TryGetComponent<MonsterController>(out var monster))
         {
             if ((enemyList.Count - 1) == 0 && MonsterSpawner.MonsterCount == 0)
             {
-                StartCoroutine(DelayChangeState(enemy));
+                StartCoroutine(DelayChangeState(monster));
             }
             else
             {
-                enemyList.Remove(enemy);
-            }           
+                enemyList.Remove(monster);
+            }         
         }
     }
 

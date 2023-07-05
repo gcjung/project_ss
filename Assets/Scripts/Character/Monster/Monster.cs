@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,7 @@ public class Monster : MonoBehaviour
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
 
+    public Action BossMonsterDied;
     private void OnEnable()
     {
         currentHp = maxHp;
@@ -58,6 +60,11 @@ public class Monster : MonoBehaviour
 
             monsterController.SetCurrentMonsterState(MonsterState.Dead);
             MainScene.Instance.GetGoods(gold);
+
+            if(this.gameObject.CompareTag("Boss"))
+            {
+                BossMonsterDied?.Invoke();
+            }
         }
     }
 }

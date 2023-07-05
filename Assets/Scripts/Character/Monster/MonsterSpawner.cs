@@ -114,6 +114,7 @@ public class MonsterSpawner : MonoBehaviour
         var _bossMonster = bossMonsterPool.GetObjectPool();
         _bossMonster.transform.localScale = bossMonster.transform.localScale;
         _bossMonster.transform.position = spawnPoint2.position;
+        _bossMonster.GetComponent<Monster>().BossMonsterDied += FinishStage;
     }
     public void OnSliderValueChanged(float value)
     {
@@ -164,9 +165,13 @@ public class MonsterSpawner : MonoBehaviour
     }
     public void FinishWave()
     {
+        mainScene.IsWaveClear = true;
+    }
+    public void FinishStage()
+    {
+        Debug.Log("스테이지 클리어");
         mainScene.IsStageClear = true;
     }
-
     public void ClearWaveTrigger()
     {
         WaveCount = 0;

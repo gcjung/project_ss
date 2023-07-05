@@ -41,8 +41,26 @@ public class MainScene : MonoBehaviour
     private float delayTime = 1f;
 
     private MonsterSpawner spawner; //스테이지 세팅용
+    public string mapName;
     public string monsterName;
     public string bossName;
+
+    private bool isWaveClear = false;
+    public bool IsWaveClear
+    {
+        get { return isWaveClear; }
+        set
+        {
+            if (value)
+            {
+                if (MonsterSpawner.WaveCount == 5)
+                {
+                    isWaveClear = value;
+                    EnterBossStage();
+                }
+            }
+        }
+    }
 
     private bool isStageClear = false;
     public bool IsStageClear
@@ -52,11 +70,7 @@ public class MainScene : MonoBehaviour
         {
             if (value)
             {
-                if (MonsterSpawner.WaveCount == 5)
-                {
-                    isStageClear = value;
-                    EnterBossStage();
-                }
+                isStageClear = value;
             }
         }
     }
@@ -89,9 +103,9 @@ public class MainScene : MonoBehaviour
 
         Debug.Log("메인 씬시작");
 
-        SetStage("1-1");    //테스트용
+        SetStage("1-1");    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
 
-        SetPlayer("ch001"); //테스트용
+        SetPlayer("ch001"); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
@@ -107,16 +121,13 @@ public class MainScene : MonoBehaviour
     }
     public void SetStage(string stageName)
     {
-        string mapName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.MapImage].ToString();
-        string monsterName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Monster].ToString();
-        string bossName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Boss].ToString();
+        mapName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.MapImage].ToString();  //맵세팅
+        monsterName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Monster].ToString();   //몬스터 세팅
+        bossName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Boss].ToString(); //보스몬스터 세팅
 
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
-
-        this.monsterName = monsterName; //몬스터 세팅
-        this.bossName = bossName;   //보스몬스터 세팅
     }
     private void InitUIfromDB()
     {
@@ -127,20 +138,16 @@ public class MainScene : MonoBehaviour
 
     private void EnterBossStage()
     {
-        if (isStageClear)
+        if (isWaveClear)
         {
             Debug.Log("보스방 입장");
-            IsStageClear = false;
+            IsWaveClear = false;
 
             fadeImage = Instantiate(fadeImage, upSidePanel.transform);
             //fadeImage.transform.SetAsFirstSibling();
-            FadeIn();
+            //FadeIn();
+            fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("VersusSetting", delayTime));
         }
-    }
-
-    private void FadeIn()
-    {
-        fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("VersusSetting", delayTime));
     }
 
     private void VersusSetting()
@@ -154,7 +161,7 @@ public class MainScene : MonoBehaviour
         playerPref.transform.position = playerPosition.position;
         ChangeLayer(playerPref, targetLayer);
 
-        var boss = Resources.Load<GameObject>("Monster/ch009");
+        var boss = Resources.Load<GameObject>($"Monster/{bossName}");
         bossPref = Instantiate(boss, bossPosition);
         bossPref.transform.position = bossPosition.position;
         ChangeLayer(bossPref, targetLayer);
@@ -226,7 +233,4 @@ public class MainScene : MonoBehaviour
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem + getGem);
         }
     }
-
-
-
 }
