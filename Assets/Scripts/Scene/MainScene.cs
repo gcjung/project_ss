@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
 using Unity.VisualScripting;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class MainScene : MonoBehaviour
 {
@@ -100,15 +102,22 @@ public class MainScene : MonoBehaviour
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
+
         category1Panel = mainUiPanel.transform.Find("DownSide_Panel/Category1_Panel").GetComponent<RectTransform>();
 
-        // 바텀 버튼
-        int categoryButtonCount = mainUiPanel.transform.Find("DownSide_Panel/Category_Image").childCount;
+        // 바텀 카테고리 버튼
+        Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
+        int categoryButtonCount = bottomCategortButton.childCount;
         for (int i = 0; i < categoryButtonCount; i++)
         {
             int index = i;
-            Button button =  mainUiPanel.transform.Find("DownSide_Panel/Category_Image").GetChild(i).GetComponent<Button>();
-            button.onClick.AddListener(() => OnClickCategory(index));
+
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerUp;
+            entry.callback.AddListener((eventData) => OnClickCategory(index, eventData.selectedObject));
+
+            EventTrigger button = bottomCategortButton.GetChild(i).GetComponent<EventTrigger>();
+            button.triggers.Add(entry);
         }
 
     }
@@ -134,25 +143,64 @@ public class MainScene : MonoBehaviour
     }
     int invisiblePosY = -1211;
     int visiblePosY = 487;
-    private void OnClickCategory(int categoryType)
+    private void OnClickCategory(int categoryType, GameObject onClickButton)
     {
-        switch(categoryType)
+        switch (categoryType)
         {
             case 0:
-                if (category1Panel.gameObject.activeSelf)
-                {
-                    category1Panel.gameObject.SetActive(false);
-                    category1Panel.anchoredPosition = new Vector2(0, invisiblePosY);
-                }
-                else
-                {
-                    category1Panel.gameObject.SetActive(true);
-                    category1Panel.DOAnchorPosY(visiblePosY, 0.3f).SetEase(Ease.OutExpo);
-                }
+                ShowCategory1UI(category1Panel.gameObject.activeSelf, onClickButton);
                 break;
         }
-
     }
+
+    void ShowCategory1UI(bool active, GameObject onClickButton)
+    {
+        category1Panel.gameObject.SetActive(!active);
+        onClickButton.transform.Find("Text").gameObject.SetActive(active);
+        onClickButton.transform.Find("CloseImage").gameObject.SetActive(!active);
+
+        if (active)
+        {
+            category1Panel.anchoredPosition = new Vector2(0, invisiblePosY);
+        }
+        else
+        {
+            category1Panel.DOAnchorPosY(visiblePosY, 0.3f).SetEase(Ease.OutExpo);
+        }
+
+
+        Transform parent = category1Panel.Find("BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            int index = i;
+            Button button = parent.GetChild(i).GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
+
+            switch (index)
+            {
+                case 0:
+                    button.onClick.AddListener(ShowUI_Character);
+                    break;
+                case 1:
+                    button.onClick.AddListener(ShowUI_Skill);
+                    break;
+            }
+        }
+    }
+    void ShowUI_Character()
+    {
+        Debug.Log("ShowUI_Character");
+        category1Panel.Find("Type1_Character").gameObject.SetActive(true);
+        category1Panel.Find("Type2_Skill").gameObject.SetActive(false);
+    }
+
+    void ShowUI_Skill()
+    {
+        Debug.Log("ShowUI_Skill");
+        category1Panel.Find("Type2_Skill").gameObject.SetActive(true);
+        category1Panel.Find("Type1_Character").gameObject.SetActive(false);
+    }
+
 
     private void FadeIn()
     {

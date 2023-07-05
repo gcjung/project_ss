@@ -232,7 +232,7 @@ public class DBManager : Manager<DBManager>
 
         await uidRef.UpdateAsync(updates).ContinueWithOnMainThread(task =>
         {
-            Debug.Log($"{key} : {value} Update");
+            //Debug.Log($"{key} : {value} Update");
         });
     }
     public override void InitializedFininsh()
