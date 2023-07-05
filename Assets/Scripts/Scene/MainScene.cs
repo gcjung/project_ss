@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using Unity.VisualScripting;
 
 public class MainScene : MonoBehaviour
 {
@@ -64,6 +65,7 @@ public class MainScene : MonoBehaviour
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
     private TMP_Text gemText;
+    private RectTransform category1Panel;
     private IEnumerator Start()
     {
         GlobalManager.Instance.Init();
@@ -77,7 +79,7 @@ public class MainScene : MonoBehaviour
            }
         );
 
-        spawner = FindChildComponent<MonsterSpawner>(transform);
+        spawner = Utill.FindChildComponent<MonsterSpawner>(transform);
     }
 
     private void Init()
@@ -98,6 +100,17 @@ public class MainScene : MonoBehaviour
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
+        category1Panel = mainUiPanel.transform.Find("DownSide_Panel/Category1_Panel").GetComponent<RectTransform>();
+
+        // πŸ≈“ πˆ∆∞
+        int categoryButtonCount = mainUiPanel.transform.Find("DownSide_Panel/Category_Image").childCount;
+        for (int i = 0; i < categoryButtonCount; i++)
+        {
+            int index = i;
+            Button button =  mainUiPanel.transform.Find("DownSide_Panel/Category_Image").GetChild(i).GetComponent<Button>();
+            button.onClick.AddListener(() => OnClickCategory(index));
+        }
+
     }
 
     private void InitUIfromDB()
@@ -118,6 +131,27 @@ public class MainScene : MonoBehaviour
             //fadeImage.transform.SetAsFirstSibling();
             FadeIn();
         }
+    }
+    int invisiblePosY = -1211;
+    int visiblePosY = 487;
+    private void OnClickCategory(int categoryType)
+    {
+        switch(categoryType)
+        {
+            case 0:
+                if (category1Panel.gameObject.activeSelf)
+                {
+                    category1Panel.gameObject.SetActive(false);
+                    category1Panel.anchoredPosition = new Vector2(0, invisiblePosY);
+                }
+                else
+                {
+                    category1Panel.gameObject.SetActive(true);
+                    category1Panel.DOAnchorPosY(visiblePosY, 0.3f).SetEase(Ease.OutExpo);
+                }
+                break;
+        }
+
     }
 
     private void FadeIn()
@@ -167,28 +201,7 @@ public class MainScene : MonoBehaviour
 
         spawner.SpawnBossMonster();
     }
-    private T FindChildComponent<T>(Transform parent) where T : Component
-    {
-        T foundComponent = null;
 
-        for (int i = 0; i < parent.childCount; i++)
-        {
-            Transform child = parent.GetChild(i);
-
-            T component = child.GetComponent<T>();
-            if (component != null)
-            {
-                foundComponent = component;
-                break;
-            }
-
-            foundComponent = FindChildComponent<T>(child);
-            if (foundComponent != null)
-                break;
-        }
-
-        return foundComponent;
-    }
 
     public void GetGoods(double getGold = 0, double getGem = 0)
     {

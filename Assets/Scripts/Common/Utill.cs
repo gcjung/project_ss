@@ -18,7 +18,28 @@ public static class Utill
         gameObject.transform.localScale = Vector3.one;
         gameObject.transform.localRotation = Quaternion.identity;
     }
+    public static T FindChildComponent<T>(Transform parent) where T : Component
+    {
+        T foundComponent = null;
 
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+
+            T component = child.GetComponent<T>();
+            if (component != null)
+            {
+                foundComponent = component;
+                break;
+            }
+
+            foundComponent = FindChildComponent<T>(child);
+            if (foundComponent != null)
+                break;
+        }
+
+        return foundComponent;
+    }
     //public static GameObject ShowMessagePopup(string Title, string Desc, Action ButtonAction = null)
     //{
     //    GameObject obj = null;
