@@ -7,6 +7,7 @@ using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using System;
 
 public class MainScene : MonoBehaviour
 {
@@ -67,7 +68,9 @@ public class MainScene : MonoBehaviour
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
     private TMP_Text gemText;
-    private RectTransform category1Panel;
+    private RectTransform category1_UI;
+    private GameObject popupUI_0 = null;
+    private GameObject popupUI_1 = null;
     private IEnumerator Start()
     {
         GlobalManager.Instance.Init();
@@ -81,7 +84,7 @@ public class MainScene : MonoBehaviour
            }
         );
 
-        spawner = Utill.FindChildComponent<MonsterSpawner>(transform);
+        spawner = Util.FindChildComponent<MonsterSpawner>(transform);
     }
 
     private void Init()
@@ -90,7 +93,7 @@ public class MainScene : MonoBehaviour
             instance = this;
 
         Debug.Log("메인 씬시작");
-        
+
         playerCharacter = Resources.Load<GameObject>("Player/ch001");   //플레이어 캐릭터 세팅
         var _playerCharacter = Instantiate(playerCharacter, transform);
         _playerCharacter.transform.position = playerSpawnPoint.position;
@@ -103,7 +106,8 @@ public class MainScene : MonoBehaviour
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
 
-        category1Panel = mainUiPanel.transform.Find("DownSide_Panel/Category1_Panel").GetComponent<RectTransform>();
+        popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
+        popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
 
         // 바텀 카테고리 버튼
         Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
@@ -141,35 +145,44 @@ public class MainScene : MonoBehaviour
             FadeIn();
         }
     }
-    int invisiblePosY = -1211;
-    int visiblePosY = 487;
+    int invisiblePosY = -1700;
     private void OnClickCategory(int categoryType, GameObject onClickButton)
     {
         switch (categoryType)
         {
             case 0:
-                ShowCategory1UI(category1Panel.gameObject.activeSelf, onClickButton);
+                ShowCategory1UI(onClickButton);
                 break;
         }
     }
 
-    void ShowCategory1UI(bool active, GameObject onClickButton)
+    void ShowCategory1UI(GameObject onClickButton)
     {
-        category1Panel.gameObject.SetActive(!active);
-        onClickButton.transform.Find("Text").gameObject.SetActive(active);
-        onClickButton.transform.Find("CloseImage").gameObject.SetActive(!active);
-
-        if (active)
+        if (category1_UI == null)
         {
-            category1Panel.anchoredPosition = new Vector2(0, invisiblePosY);
+            category1_UI = CommonFuntion.GetPrefab("UI/Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
         }
         else
         {
-            category1Panel.DOAnchorPosY(visiblePosY, 0.3f).SetEase(Ease.OutExpo);
+            bool active = category1_UI.gameObject.activeSelf;
+
+            category1_UI.gameObject.SetActive(!active);
+            
+            if (active)
+            {
+                category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+            }
+            else
+            {
+                category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+            }
         }
 
+        onClickButton.transform.Find("Text").gameObject.SetActive(!category1_UI.gameObject.activeSelf);
+        onClickButton.transform.Find("CloseImage").gameObject.SetActive(category1_UI.gameObject.activeSelf);
 
-        Transform parent = category1Panel.Find("BottomMenu");
+        Transform parent = category1_UI.Find("BottomMenu");
         for (int i = 0; i < parent.childCount; i++)
         {
             int index = i;
@@ -190,15 +203,15 @@ public class MainScene : MonoBehaviour
     void ShowUI_Character()
     {
         Debug.Log("ShowUI_Character");
-        category1Panel.Find("Type1_Character").gameObject.SetActive(true);
-        category1Panel.Find("Type2_Skill").gameObject.SetActive(false);
+        category1_UI.Find("Type1_Character").gameObject.SetActive(true);
+        category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
     }
 
     void ShowUI_Skill()
     {
         Debug.Log("ShowUI_Skill");
-        category1Panel.Find("Type2_Skill").gameObject.SetActive(true);
-        category1Panel.Find("Type1_Character").gameObject.SetActive(false);
+        category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
+        category1_UI.Find("Type1_Character").gameObject.SetActive(false);
     }
 
 

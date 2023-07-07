@@ -1,23 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using System;
-using UnityEngine.UI;
-public static class Utill
-{ 
-    public static void SetParent(this GameObject gameObject, Transform transform)
-    {
-        if(transform == null)
-        {
-            Debug.LogError($" {nameof(SetParent)} null");
-            return;
-        }
-        gameObject.transform.parent = transform;
-        gameObject.transform.localPosition = Vector3.zero;
-        gameObject.transform.localScale = Vector3.one;
-        gameObject.transform.localRotation = Quaternion.identity;
-    }
+
+public class Util
+{
+    
     public static T FindChildComponent<T>(Transform parent) where T : Component
     {
         T foundComponent = null;
@@ -129,4 +116,5 @@ public static class Utill
 
         return string.Format("{0}{1}", numString, unitString);
     }
+
 }

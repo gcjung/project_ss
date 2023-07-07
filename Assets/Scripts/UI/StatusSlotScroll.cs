@@ -83,7 +83,7 @@ public class StatusSlotScroll : MonoBehaviour
         {
             double value = level * val_calc;
 
-            valueText.GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(value);
+            valueText.GetComponent<TextMeshProUGUI>().text = Util.BigNumCalculate(value);
         }
 
         var button = slot.transform.Find("LevelUp_Button").gameObject;
@@ -94,7 +94,7 @@ public class StatusSlotScroll : MonoBehaviour
             var costText = button.transform.Find("Cost_Text").gameObject;
             if (costText != null)
             {
-                costText.GetComponent<TextMeshProUGUI>().text = $"{Utill.BigNumCalculate(cost)}  G";
+                costText.GetComponent<TextMeshProUGUI>().text = $"{Util.BigNumCalculate(cost)}  G";
             }
         }
 
@@ -124,7 +124,7 @@ public class StatusSlotScroll : MonoBehaviour
                 var valueText = slot.transform.Find("StatusValue_Text").gameObject;
                 if (valueText != null)
                 {
-                    valueText.GetComponent<TextMeshProUGUI>().text = Utill.BigNumCalculate(slots[i].statusValue);
+                    valueText.GetComponent<TextMeshProUGUI>().text = Util.BigNumCalculate(slots[i].statusValue);
                 }
                 
                 var button = slot.transform.Find("LevelUp_Button").gameObject;
@@ -133,7 +133,7 @@ public class StatusSlotScroll : MonoBehaviour
                     var costText = button.transform.Find("Cost_Text").gameObject;
                     if(costText!=null)
                     {
-                        costText.GetComponent<TextMeshProUGUI>().text = $"{Utill.BigNumCalculate(slots[i].cost)}  G";
+                        costText.GetComponent<TextMeshProUGUI>().text = $"{Util.BigNumCalculate(slots[i].cost)}  G";
                     }
 
                     var buttonClick = button.GetComponent<Button>();
