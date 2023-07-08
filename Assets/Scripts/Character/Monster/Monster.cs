@@ -56,15 +56,20 @@ public class Monster : MonoBehaviour
         
         if (currentHp <= 0)
         {
-            boxCollider.enabled = false;
+            MonsterDie();
+        }
+    }
 
-            monsterController.SetCurrentMonsterState(MonsterState.Dead);
-            MainScene.Instance.GetGoods(gold);
+    private void MonsterDie()
+    {
+        boxCollider.enabled = false;
 
-            if(this.gameObject.CompareTag("Boss"))
-            {
-                BossMonsterDied?.Invoke();
-            }
+        monsterController.SetCurrentMonsterState(MonsterState.Dead);
+        MainScene.Instance.GetGoods(gold);
+
+        if (this.gameObject.CompareTag("Boss"))
+        {
+            BossMonsterDied?.Invoke();
         }
     }
 }

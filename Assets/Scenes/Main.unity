@@ -384,7 +384,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 59080075}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.09, y: 2.9265, z: 0}
+  m_LocalPosition: {x: 4.1, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2026,6 +2026,7 @@ Transform:
   - {fileID: 59080076}
   - {fileID: 1071568692}
   - {fileID: 1424292077}
+  - {fileID: 1242721248}
   m_Father: {fileID: 850563152}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2041,14 +2042,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cbb58a3fcade3942b3676ef31a923d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upSidePanel: {fileID: 1249786170}
   playerSpawnPoint: {fileID: 1447943316}
   map1: {fileID: 1820378810}
   map2: {fileID: 587764934}
   fadeImage: {fileID: 1187355897327120250, guid: 6914bad92f8ea064aabceb985d55e6e3, type: 3}
-  upSidePanel: {fileID: 1249786170}
   vsImage: {fileID: -1250306742949942494, guid: c5bf3d997ef6bb24abf6b1d087045766, type: 3}
   playerPosition: {fileID: 1071568692}
   bossPosition: {fileID: 1424292077}
+  movePoint: {fileID: 1242721248}
+  victoryText: {fileID: 6669254609789748411, guid: 3b3ca7fda0fcc514698ec2e21119fee7, type: 3}
+  mapName: 
+  monsterName: 
+  bossName: 
   mainUiPanel: {fileID: 972070603}
 --- !u!1 &838461504
 GameObject:
@@ -2996,6 +3002,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 1
+--- !u!1 &1242721247
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1242721248}
+  m_Layer: 0
+  m_Name: MovePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1242721248
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242721247}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.5, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 834597529}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1249786166
 GameObject:
   m_ObjectHideFlags: 0

@@ -152,20 +152,20 @@ public class DBManager : Manager<DBManager>
 
         return defaultValue;
     }
-    public string GetUserStringData(UserDoubleDataType key_)
+    public string GetUserStringData(UserDoubleDataType key_, string defaultValue = "")
     {
         string key = key_.ToString();
         if (usesrStringDataDic.ContainsKey(key))
             return usesrStringDataDic[key];
 
-        return default;
+        return defaultValue;
     }
-    public string GetUserStringData(string key)
+    public string GetUserStringData(string key, string defaultValue = "")
     {
         if (usesrStringDataDic.ContainsKey(key))
             return usesrStringDataDic[key];
 
-        return default;
+        return defaultValue;
     }
     public void UpdateUserData(UserDoubleDataType key_, double value)
     {

@@ -23,9 +23,14 @@ public class Player : MonoBehaviour
 
         if (CurrentHp <= 0)
         {
-            playerController.SetCurrentPlayerState(PlayerState.Dead);
-
-            Debug.Log("플레이어 사망");
+            PlayerDie();
         }
+    }
+
+    private void PlayerDie()
+    {
+        playerController.SetCurrentPlayerState(PlayerState.Dead);
+
+        Debug.Log("플레이어 사망");
     }
 }

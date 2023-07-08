@@ -18,11 +18,13 @@ public class MainScene : MonoBehaviour
             return instance;
         }
     }
+    [Header("UI Canvas")]
+    [SerializeField] private UpSidePanel upSidePanel;
+    //[SerializeField] private DownSidePanel downSidePanel;
 
     [Header("Create Player")]
-    private GameObject playerCharacter;
-
     [SerializeField] private Transform playerSpawnPoint;
+    private GameObject playerCharacter;   
 
     [Header("Change Map Sprite")]   
     [SerializeField] private SpriteRenderer map1;
@@ -30,20 +32,22 @@ public class MainScene : MonoBehaviour
     private Sprite mapSprite;
 
     [Header("Enter Boss Room")]
-    [SerializeField] private Image fadeImage;
-    [SerializeField] private UpSidePanel upSidePanel;
+    [SerializeField] private Image fadeImage;   
     [SerializeField] private Image vsImage;
     [SerializeField] private Transform playerPosition;
     [SerializeField] private Transform bossPosition;
     private GameObject playerPref;
     private GameObject bossPref;
-    private float fadeInTime = 1f;
-    private float delayTime = 1f;
+    
+
+    [Header("Stage Clear")]
+    [SerializeField] private Transform movePoint;
+    [SerializeField] private TextMeshProUGUI victoryText;
 
     private MonsterSpawner spawner; //스테이지 세팅용
-    public string mapName;
-    public string monsterName;
-    public string bossName;
+    [HideInInspector] public string mapName;
+    [HideInInspector] public string monsterName;
+    [HideInInspector] public string bossName;
 
     private bool isWaveClear = false;
     public bool IsWaveClear
@@ -71,6 +75,7 @@ public class MainScene : MonoBehaviour
             if (value)
             {
                 isStageClear = value;
+                StageClear();
             }
         }
     }
@@ -112,18 +117,21 @@ public class MainScene : MonoBehaviour
     }
     public void SetPlayer(string charName)
     {
-        playerCharacter = Resources.Load<GameObject>($"Player/{charName}");   //플레이어 캐릭터 세팅
-        var _playerCharacter = Instantiate(playerCharacter, transform);
-        _playerCharacter.transform.position = playerSpawnPoint.position;
-        _playerCharacter.AddComponent<Player>();
-        _playerCharacter.AddComponent<PlayerController>();
+        if (playerCharacter != null)
+            Destroy(playerCharacter);
+
+        var _playerCharacter = Resources.Load<GameObject>($"Player/{charName}");   //플레이어 캐릭터 세팅
+        playerCharacter = Instantiate(_playerCharacter, transform);
+        playerCharacter.transform.position = playerSpawnPoint.position;
+        playerCharacter.AddComponent<Player>();
+        playerCharacter.AddComponent<PlayerController>();
         IsPlayer = true;
     }
     public void SetStage(string stageName)
     {
-        mapName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.MapImage].ToString();  //맵세팅
-        monsterName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Monster].ToString();   //몬스터 세팅
-        bossName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Boss].ToString(); //보스몬스터 세팅
+        mapName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.MapImage];  //맵세팅
+        monsterName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Monster];   //몬스터 세팅
+        bossName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Boss]; //보스몬스터 세팅
 
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
@@ -143,9 +151,11 @@ public class MainScene : MonoBehaviour
             Debug.Log("보스방 입장");
             IsWaveClear = false;
 
+            float fadeInTime = 1.0f;
+            float delayTime = 1.0f;
+
             fadeImage = Instantiate(fadeImage, upSidePanel.transform);
             //fadeImage.transform.SetAsFirstSibling();
-            //FadeIn();
             fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("VersusSetting", delayTime));
         }
     }
@@ -191,6 +201,32 @@ public class MainScene : MonoBehaviour
         Destroy(fadeImage.gameObject);
 
         spawner.SpawnBossMonster();
+    }
+
+    private void StageClear()
+    {
+        float durationTime = 1.0f;
+        float delayTime = 3.0f;
+
+        victoryText = Instantiate(victoryText, upSidePanel.transform);
+
+        Color color = victoryText.color;    //알파값 초기화
+        color.a = 0f;
+        victoryText.color = color;
+
+        victoryText.DOFade(1f, durationTime).OnComplete(() =>
+        victoryText.DOFade(0f, durationTime).OnComplete(() => StageClear2()));
+    }
+    private void StageClear2()
+    {
+        float durationTime = 1.0f;
+        float delayTime = 3.0f;
+        float movingTime = 3.0f;
+
+        fadeImage = Instantiate(fadeImage, upSidePanel.transform);
+        fadeImage.DOFade(1f, durationTime).OnComplete(() => Invoke("VersusSetting", delayTime));
+
+        playerCharacter.transform.DOMove(movePoint.position, movingTime);
     }
     private T FindChildComponent<T>(Transform parent) where T : Component
     {
