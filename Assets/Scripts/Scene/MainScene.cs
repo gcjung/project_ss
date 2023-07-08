@@ -152,31 +152,44 @@ public class MainScene : MonoBehaviour
             IsWaveClear = false;
 
             float fadeInTime = 1.0f;
-            float delayTime = 1.0f;
+            float delayTime = 2.0f;
 
-            fadeImage = Instantiate(fadeImage, upSidePanel.transform);
+            var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
             //fadeImage.transform.SetAsFirstSibling();
-            fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Invoke("VersusSetting", delayTime));
+            _fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Destroy(_fadeImage));
+
+            Invoke("VersusSetting", delayTime);
         }
     }
-
     private void VersusSetting()
     {
+        StartCoroutine(BossBattle());
+    }
+    private IEnumerator BossBattle()
+    {
+        float delayTime = 2.0f;
+
         int targetLayer = LayerMask.NameToLayer("Over UI");
 
-        vsImage = Instantiate(vsImage, upSidePanel.transform);
+        var _vsImage = Instantiate(vsImage, upSidePanel.transform);
 
-        var player = Resources.Load<GameObject>("Player/ch001");
-        playerPref = Instantiate(player, playerPosition);
-        playerPref.transform.position = playerPosition.position;
-        ChangeLayer(playerPref, targetLayer);
+        playerPref = Resources.Load<GameObject>("Player/ch001");
+        var _playerPref = Instantiate(playerPref, playerPosition);
+        _playerPref.transform.position = playerPosition.position;
+        ChangeLayer(_playerPref, targetLayer);
 
-        var boss = Resources.Load<GameObject>($"Monster/{bossName}");
-        bossPref = Instantiate(boss, bossPosition);
-        bossPref.transform.position = bossPosition.position;
-        ChangeLayer(bossPref, targetLayer);
+        bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
+        var _bossPref = Instantiate(bossPref, bossPosition);
+        _bossPref.transform.position = bossPosition.position;
+        ChangeLayer(_bossPref, targetLayer);
 
-        StartCoroutine(BossBattle());
+        yield return new WaitForSeconds(delayTime);
+
+        Destroy(_bossPref);
+        Destroy(_playerPref);
+        Destroy(_vsImage.gameObject);
+
+        spawner.SpawnBossMonster();
     }
     private void ChangeLayer(GameObject obj, int layer)
     {
@@ -189,33 +202,19 @@ public class MainScene : MonoBehaviour
         }
     }
 
-    private IEnumerator BossBattle()
-    {
-        float delayTime = 2.0f;
-
-        yield return new WaitForSeconds(delayTime);
-
-        Destroy(bossPref);
-        Destroy(playerPref);
-        Destroy(vsImage.gameObject);
-        Destroy(fadeImage.gameObject);
-
-        spawner.SpawnBossMonster();
-    }
-
     private void StageClear()
     {
         float durationTime = 1.0f;
         float delayTime = 3.0f;
 
-        victoryText = Instantiate(victoryText, upSidePanel.transform);
+        var _victoryText = Instantiate(victoryText, upSidePanel.transform);
 
-        Color color = victoryText.color;    //알파값 초기화
+        Color color = _victoryText.color;    //알파값 초기화
         color.a = 0f;
-        victoryText.color = color;
+        _victoryText.color = color;
 
-        victoryText.DOFade(1f, durationTime).OnComplete(() =>
-        victoryText.DOFade(0f, durationTime).OnComplete(() => StageClear2()));
+        _victoryText.DOFade(1f, durationTime).OnComplete(() =>
+        _victoryText.DOFade(0f, durationTime).OnComplete(() => StageClear2()));
     }
     private void StageClear2()
     {
@@ -223,8 +222,8 @@ public class MainScene : MonoBehaviour
         float delayTime = 3.0f;
         float movingTime = 3.0f;
 
-        fadeImage = Instantiate(fadeImage, upSidePanel.transform);
-        fadeImage.DOFade(1f, durationTime).OnComplete(() => Invoke("VersusSetting", delayTime));
+        var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
+        _fadeImage.DOFade(1f, durationTime);
 
         playerCharacter.transform.DOMove(movePoint.position, movingTime);
     }
