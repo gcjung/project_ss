@@ -151,12 +151,12 @@ public class MainScene : MonoBehaviour
         switch (categoryType)
         {
             case 0:
-                ShowCategory1UI(onClickButton);
+                OpenUI_Category1(onClickButton);
                 break;
         }
     }
 
-    void ShowCategory1UI(GameObject onClickButton)
+    void OpenUI_Category1(GameObject clickButton)
     {
         if (category1_UI == null)
         {
@@ -167,8 +167,6 @@ public class MainScene : MonoBehaviour
         {
             bool active = category1_UI.gameObject.activeSelf;
 
-            category1_UI.gameObject.SetActive(!active);
-            
             if (active)
             {
                 category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
@@ -177,10 +175,12 @@ public class MainScene : MonoBehaviour
             {
                 category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
             }
+
+            category1_UI.gameObject.SetActive(!active);
         }
 
-        onClickButton.transform.Find("Text").gameObject.SetActive(!category1_UI.gameObject.activeSelf);
-        onClickButton.transform.Find("CloseImage").gameObject.SetActive(category1_UI.gameObject.activeSelf);
+        clickButton.transform.Find("Text").gameObject.SetActive(!category1_UI.gameObject.activeSelf);
+        clickButton.transform.Find("CloseImage").gameObject.SetActive(category1_UI.gameObject.activeSelf);
 
         Transform parent = category1_UI.Find("BottomMenu");
         for (int i = 0; i < parent.childCount; i++)

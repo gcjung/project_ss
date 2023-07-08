@@ -12,13 +12,11 @@ public class CommonFuntion : MonoBehaviour
         prefabsPool.Clear();
     }
 
-
     public static void LoadPrefab(string prefabName)
     {
         if (!prefabsPool.ContainsKey(prefabName))
         {
             GameObject newObj = Resources.Load<GameObject>(prefabName);
-            Debug.Log("!!!" + newObj);
             prefabsPool.Add(prefabName, newObj);
         }
         else if (prefabsPool[prefabName] == null)
@@ -35,11 +33,11 @@ public class CommonFuntion : MonoBehaviour
         return GetPrefab(prefabsPool[prefabName], parentTransform);
     }
 
-    public static GameObject GetPrefab(GameObject prefab, Transform parenttransform)
+    public static GameObject GetPrefab(GameObject prefab, Transform parentTransform)
     {
-        GameObject obj = Instantiate(prefab) as GameObject;
+        GameObject obj = Instantiate(prefab);
 
-        obj.transform.SetParent(parenttransform, false);
+        obj.transform.SetParent(parentTransform, false);
 
         return obj;
     }
