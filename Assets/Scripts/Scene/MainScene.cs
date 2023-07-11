@@ -60,7 +60,7 @@ public class MainScene : MonoBehaviour
                 if (MonsterSpawner.WaveCount == 5)
                 {
                     isWaveClear = value;
-                    EnterBossStage();
+                    EnterBossRoom();
                 }
             }
         }
@@ -144,7 +144,7 @@ public class MainScene : MonoBehaviour
         gemText.text = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem).ToString();
     }
 
-    private void EnterBossStage()
+    private void EnterBossRoom()
     {
         if (isWaveClear)
         {
@@ -158,10 +158,10 @@ public class MainScene : MonoBehaviour
             //fadeImage.transform.SetAsFirstSibling();
             _fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Destroy(_fadeImage));
 
-            Invoke("VersusSetting", delayTime);
+            Invoke("StartBossBattle", delayTime);
         }
     }
-    private void VersusSetting()
+    private void StartBossBattle()
     {
         StartCoroutine(BossBattle());
     }
@@ -204,17 +204,16 @@ public class MainScene : MonoBehaviour
 
     private void StageClear()
     {
-        float durationTime = 1.0f;
-        float delayTime = 3.0f;
+        float fadeTime = 1.0f;
 
         var _victoryText = Instantiate(victoryText, upSidePanel.transform);
 
-        Color color = _victoryText.color;    //알파값 초기화
+        Color color = _victoryText.color;    //알파값 0으로 초기화
         color.a = 0f;
         _victoryText.color = color;
 
-        _victoryText.DOFade(1f, durationTime).OnComplete(() =>
-        _victoryText.DOFade(0f, durationTime).OnComplete(() => StageClear2()));
+        _victoryText.DOFade(1f, fadeTime).OnComplete(() =>
+        _victoryText.DOFade(0f, fadeTime).OnComplete(() => StageClear2()));
     }
     private void StageClear2()
     {
