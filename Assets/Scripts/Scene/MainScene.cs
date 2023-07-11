@@ -5,6 +5,11 @@ using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
 using static GameDataManager;
+using Unity.VisualScripting;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
+using System;
+
 public class MainScene : MonoBehaviour
 {
     private static MainScene instance;
@@ -85,6 +90,9 @@ public class MainScene : MonoBehaviour
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
     private TMP_Text gemText;
+    private RectTransform category1_UI;
+    private GameObject popupUI_0 = null;
+    private GameObject popupUI_1 = null;
     private IEnumerator Start()
     {
         GlobalManager.Instance.Init();
@@ -98,7 +106,7 @@ public class MainScene : MonoBehaviour
            }
         );
 
-        spawner = FindChildComponent<MonsterSpawner>(transform);
+        spawner = Util.FindChildComponent<MonsterSpawner>(transform);
     }
 
     private void Init()
@@ -114,6 +122,25 @@ public class MainScene : MonoBehaviour
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
+
+        popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
+        popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
+
+        // 바텀 카테고리 버튼
+        Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
+        int categoryButtonCount = bottomCategortButton.childCount;
+        for (int i = 0; i < categoryButtonCount; i++)
+        {
+            int index = i;
+
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerUp;
+            entry.callback.AddListener((eventData) => OnClickCategory(index, eventData.selectedObject));
+
+            EventTrigger button = bottomCategortButton.GetChild(i).GetComponent<EventTrigger>();
+            button.triggers.Add(entry);
+        }
+
     }
     public void SetPlayer(string charName)
     {
@@ -161,6 +188,77 @@ public class MainScene : MonoBehaviour
             Invoke("StartBossBattle", delayTime);
         }
     }
+
+    int invisiblePosY = -1700;
+    private void OnClickCategory(int categoryType, GameObject onClickButton)
+    {
+        switch (categoryType)
+        {
+            case 0:
+                OpenUI_Category1(onClickButton);
+                break;
+        }
+    }
+
+    void OpenUI_Category1(GameObject clickButton)
+    {
+        if (category1_UI == null)
+        {
+            category1_UI = CommonFuntion.GetPrefab("UI/Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+        }
+        else
+        {
+            bool active = category1_UI.gameObject.activeSelf;
+
+            if (active)
+            {
+                category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+            }
+            else
+            {
+                category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+            }
+
+            category1_UI.gameObject.SetActive(!active);
+        }
+
+        clickButton.transform.Find("Text").gameObject.SetActive(!category1_UI.gameObject.activeSelf);
+        clickButton.transform.Find("CloseImage").gameObject.SetActive(category1_UI.gameObject.activeSelf);
+
+        Transform parent = category1_UI.Find("BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            int index = i;
+            Button button = parent.GetChild(i).GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
+
+            switch (index)
+            {
+                case 0:
+                    button.onClick.AddListener(ShowUI_Character);
+                    break;
+                case 1:
+                    button.onClick.AddListener(ShowUI_Skill);
+                    break;
+            }
+        }
+    }
+    void ShowUI_Character()
+    {
+        Debug.Log("ShowUI_Character");
+        category1_UI.Find("Type1_Character").gameObject.SetActive(true);
+        category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
+    }
+
+    void ShowUI_Skill()
+    {
+        Debug.Log("ShowUI_Skill");
+        category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
+        category1_UI.Find("Type1_Character").gameObject.SetActive(false);
+    }
+
+
     private void StartBossBattle()
     {
         StartCoroutine(BossBattle());
@@ -226,28 +324,7 @@ public class MainScene : MonoBehaviour
 
         playerCharacter.transform.DOMove(movePoint.position, movingTime);
     }
-    private T FindChildComponent<T>(Transform parent) where T : Component
-    {
-        T foundComponent = null;
 
-        for (int i = 0; i < parent.childCount; i++)
-        {
-            Transform child = parent.GetChild(i);
-
-            T component = child.GetComponent<T>();
-            if (component != null)
-            {
-                foundComponent = component;
-                break;
-            }
-
-            foundComponent = FindChildComponent<T>(child);
-            if (foundComponent != null)
-                break;
-        }
-
-        return foundComponent;
-    }
 
     public void GetGoods(double getGold = 0, double getGem = 0)
     {

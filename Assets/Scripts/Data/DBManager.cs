@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [FirestoreData]
@@ -11,7 +12,6 @@ public class UserDatas
 {
     //[FirestoreProperty] public double Gold { get; set; }
     //[FirestoreProperty] public double Gem { get; set; }
-
 }
 
 public enum UserDoubleDataType
@@ -22,6 +22,10 @@ public enum UserDoubleDataType
     AttackSpeedLevel,
     CriticalLevel,
     HpLevel,
+}
+public enum UserStringDataType
+{
+
 }
 
 public class DBManager : Manager<DBManager>
@@ -84,64 +88,14 @@ public class DBManager : Manager<DBManager>
 
         Ininialized = true;
     }
-    async void LoadGameDataFromFirebase()
-    {
-        await firebaseGameData.GetSnapshotAsync().ContinueWithOnMainThread(task =>
-        {
-            QuerySnapshot GameDataQuerySnapshot = task.Result;
-            foreach (DocumentSnapshot documentSnapshot in GameDataQuerySnapshot.Documents)
-            {
-                //Debug.Log($"Document data for document : {documentSnapshot.Id} ");
-                Dictionary<string, object> data = documentSnapshot.ToDictionary();
-
-                switch(documentSnapshot.Id)
-                {
-                    case "Monster":
-                        {
-                            foreach (KeyValuePair<string, object> pair in data)
-                            {
-                                //Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
-                                GameDataManager.MonsterTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
-                            }
-                            break;
-                        }
-                    case "Status":
-                        {
-                            foreach (KeyValuePair<string, object> pair in data)
-                            {
-                                //Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
-                                GameDataManager.StatusTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
-                            }
-                        }
-                        break;
-
-                    default: 
-                        break;
-                }
-
-                //else if (documentSnapshot.Id == "Status")
-                //{
-                //    foreach (KeyValuePair<string, object> pair in data)
-                //    {
-                //        Debug.Log(String.Format("{0}: {1}", pair.Key, pair.Value));
-                //        GameDataManager.StatusTemplate.Add(pair.Key, pair.Value.ToString().Split(','));
-                //    }
-                //}
-
-
-                // Newline to separate entries
-                //Debug.Log("");
-            }
-        });
-
-    }
-
 
     public double GetUserDoubleData(UserDoubleDataType key_, double defaultValue = 0)
     {
         string key = key_.ToString();
         if (userDoubleDataDic.ContainsKey(key.ToString()))
             return userDoubleDataDic[key.ToString()];
+        else
+            UpdateUserData(key, defaultValue);
 
         return defaultValue;
     }
@@ -149,6 +103,8 @@ public class DBManager : Manager<DBManager>
     {
         if (userDoubleDataDic.ContainsKey(key))
             return userDoubleDataDic[key];
+        else
+            UpdateUserData(key, defaultValue);
 
         return defaultValue;
     }
@@ -157,6 +113,8 @@ public class DBManager : Manager<DBManager>
         string key = key_.ToString();
         if (usesrStringDataDic.ContainsKey(key))
             return usesrStringDataDic[key];
+        else
+            UpdateUserData(key, defaultValue);
 
         return defaultValue;
     }
@@ -164,6 +122,8 @@ public class DBManager : Manager<DBManager>
     {
         if (usesrStringDataDic.ContainsKey(key))
             return usesrStringDataDic[key];
+        else
+            UpdateUserData(key, defaultValue);
 
         return defaultValue;
     }
@@ -272,7 +232,7 @@ public class DBManager : Manager<DBManager>
 
         await uidRef.UpdateAsync(updates).ContinueWithOnMainThread(task =>
         {
-            Debug.Log($"{key} : {value} Update");
+            //Debug.Log($"{key} : {value} Update");
         });
     }
     public override void InitializedFininsh()
