@@ -30,9 +30,10 @@ public class GameDataManager : Manager<GameDataManager>
 
         Max,
     }
-    public enum MonsterSpawnTemplate_
+    public enum StageTemplate_
     {
         None = -1,
+        StageId,
         Stage,
         Monster,
         MapImage,
@@ -43,13 +44,13 @@ public class GameDataManager : Manager<GameDataManager>
 
     public static Dictionary<string, string[]> MonsterTemplate;
     public static Dictionary<string, string[]> StatusTemplate;
-    public static Dictionary<string, string[]> MonsterSpawnTemplate;
+    public static Dictionary<string, string[]> StageTemplate;
 
     private void Awake()
     {
         MonsterTemplate = CSVRead("data/Monster_Template");
         StatusTemplate = CSVRead("data/Status_Template");
-        MonsterSpawnTemplate = CSVRead("data/MonsterSpawn_Template");
+        StageTemplate = CSVRead("data/Stage_Template");
 
         Ininialized = true;
     }

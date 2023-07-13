@@ -116,7 +116,7 @@ public class MainScene : MonoBehaviour
 
         Debug.Log("메인 씬시작");
 
-        SetStage("1-1");    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
+        SetStage("1");    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
 
         SetPlayer("ch001"); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
 
@@ -156,9 +156,9 @@ public class MainScene : MonoBehaviour
     }
     public void SetStage(string stageName)
     {
-        mapName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.MapImage];  //맵세팅
-        monsterName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Monster];   //몬스터 세팅
-        bossName = MonsterSpawnTemplate[stageName][(int)MonsterSpawnTemplate_.Boss]; //보스몬스터 세팅
+        mapName = StageTemplate[stageName][(int)StageTemplate_.MapImage];  //맵세팅
+        monsterName = StageTemplate[stageName][(int)StageTemplate_.Monster]; //몬스터 세팅
+        bossName = StageTemplate[stageName][(int)StageTemplate_.Boss]; //보스몬스터 세팅
 
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
