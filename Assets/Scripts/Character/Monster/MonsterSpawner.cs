@@ -43,7 +43,7 @@ public class MonsterSpawner : MonoBehaviour
         SetMonster();
     }
 
-    private void SetMonster()
+    public void SetMonster()
     {
         ClearWaveTrigger();
 
@@ -61,7 +61,7 @@ public class MonsterSpawner : MonoBehaviour
         }
         else
         {
-            monsterPool.ClearPool();
+            monsterPool = null;
             monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
         }
         Destroy(_monster);
@@ -77,7 +77,7 @@ public class MonsterSpawner : MonoBehaviour
         }
         else
         {
-            bossMonsterPool.ClearPool();
+            bossMonsterPool = null;
             bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
         }
         Destroy(_bossMonster);

@@ -50,6 +50,7 @@ public class MainScene : MonoBehaviour
     [SerializeField] private TextMeshProUGUI victoryText;
 
     private MonsterSpawner spawner; //스테이지 세팅용
+    [HideInInspector] public int stageId;
     [HideInInspector] public string mapName;
     [HideInInspector] public string monsterName;
     [HideInInspector] public string bossName;
@@ -116,7 +117,8 @@ public class MainScene : MonoBehaviour
 
         Debug.Log("메인 씬시작");
 
-        SetStage("1");    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
+        stageId = 1;
+        SetStage(stageId.ToString());    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
 
         SetPlayer("ch001"); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
 
@@ -145,7 +147,7 @@ public class MainScene : MonoBehaviour
     public void SetPlayer(string charName)
     {
         if (playerCharacter != null)
-            Destroy(playerCharacter);
+            Destroy(playerCharacter.gameObject);
 
         var _playerCharacter = Resources.Load<GameObject>($"Player/{charName}");   //플레이어 캐릭터 세팅
         playerCharacter = Instantiate(_playerCharacter, transform);
@@ -154,11 +156,11 @@ public class MainScene : MonoBehaviour
         playerCharacter.AddComponent<PlayerController>();
         IsPlayer = true;
     }
-    public void SetStage(string stageName)
+    public void SetStage(string stageId)
     {
-        mapName = StageTemplate[stageName][(int)StageTemplate_.MapImage];  //맵세팅
-        monsterName = StageTemplate[stageName][(int)StageTemplate_.Monster]; //몬스터 세팅
-        bossName = StageTemplate[stageName][(int)StageTemplate_.Boss]; //보스몬스터 세팅
+        mapName = StageTemplate[stageId][(int)StageTemplate_.MapImage];  //맵세팅
+        monsterName = StageTemplate[stageId][(int)StageTemplate_.Monster]; //몬스터 세팅
+        bossName = StageTemplate[stageId][(int)StageTemplate_.Boss]; //보스몬스터 세팅
 
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
@@ -179,7 +181,7 @@ public class MainScene : MonoBehaviour
             IsWaveClear = false;
 
             float fadeInTime = 1.0f;
-            float delayTime = 2.0f;
+            float delayTime = 1.0f;
 
             var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
             //fadeImage.transform.SetAsFirstSibling();
@@ -188,6 +190,84 @@ public class MainScene : MonoBehaviour
             Invoke("StartBossBattle", delayTime);
         }
     }
+    private void StartBossBattle()
+    {
+        StartCoroutine(BossBattle());
+    }
+    private IEnumerator BossBattle()
+    {
+        float delayTime = 2.0f;
+
+        int targetLayer = LayerMask.NameToLayer("Over UI");
+
+        var _vsImage = Instantiate(vsImage, upSidePanel.transform);
+
+        playerPref = Resources.Load<GameObject>("Player/ch001");
+        var _playerPref = Instantiate(playerPref, playerPosition);
+        _playerPref.transform.position = playerPosition.position;
+        ChangeLayer(_playerPref, targetLayer);
+
+        bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
+        var _bossPref = Instantiate(bossPref, bossPosition);
+        _bossPref.transform.position = bossPosition.position;
+        ChangeLayer(_bossPref, targetLayer);
+
+        yield return new WaitForSeconds(delayTime);
+
+        Destroy(_bossPref);
+        Destroy(_playerPref);
+        Destroy(_vsImage.gameObject);
+
+        spawner.SpawnBossMonster();
+    }
+    private void ChangeLayer(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+
+        for (int i = 0; i < obj.transform.childCount; i++)
+        {
+            GameObject childObj = obj.transform.GetChild(i).gameObject;
+            ChangeLayer(childObj, layer);
+        }
+    }
+
+    private void StageClear()
+    {
+        float fadeTime = 1.0f;
+
+        var _victoryText = Instantiate(victoryText, upSidePanel.transform);
+
+        Color color = _victoryText.color;    //알파값 0으로 초기화
+        color.a = 0f;
+        _victoryText.color = color;
+
+        _victoryText.DOFade(1f, fadeTime).OnComplete(() =>
+        _victoryText.DOFade(0f, fadeTime).OnComplete(() => StageClear2()));
+    }
+    private void StageClear2()
+    {
+        float durationTime = 3.0f;
+        float movingTime = 3.0f;
+
+        var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
+        _fadeImage.DOFade(1f, durationTime).OnComplete(() => Destroy(_fadeImage));
+
+        playerCharacter.transform.DOMove(movePoint.position, movingTime).OnComplete(() => StageClear3());
+    }
+    private void StageClear3()
+    {
+        stageId += 1;
+        
+        if(StageTemplate.Count < stageId)
+        {
+            stageId -= 1;
+        }           
+
+        SetPlayer("ch001");
+        SetStage(stageId.ToString());
+        spawner.SetMonster();
+    }
+
 
     int invisiblePosY = -1700;
     private void OnClickCategory(int categoryType, GameObject onClickButton)
@@ -257,74 +337,6 @@ public class MainScene : MonoBehaviour
         category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
         category1_UI.Find("Type1_Character").gameObject.SetActive(false);
     }
-
-
-    private void StartBossBattle()
-    {
-        StartCoroutine(BossBattle());
-    }
-    private IEnumerator BossBattle()
-    {
-        float delayTime = 2.0f;
-
-        int targetLayer = LayerMask.NameToLayer("Over UI");
-
-        var _vsImage = Instantiate(vsImage, upSidePanel.transform);
-
-        playerPref = Resources.Load<GameObject>("Player/ch001");
-        var _playerPref = Instantiate(playerPref, playerPosition);
-        _playerPref.transform.position = playerPosition.position;
-        ChangeLayer(_playerPref, targetLayer);
-
-        bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
-        var _bossPref = Instantiate(bossPref, bossPosition);
-        _bossPref.transform.position = bossPosition.position;
-        ChangeLayer(_bossPref, targetLayer);
-
-        yield return new WaitForSeconds(delayTime);
-
-        Destroy(_bossPref);
-        Destroy(_playerPref);
-        Destroy(_vsImage.gameObject);
-
-        spawner.SpawnBossMonster();
-    }
-    private void ChangeLayer(GameObject obj, int layer)
-    {
-        obj.layer = layer;
-
-        for (int i = 0; i < obj.transform.childCount; i++)
-        {
-            GameObject childObj = obj.transform.GetChild(i).gameObject;
-            ChangeLayer(childObj, layer);
-        }
-    }
-
-    private void StageClear()
-    {
-        float fadeTime = 1.0f;
-
-        var _victoryText = Instantiate(victoryText, upSidePanel.transform);
-
-        Color color = _victoryText.color;    //알파값 0으로 초기화
-        color.a = 0f;
-        _victoryText.color = color;
-
-        _victoryText.DOFade(1f, fadeTime).OnComplete(() =>
-        _victoryText.DOFade(0f, fadeTime).OnComplete(() => StageClear2()));
-    }
-    private void StageClear2()
-    {
-        float durationTime = 1.0f;
-        float delayTime = 3.0f;
-        float movingTime = 3.0f;
-
-        var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
-        _fadeImage.DOFade(1f, durationTime);
-
-        playerCharacter.transform.DOMove(movePoint.position, movingTime);
-    }
-
 
     public void GetGoods(double getGold = 0, double getGem = 0)
     {

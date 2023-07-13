@@ -43,7 +43,7 @@ public class MonsterController : MonoBehaviour
                     ResetAllTriggers();
                     monsterAnimator.SetTrigger("Walk");
 
-                    transform.position = Vector3.MoveTowards(transform.position, player.transform.position, moveSpeed * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(transform.position, player.transform.position, moveSpeed * Time.deltaTime); //플레이어 위치값 받아오는거 수정해
                     if (Mathf.Abs(Vector3.Distance(transform.position, player.transform.position)) <= attackRange)
                     {
                         CurrentMonsterState = MonsterState.Attacking;
