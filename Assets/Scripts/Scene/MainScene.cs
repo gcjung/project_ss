@@ -118,7 +118,7 @@ public class MainScene : MonoBehaviour
         Debug.Log("메인 씬시작");
 
         stageId = 1;
-        SetStage(stageId.ToString());    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
+        SetStage(stageId);    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
 
         SetPlayer("ch001"); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
 
@@ -156,11 +156,11 @@ public class MainScene : MonoBehaviour
         playerCharacter.AddComponent<PlayerController>();
         IsPlayer = true;
     }
-    public void SetStage(string stageId)
+    public void SetStage(int stageId)
     {
-        mapName = StageTemplate[stageId][(int)StageTemplate_.MapImage];  //맵세팅
-        monsterId = int.Parse(StageTemplate[stageId][(int)StageTemplate_.Monster]); //몬스터 세팅
-        bossId = int.Parse(StageTemplate[stageId][(int)StageTemplate_.Boss]); //보스몬스터 세팅
+        mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵세팅
+        monsterId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Monster]); //몬스터 세팅
+        bossId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Boss]); //보스몬스터 세팅
 
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
@@ -267,7 +267,7 @@ public class MainScene : MonoBehaviour
         }           
 
         SetPlayer("ch001");
-        SetStage(stageId.ToString());
+        SetStage(stageId);
         spawner.SetMonster();
     }
 
@@ -347,15 +347,17 @@ public class MainScene : MonoBehaviour
         {
             double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
-            goldText.text = $"{(currentGold + getGold)}";
+            //goldText.text = $"{(currentGold + getGold)}";
+            goldText.text = Util.BigNumCalculate(currentGold + getGold);
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold + getGold);
         }
 
         if (getGem > 0)
         {
             double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
-            
-            gemText.text = $"{(currentGem + getGem)}";
+
+            //gemText.text = $"{(currentGem + getGem)}";
+            gemText.text = Util.BigNumCalculate(currentGem + getGem);
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem + getGem);
         }
     }
