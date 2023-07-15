@@ -52,8 +52,8 @@ public class MainScene : MonoBehaviour
     private MonsterSpawner spawner; //스테이지 세팅용
     [HideInInspector] public int stageId;
     [HideInInspector] public string mapName;
-    [HideInInspector] public string monsterName;
-    [HideInInspector] public string bossName;
+    [HideInInspector] public int monsterId;
+    [HideInInspector] public int bossId;
 
     private bool isWaveClear = false;
     public bool IsWaveClear
@@ -159,8 +159,8 @@ public class MainScene : MonoBehaviour
     public void SetStage(string stageId)
     {
         mapName = StageTemplate[stageId][(int)StageTemplate_.MapImage];  //맵세팅
-        monsterName = StageTemplate[stageId][(int)StageTemplate_.Monster]; //몬스터 세팅
-        bossName = StageTemplate[stageId][(int)StageTemplate_.Boss]; //보스몬스터 세팅
+        monsterId = int.Parse(StageTemplate[stageId][(int)StageTemplate_.Monster]); //몬스터 세팅
+        bossId = int.Parse(StageTemplate[stageId][(int)StageTemplate_.Boss]); //보스몬스터 세팅
 
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
@@ -169,8 +169,12 @@ public class MainScene : MonoBehaviour
     private void InitUIfromDB()
     {
         Debug.Log("InitUIfromDB");
-        goldText.text = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold).ToString();
-        gemText.text = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem).ToString();
+
+        double gold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
+        double gem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
+
+        goldText.text = Util.BigNumCalculate(gold);
+        gemText.text = Util.BigNumCalculate(gem);
     }
 
     private void EnterBossRoom()
@@ -197,9 +201,7 @@ public class MainScene : MonoBehaviour
     private IEnumerator BossBattle()
     {
         float delayTime = 2.0f;
-
         int targetLayer = LayerMask.NameToLayer("Over UI");
-
         var _vsImage = Instantiate(vsImage, upSidePanel.transform);
 
         playerPref = Resources.Load<GameObject>("Player/ch001");
@@ -207,6 +209,7 @@ public class MainScene : MonoBehaviour
         _playerPref.transform.position = playerPosition.position;
         ChangeLayer(_playerPref, targetLayer);
 
+        string bossName = MonsterTemplate[bossId.ToString()][(int)MonsterTemplate_.Name];
         bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
         var _bossPref = Instantiate(bossPref, bossPosition);
         _bossPref.transform.position = bossPosition.position;

@@ -9,10 +9,10 @@ public class Monster : MonoBehaviour
     //public double MaxHp { get; private set; } = 100;
     //public double CurrentHp { get; private set; } = 100;
     //public double Attack { get; private set; } = 1;
-    public double maxHp;
-    public double currentHp;
-    public double attack;
-    public double gold;
+    [HideInInspector] public double maxHp;
+    [HideInInspector] public double currentHp;
+    [HideInInspector] public double attack;
+    [HideInInspector] public double gold;
 
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
@@ -40,11 +40,11 @@ public class Monster : MonoBehaviour
             monsterController = controller;
         }
     }
-    public void SetMonsterStat(string monsterName)
+    public void SetMonsterStat(int monsterId)
     {
-        maxHp = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Hp]);
-        attack = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Attack]);
-        gold = double.Parse(MonsterTemplate[monsterName][(int)MonsterTemplate_.Gold]);
+        maxHp = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Hp]);
+        attack = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Attack]);
+        gold = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Gold]);
 
         currentHp = maxHp;
     }

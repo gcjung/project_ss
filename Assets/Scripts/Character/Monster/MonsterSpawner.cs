@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static GameDataManager;
 public class MonsterSpawner : MonoBehaviour
 {
     [Header("Stage Slider")]
@@ -50,37 +51,44 @@ public class MonsterSpawner : MonoBehaviour
         if (!slider.IsActive())
             slider.gameObject.SetActive(true);
 
-        monster = Resources.Load<Monster>($"Monster/{mainScene.monsterName}");     //일반몬스터 세팅        
-        var _monster = Instantiate(monster, transform);
-        _monster.gameObject.AddComponent<MonsterController>();
-        _monster.gameObject.SetActive(false);
-        _monster.SetMonsterStat(mainScene.monsterName);
-        if (monsterPool == null)   
-        {
-            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
-        }
-        else
-        {
-            monsterPool = null;
-            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
-        }
-        Destroy(_monster);
+        string monsterName = MonsterTemplate[mainScene.monsterId.ToString()][(int)MonsterTemplate_.Name];
+        string bossName = MonsterTemplate[mainScene.bossId.ToString()][(int)MonsterTemplate_.Name];
 
-        bossMonster = Resources.Load<Monster>($"Monster/{mainScene.bossName}");     //보스몬스터 세팅
-        var _bossMonster = Instantiate(bossMonster, transform);
-        _bossMonster.gameObject.AddComponent<MonsterController>();
-        _bossMonster.gameObject.SetActive(false);
-        _bossMonster.SetMonsterStat(mainScene.bossName);
-        if (bossMonsterPool == null)
-        {
-            bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
+        {//일반몬스터 세팅   
+            monster = Resources.Load<Monster>($"Monster/{monsterName}");          
+            var _monster = Instantiate(monster, transform);
+            _monster.gameObject.AddComponent<MonsterController>();
+            _monster.gameObject.SetActive(false);
+            _monster.SetMonsterStat(mainScene.monsterId);
+            if (monsterPool == null)
+            {
+                monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+            }
+            else
+            {
+                monsterPool = null;
+                monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+            }
+            Destroy(_monster);
         }
-        else
-        {
-            bossMonsterPool = null;
-            bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
-        }
-        Destroy(_bossMonster);
+
+        {//보스몬스터 세팅
+            bossMonster = Resources.Load<Monster>($"Monster/{bossName}");     
+            var _bossMonster = Instantiate(bossMonster, transform);
+            _bossMonster.gameObject.AddComponent<MonsterController>();
+            _bossMonster.gameObject.SetActive(false);
+            _bossMonster.SetMonsterStat(mainScene.bossId);
+            if (bossMonsterPool == null)
+            {
+                bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
+            }
+            else
+            {
+                bossMonsterPool = null;
+                bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
+            }
+            Destroy(_bossMonster);
+        }        
     }
     private IEnumerator SpawnMonster()
     {

@@ -2069,6 +2069,7 @@ MonoBehaviour:
   bossPosition: {fileID: 1424292077}
   movePoint: {fileID: 1242721248}
   victoryText: {fileID: 6669254609789748411, guid: 3b3ca7fda0fcc514698ec2e21119fee7, type: 3}
+  stageId: 0
   mapName: 
   monsterName: 
   bossName: 
@@ -4934,7 +4935,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1750882668
 Transform:
   m_ObjectHideFlags: 0

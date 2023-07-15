@@ -12,6 +12,7 @@ public class GameDataManager : Manager<GameDataManager>
     public enum MonsterTemplate_
     {
         None = -1,
+        MonsterId,
         Name,
         Hp,
         Attack,
