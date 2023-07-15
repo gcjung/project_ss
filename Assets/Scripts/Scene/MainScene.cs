@@ -50,6 +50,7 @@ public class MainScene : MonoBehaviour
     [SerializeField] private TextMeshProUGUI victoryText;
 
     private MonsterSpawner spawner; //스테이지 세팅용
+    [HideInInspector] public string playerName;    //임시 테스트용
     [HideInInspector] public int stageId;
     [HideInInspector] public string mapName;
     [HideInInspector] public int monsterId;
@@ -120,7 +121,8 @@ public class MainScene : MonoBehaviour
         stageId = 1;
         SetStage(stageId);    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
 
-        SetPlayer("ch001"); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
+        playerName = "ch001";
+        SetPlayer(playerName); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
@@ -264,13 +266,12 @@ public class MainScene : MonoBehaviour
         if(StageTemplate.Count < stageId)
         {
             stageId -= 1;
-        }           
+        }
 
-        SetPlayer("ch001");
+        SetPlayer(playerName);
         SetStage(stageId);
         spawner.SetMonster();
     }
-
 
     int invisiblePosY = -1700;
     private void OnClickCategory(int categoryType, GameObject onClickButton)
