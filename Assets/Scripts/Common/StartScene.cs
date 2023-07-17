@@ -76,7 +76,7 @@ public class StartScene : MonoBehaviour
     public void DestoryPanel()
     {
         Destroy(logoPanel);
-
+        
         startPanel = Instantiate(startPanel, loadingCanvas.transform);
     }
 

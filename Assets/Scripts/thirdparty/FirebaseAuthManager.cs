@@ -95,7 +95,6 @@ public class FirebaseAuthManager
 
             case LoginType.Google:
                 GPGS.Instance.LoginGoogleAccount();
-                StartScene.logtest("test1");
                 result = await SignInFirebaseWithGoogleAccount();
                 break;
         }
@@ -103,7 +102,6 @@ public class FirebaseAuthManager
         if(result)
         {
             CloseLoginPanel();
-            StartScene.logtest("test3");
         }
         else
         {
@@ -163,42 +161,32 @@ public class FirebaseAuthManager
             });
     }
 
-    string idToken = "";
-    private IEnumerator GetGoogleIdToken()
-    {
-        while (string.IsNullOrEmpty(((PlayGamesLocalUser)Social.localUser).GetIdToken()))
-            yield return null;
-
-        idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
-    }
     public async Task<bool> SignInFirebaseWithGoogleAccount(Action action = null)
     {
         bool result = true;
         if (auth.CurrentUser != null) return result;
-        
-        string idToken = ((PlayGamesLocalUser)PlayGamesPlatform.Instance.localUser).GetIdToken();
 
-        StartScene.logtest(str1: "test2");
+        string idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
+
+        await Task.Delay(1000);
+        idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
+
         Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
-        StartScene.logtest(str2: "test2");
-        StartScene.logtest(str3: string.IsNullOrEmpty(idToken)? "empty" : idToken);
         await auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
         {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInWithCredentialAsync was canceled.");
                 result = false;
-                StartScene.logtest(str1: "test@");
                 return;
             }
             if (task.IsFaulted)
             {
                 Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
                 result = false;
-                StartScene.logtest(str1: task.Exception.ToString());
                 return;
             }
-            
+
             action?.Invoke();
         });
 
