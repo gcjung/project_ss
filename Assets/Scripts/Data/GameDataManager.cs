@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Events;
-using static GameDataManager;
 
 
 public class GameDataManager : Manager<GameDataManager>
@@ -47,13 +46,23 @@ public class GameDataManager : Manager<GameDataManager>
     public static Dictionary<string, string[]> StatusTemplate;
     public static Dictionary<string, string[]> StageTemplate;
 
-    private void Awake()
+    public override void Init()
     {
+        if (Ininialized)
+        {
+            Debug.Log("GameDataManmger already Initialized");
+            return;
+        }
         MonsterTemplate = CSVRead("data/Monster_Template");
         StatusTemplate = CSVRead("data/Status_Template");
         StageTemplate = CSVRead("data/Stage_Template");
 
         Ininialized = true;
+    }
+
+    public override void InitializedFininsh()
+    {
+        //throw new System.NotImplementedException();
     }
 
     const string COMMA_SPLIT = @"\s*,\s*";
@@ -89,13 +98,5 @@ public class GameDataManager : Manager<GameDataManager>
         return dic;
     }
 
-    public override void Init()
-    {
-        //throw new System.NotImplementedException();
-    }
 
-    public override void InitializedFininsh()
-    {
-        //throw new System.NotImplementedException();
-    }
 }

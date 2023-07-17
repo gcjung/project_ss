@@ -7,6 +7,7 @@ using DG.Tweening;
 using Firebase.Auth;
 using UnityEngine.SocialPlatforms;
 using GooglePlayGames;
+using System.Threading.Tasks;
 
 public class StartScene : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class StartScene : MonoBehaviour
     private float fadeInTime = 2f;
     private float fadeOutTime = 2f;
     private float delayTime = 2f;
+
+
     private void Awake()
     {
         loadingCanvas = GameObject.Find("Canvas");
@@ -31,20 +34,21 @@ public class StartScene : MonoBehaviour
         canvasGroup = logoPanel.GetComponent<CanvasGroup>();
         canvasGroup.alpha = 0f;
 
-        GPGS.Instance.LoginGoogleAccount();
     }
 
     private IEnumerator Start()
     {
-        Debug.Log("start@@");
         GlobalManager.Instance.Init();
 
         yield return CommonIEnumerator.IEWaitUntil(
            predicate: () => { return GlobalManager.Instance.Initialized; },
-           onFinish: () => { Init(); }
+           onFinish: () => { 
+               Init();
+           }
         );
     }
 
+  
     private void Init()
     {
         Debug.Log("스타트씬 시작");
@@ -59,9 +63,16 @@ public class StartScene : MonoBehaviour
 
     public void FadeOut()
     {
-        canvasGroup.DOFade(0f, fadeOutTime).OnComplete(() => DestoryPanel());
+        canvasGroup.DOFade(0f, fadeOutTime).OnComplete((TweenCallback)(() =>
+        {
+            DestoryPanel();
+            ShowLoginPanel();
+        }));
     }
-
+    private void ShowLoginPanel()
+    {
+        FirebaseAuthManager.Instance.ShowLoginPanel();
+    }
     public void DestoryPanel()
     {
         Destroy(logoPanel);
@@ -72,10 +83,10 @@ public class StartScene : MonoBehaviour
 
     #region 테스트용
     // 테스트
-    string log1;
-    string log2;
-    string log3;
-    public void logtest(string str1 = "", string str2 = "", string str3 = "")
+    static string log1;
+    static string log2;
+    static string log3;
+    public static void logtest(string str1 = "", string str2 = "", string str3 = "")
     {
         if (!string.IsNullOrEmpty(str1))
             log1 = str1;
@@ -94,29 +105,14 @@ public class StartScene : MonoBehaviour
             log2 = "";
             startPanel.GetComponent<CanvasGroup>().alpha = 1f;
         }
-        //if (GUILayout.Button("플레이스토어 로그인"))
-        //{
-        //    Social.localUser.Authenticate((bool success) => {
-        //        // handle success or failure
-        //        if (success)
-        //        {
-        //            log1 = $"{success}, authCode : {PlayGamesPlatform.Instance.GetServerAuthCode()}";
-        //        }
-        //        else { }
 
-        //    });
-        //}
-        //if (GUILayout.Button("플레이스토어 로그아웃"))
-        //{
-        //    GPGS.Instance.LogoutPlayGames();
-        //}
 
         if (GUILayout.Button("로그인 Check"))
         {
             startPanel.GetComponent<CanvasGroup>().alpha = 0.3f;
 
 
-            if (FirebaseAuthManager.Instance.isCurrentUserLoggedin())
+            if (FirebaseAuthManager.Instance.isCurrentLogin())
             {
                 log1 = $"파이어베이스 등록 OK, uid : {FirebaseAuth.DefaultInstance.CurrentUser.UserId}";
             }

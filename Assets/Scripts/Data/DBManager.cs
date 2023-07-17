@@ -34,20 +34,35 @@ public class DBManager : Manager<DBManager>
     Dictionary<string, string> usesrStringDataDic = new Dictionary<string, string>();
     
     CollectionReference firebaseUserDB;
-    CollectionReference firebaseGameData;
     DocumentReference uidRef;
     UserDatas dataTable;
     
-
     public void Awake()
     {
         firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
-        firebaseGameData = FirebaseFirestore.DefaultInstance.Collection("DataTable");
-        uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
         dataTable = new UserDatas();
+    }
+    public override void Init()
+    {
+        if (Ininialized)
+        {
+            Debug.Log("DBManager already Initialized");
+            return;
+        }
 
-        LoadUserDBFromFirebase();
-        //LoadGameDataFromFirebase();
+        if (FirebaseAuthManager.Instance.isCurrentLogin())
+        {
+            uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
+            LoadUserDBFromFirebase();
+        }
+        else
+        {
+            Ininialized = true;
+        }
+    }
+    public override void InitializedFininsh()
+    {
+        //
     }
 
     async void LoadUserDBFromFirebase()
@@ -80,10 +95,10 @@ public class DBManager : Manager<DBManager>
         }
         else            // 최초 접속시
         {
-            await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
-            {   
-                Debug.Log($"처음 접속 시, UserDB 초기화");
-            });
+            //await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
+            //{   
+            //    Debug.Log($"처음 접속 시, UserDB 초기화");
+            //});
         }
 
         Ininialized = true;
@@ -235,17 +250,10 @@ public class DBManager : Manager<DBManager>
             //Debug.Log($"{key} : {value} Update");
         });
     }
-    public override void InitializedFininsh()
-    {
-        //
-    }
-    public override void Init()
-    {
-
-    }
 
 
-    
+
+
 
 }
 

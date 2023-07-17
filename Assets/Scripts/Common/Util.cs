@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Util
 {
@@ -31,20 +32,21 @@ public class Util
     //{
     //    GameObject obj = null;
 
-    //    if (TitleManager.Instance)
-    //        obj = GetPrefab("PopUp/MessagePopUp", TitleManager.Instance.transform.Find("Canvas"));
-    //    else if (UIManager.instance)
-    //        obj = GetPrefab("PopUp/MessagePopUp", UIManager.instance.transform.Find("PopupUI_5"));
+    //    //if (TitleManager.Instance)
+    //    //    obj = GetPrefab("PopUp/MessagePopUp", TitleManager.Instance.transform.Find("Canvas"));
+    //    //else if (UIManager.instance)
+    //        obj = CommonFuntion.GetPrefab("PopUp/MessagePopUp", UIManager.instance.transform.Find("PopupUI_0"));
 
     //    obj.transform.Find("AchieveTitle").GetComponent<TextMeshProUGUI>().text = Title;
     //    obj.transform.Find("Desc").GetComponent<TextMeshProUGUI>().text = Desc;
 
-    //    var btns = obj.transform.GetComponentsInChildren<CloseButton>();
+        
+    //    //var btns = obj.transform.GetComponentsInChildren<CloseButton>();
 
-    //    foreach (var item in btns)
-    //    {
-    //        item.closeAction += ButtonAction;
-    //    }
+    //    //foreach (var item in btns)
+    //    //{
+    //    //    item.closeAction += ButtonAction;
+    //    //}
 
     //    return obj;
     //}
