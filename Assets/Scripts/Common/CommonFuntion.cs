@@ -2,15 +2,13 @@ using DG.Tweening.Core.Easing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UIElements;
 
 public class CommonFuntion : MonoBehaviour
 {
-    static Dictionary<string, GameObject> prefabsPool = new Dictionary<string, GameObject>();
-    private void Awake()
-    {
-        prefabsPool.Clear();
-    }
+    static Dictionary<string, Object> prefabsPool = new Dictionary<string, Object>();
+    static Dictionary<string, Object> atlasPool = new Dictionary<string, Object>();
 
     public static void LoadPrefab(string prefabName)
     {
@@ -26,6 +24,14 @@ public class CommonFuntion : MonoBehaviour
         }
     }
 
+    public static GameObject GetPrefab(Object prefab, Transform parentTransform)
+    {
+        GameObject obj = Instantiate(prefab) as GameObject;
+
+        obj.transform.SetParent(parentTransform, false);
+
+        return obj;
+    }
     public static GameObject GetPrefab(string prefabName, Transform parentTransform)
     {
         LoadPrefab(prefabName);
@@ -33,12 +39,35 @@ public class CommonFuntion : MonoBehaviour
         return GetPrefab(prefabsPool[prefabName], parentTransform);
     }
 
-    public static GameObject GetPrefab(GameObject prefab, Transform parentTransform)
+    public static void LoadAtlas(string prefabName)
     {
-        GameObject obj = Instantiate(prefab);
-
-        obj.transform.SetParent(parentTransform, false);
-
-        return obj;
+        string path = "Atlas/";
+        if (!atlasPool.ContainsKey(prefabName))
+        {
+            SpriteAtlas newObj = Resources.Load<SpriteAtlas>(path + prefabName);
+            atlasPool.Add(prefabName, newObj);
+        }
+        else if (atlasPool[prefabName] == null)
+        {
+            SpriteAtlas newObj = Resources.Load<SpriteAtlas>(path + prefabName);
+            atlasPool[prefabName] = newObj;
+        }
     }
+
+    public static Sprite GetSprite_Atlas(string imageName, string atlasName)
+    {
+        LoadAtlas(atlasName);
+        
+        SpriteAtlas atlas = atlasPool[atlasName] as SpriteAtlas;
+
+        if (atlas)
+            return atlas.GetSprite(imageName);
+        else
+            return null;
+    }
+
+
 }
+
+//atlasPool.Add(atlasName, null);
+//atlasPool[atlasName] = ResourceLoader.Load_Atlas(atlasName);

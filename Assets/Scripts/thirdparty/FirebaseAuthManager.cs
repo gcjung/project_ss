@@ -36,7 +36,7 @@ public class FirebaseAuthManager
         Google,
     }
 
-    private GameObject loginPanel;
+    private GameObject loginPanel = null;
     public void ShowLoginPanel()
     {
         if (!isCurrentLogin())  // 파이어베이스 연동 X
@@ -52,7 +52,7 @@ public class FirebaseAuthManager
             loginPanel.transform.Find("LoginSelect_Panel/GuestLogin_Button").GetComponent<Button>().onClick.AddListener(
                 () => TrySignIn(LoginType.Guest));
         }
-        else        // 파이어베이스 연동상태
+        else                    // 파이어베이스 연동상태
         {
             if (!isCurrentUserAnonymous())
                 GPGS.Instance.LoginGoogleAccount();
@@ -102,10 +102,6 @@ public class FirebaseAuthManager
         if(result)
         {
             CloseLoginPanel();
-        }
-        else
-        {
-
         }
         
     }

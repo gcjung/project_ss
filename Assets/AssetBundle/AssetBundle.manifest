@@ -1,7 +1,0 @@
-ManifestFileVersion: 0
-CRC: 59860100
-AssetBundleManifest:
-  AssetBundleInfos:
-    Info_0:
-      Name: bullet
-      Dependencies: {}

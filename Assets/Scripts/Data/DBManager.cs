@@ -75,7 +75,6 @@ public class DBManager : Manager<DBManager>
             Dictionary<string, object> data = snapshot.ToDictionary();
             foreach (KeyValuePair<string, object> pair in data)
             {
-                
                 if (pair.Value is Double)
                 {
                     userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
@@ -95,10 +94,10 @@ public class DBManager : Manager<DBManager>
         }
         else            // 최초 접속시
         {
-            //await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
-            //{   
-            //    Debug.Log($"처음 접속 시, UserDB 초기화");
-            //});
+            await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
+            {
+                Debug.Log($"처음 접속 시, UserDB 초기화");
+            });
         }
 
         Ininialized = true;

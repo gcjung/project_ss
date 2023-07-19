@@ -51,6 +51,7 @@ public class GlobalManager : SingletonObject<GlobalManager>
         GameDataManager.InitializedFininsh();
 
         Initialized = true;
+        Debug.Log("Global Manager Initialized");
     }
 
     private void InitGameSetting()
