@@ -88,6 +88,12 @@ public class MainScene : MonoBehaviour
     }
     public static bool IsPlayer { get; private set; } = false;
 
+    //스탯 적용 테스트 중
+    public static int attackLevel;
+    public static int attackSpeedLevel;
+    public static int criticalLevel;
+    public static int hpLevel;
+
 
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
@@ -116,13 +122,16 @@ public class MainScene : MonoBehaviour
         if (instance == null)
             instance = this;
 
-        Debug.Log("메인 씬시작");
+        Debug.Log("메인씬 시작");
 
-        stageId = 1;
-        SetStage(stageId);    //나중에 유저 테이블에 저장되어 있는 마지막으로 플레이하던 스테이지 받아서 넣어줄 예정
+        stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
+        Debug.Log($"스테이지 ID : {stageId}"); 
+        SetStage(stageId);
 
         playerName = "ch001";
         SetPlayer(playerName); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
+
+        //SetStatusLevel()
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
@@ -160,7 +169,7 @@ public class MainScene : MonoBehaviour
     }
     public void SetStage(int stageId)
     {
-        mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵세팅
+        mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵이미지 세팅
         monsterId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Monster]); //몬스터 세팅
         bossId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Boss]); //보스몬스터 세팅
 
@@ -247,7 +256,11 @@ public class MainScene : MonoBehaviour
         _victoryText.color = color;
 
         _victoryText.DOFade(1f, fadeTime).OnComplete(() =>
-        _victoryText.DOFade(0f, fadeTime).OnComplete(() => StageClear2()));
+        _victoryText.DOFade(0f, fadeTime).OnComplete(() =>
+        {
+            StageClear2();
+            Destroy(_victoryText);
+        }));
     }
     private void StageClear2()
     {
@@ -267,6 +280,7 @@ public class MainScene : MonoBehaviour
         {
             stageId -= 1;
         }
+        GlobalManager.Instance.DBManager.UpdateUserData("CurrentStageId", stageId);
 
         SetPlayer(playerName);
         SetStage(stageId);

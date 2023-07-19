@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public double MaxHp { get; private set; } = 300;
     public double CurrentHp { get; private set; }
     public double Attack { get; private set; } = 50;
+    public double TotalAttack { get; private set; }
 
     private PlayerController playerController;
 

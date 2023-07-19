@@ -22,6 +22,7 @@ public enum UserDoubleDataType
     AttackSpeedLevel,
     CriticalLevel,
     HpLevel,
+    CurrentStageId,
 }
 public enum UserStringDataType
 {
