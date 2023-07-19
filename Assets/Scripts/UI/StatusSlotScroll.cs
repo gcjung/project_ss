@@ -99,6 +99,7 @@ public class StatusSlotScroll : MonoBehaviour
         }
 
         GlobalManager.Instance.DBManager.UpdateUserData(stat, level);
+        MainScene.UpdateStatusLevel(stat);
     }
 
     private void CreateSlots()

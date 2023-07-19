@@ -4,17 +4,33 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public double MaxHp { get; private set; } = 300;
-    public double CurrentHp { get; private set; }
-    public double Attack { get; private set; } = 50;
+    public double Attack { get; private set; }
+    public double AttackSpeed { get; private set; }
+    public double Critical { get; private set; }
+    public double MaxHp { get; private set; }
+
+    private double currentHp;
+    public double CurrentHp
+    {
+        get { return currentHp; }
+        private set
+        {
+            if (value > MaxHp)
+            {
+                currentHp = MaxHp;
+            }
+            else
+            {
+                currentHp = value;
+            }
+        }
+    }
     public double TotalAttack { get; private set; }
 
     private PlayerController playerController;
 
     private void Start()
-    {
-        CurrentHp = MaxHp;
-
+    {       
         playerController = GetComponent<PlayerController>();
     }
 
@@ -33,5 +49,14 @@ public class Player : MonoBehaviour
         playerController.SetCurrentPlayerState(PlayerState.Dead);
 
         Debug.Log("플레이어 사망");
+    }
+
+    public void SetHeroStatus(double attack, double attackSpeed, double critical, double hp)
+    {
+        Attack = attack;
+        AttackSpeed = attackSpeed;
+        Critical = critical;
+        MaxHp = hp;
+        CurrentHp = MaxHp;
     }
 }

@@ -6,13 +6,10 @@ using static GameDataManager;
 
 public class Monster : MonoBehaviour
 {
-    //public double MaxHp { get; private set; } = 100;
-    //public double CurrentHp { get; private set; } = 100;
-    //public double Attack { get; private set; } = 1;
-    [HideInInspector] public double maxHp;
-    [HideInInspector] public double currentHp;
-    [HideInInspector] public double attack;
-    [HideInInspector] public double gold;
+    public double MaxHp { get; private set; }
+    public double CurrentHp { get; private set; }
+    public double Attack { get; private set; }
+    public double Gold { get; private set; }
 
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
@@ -20,7 +17,7 @@ public class Monster : MonoBehaviour
     public Action BossMonsterDied;
     private void OnEnable()
     {
-        currentHp = maxHp;
+        CurrentHp = MaxHp;
 
         if (boxCollider != null)
         {
@@ -42,19 +39,19 @@ public class Monster : MonoBehaviour
     }
     public void SetMonsterStat(int monsterId)
     {
-        maxHp = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Hp]);
-        attack = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Attack]);
-        gold = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Gold]);
+        MaxHp = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Hp]);
+        Attack = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Attack]);
+        Gold = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Gold]);
 
-        currentHp = maxHp;
+        CurrentHp = MaxHp;
     }
 
 
     public void TakeDamage(double damageAmount)
     {
-        currentHp -= damageAmount;
+        CurrentHp -= damageAmount;
         
-        if (currentHp <= 0)
+        if (CurrentHp <= 0)
         {
             MonsterDie();
         }
@@ -65,7 +62,7 @@ public class Monster : MonoBehaviour
         boxCollider.enabled = false;
 
         monsterController.SetCurrentMonsterState(MonsterState.Dead);
-        MainScene.Instance.GetGoods(gold);
+        MainScene.Instance.GetGoods(Gold);
 
         if (this.gameObject.CompareTag("Boss"))
         {

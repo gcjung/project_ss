@@ -15,6 +15,8 @@ public class MonsterSpawner : MonoBehaviour
     private ObjectPool<Monster> monsterPool;
     private ObjectPool<Monster> bossMonsterPool;
 
+    private ObjectPool<Monster> objPool;
+
     [Header("Monster Spawn Point")]
     [SerializeField] private Transform spawnPoint1;
     [SerializeField] private Transform spawnPoint2;
@@ -58,36 +60,28 @@ public class MonsterSpawner : MonoBehaviour
             monster = Resources.Load<Monster>($"Monster/{monsterName}");          
             var _monster = Instantiate(monster, transform);
             _monster.gameObject.AddComponent<MonsterController>();
-            _monster.gameObject.SetActive(false);
             _monster.SetMonsterStat(mainScene.monsterId);
-            if (monsterPool == null)
-            {
-                monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
-            }
-            else
-            {
-                monsterPool = null;
-                monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
-            }
-            Destroy(_monster);
+
+            if (monsterPool != null)
+                Destroy(monsterPool.TrPool.gameObject);
+
+            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+           
+            Destroy(_monster.gameObject);
         }
 
         {//보스몬스터 세팅
             bossMonster = Resources.Load<Monster>($"Monster/{bossName}");     
             var _bossMonster = Instantiate(bossMonster, transform);
             _bossMonster.gameObject.AddComponent<MonsterController>();
-            _bossMonster.gameObject.SetActive(false);
             _bossMonster.SetMonsterStat(mainScene.bossId);
-            if (bossMonsterPool == null)
-            {
-                bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
-            }
-            else
-            {
-                bossMonsterPool = null;
-                bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
-            }
-            Destroy(_bossMonster);
+
+            if (bossMonsterPool != null)
+                Destroy(bossMonsterPool.TrPool.gameObject);
+
+            bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
+
+            Destroy(_bossMonster.gameObject);
         }        
     }
     private IEnumerator SpawnMonster()

@@ -9,6 +9,18 @@ using static GameDataManager;
 
 public class GameDataManager : Manager<GameDataManager>
 {
+    public enum HeroTemplate_
+    {
+        None = -1,
+        HeroId,
+        Name,
+        Attack,
+        AttackSpeed,
+        Critical,
+        Hp,
+
+        Max,
+    }
     public enum MonsterTemplate_
     {
         None = -1,
@@ -43,12 +55,14 @@ public class GameDataManager : Manager<GameDataManager>
         Max,
     }
 
+    public static Dictionary<string, string[]> HeroTemplate;
     public static Dictionary<string, string[]> MonsterTemplate;
     public static Dictionary<string, string[]> StatusTemplate;
     public static Dictionary<string, string[]> StageTemplate;
 
     private void Awake()
     {
+        HeroTemplate = CSVRead("data/Hero_Template");
         MonsterTemplate = CSVRead("data/Monster_Template");
         StatusTemplate = CSVRead("data/Status_Template");
         StageTemplate = CSVRead("data/Stage_Template");

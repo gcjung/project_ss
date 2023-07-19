@@ -15,6 +15,11 @@ public class MonsterController : MonoBehaviour
     private float moveSpeed = 1f;
     private float attackRange = 1f;
 
+    private void Awake()
+    {
+        monster = GetComponent<Monster>();
+        monsterAnimator = GetComponent<Animator>();
+    }
     void Start()
     {
         player = GameObject.FindWithTag("Player");
@@ -22,9 +27,6 @@ public class MonsterController : MonoBehaviour
         {
             target = value;
         }
-
-        monster = GetComponent<Monster>();
-        monsterAnimator = GetComponent<Animator>();
     }
 
     void Update()
@@ -89,7 +91,7 @@ public class MonsterController : MonoBehaviour
     {
         if (PlayerController.CurrentPlayerState != PlayerState.Dead)
         {
-            target.TakeDamage(monster.attack);
+            target.TakeDamage(monster.Attack);
         }
         else
         {

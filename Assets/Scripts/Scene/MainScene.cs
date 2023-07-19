@@ -50,7 +50,8 @@ public class MainScene : MonoBehaviour
     [SerializeField] private TextMeshProUGUI victoryText;
 
     private MonsterSpawner spawner; //스테이지 세팅용
-    [HideInInspector] public string playerName;    //임시 테스트용
+    [HideInInspector] public int heroId;    //임시 테스트용
+    [HideInInspector] public string heroName;    //임시 테스트용
     [HideInInspector] public int stageId;
     [HideInInspector] public string mapName;
     [HideInInspector] public int monsterId;
@@ -128,10 +129,11 @@ public class MainScene : MonoBehaviour
         Debug.Log($"스테이지 ID : {stageId}"); 
         SetStage(stageId);
 
-        playerName = "ch001";
-        SetPlayer(playerName); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
+        heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
+        Debug.Log($"영웅 ID : {heroId}");
+        SetPlayer(heroId); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
 
-        //SetStatusLevel()
+        UpdateStatusLevel();
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
@@ -155,16 +157,24 @@ public class MainScene : MonoBehaviour
         }
 
     }
-    public void SetPlayer(string charName)
+    public void SetPlayer(int heroId)
     {
         if (playerCharacter != null)
             Destroy(playerCharacter.gameObject);
 
-        var _playerCharacter = Resources.Load<GameObject>($"Player/{charName}");   //플레이어 캐릭터 세팅
+        heroName = HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Name];
+        double attack = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Attack]);
+        double attackSpeed = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.AttackSpeed]);
+        double critical = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Critical]);
+        double hp = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Hp]);
+
+        var _playerCharacter = Resources.Load<GameObject>($"Player/{heroName}");   //플레이어 캐릭터 세팅
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
         playerCharacter.AddComponent<Player>();
         playerCharacter.AddComponent<PlayerController>();
+        playerCharacter.GetComponent<Player>().SetHeroStatus(attack, attackSpeed, critical, hp);
+
         IsPlayer = true;
     }
     public void SetStage(int stageId)
@@ -176,6 +186,36 @@ public class MainScene : MonoBehaviour
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
+    }
+
+    public static void UpdateStatusLevel(string statusName = "")    //임시 메서드(존나게 맘에 안듬)
+    {
+        switch (statusName)
+        {
+            case "AttackLevel":
+                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel);
+                Debug.Log($"AttackLevel : {attackLevel}");
+                break;
+            case "AttackSpeedLevel":
+                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel);
+                Debug.Log($"AttackSpeedLevel : {attackSpeedLevel}");
+                break;
+            case "CriticalLevel":
+                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel);
+                Debug.Log($"CriticalLevel : {criticalLevel}");
+                break;
+            case "HpLevel":
+                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel);
+                Debug.Log($"HpLevel : {hpLevel}");
+                break;
+            default:
+                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel);
+                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel);
+                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel);
+                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel);
+                Debug.Log($"All Status Update");
+                break;
+        }
     }
     private void InitUIfromDB()
     {
@@ -215,7 +255,8 @@ public class MainScene : MonoBehaviour
         int targetLayer = LayerMask.NameToLayer("Over UI");
         var _vsImage = Instantiate(vsImage, upSidePanel.transform);
 
-        playerPref = Resources.Load<GameObject>("Player/ch001");
+        playerPref = null;
+        playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
         _playerPref.transform.position = playerPosition.position;
         ChangeLayer(_playerPref, targetLayer);
@@ -282,7 +323,8 @@ public class MainScene : MonoBehaviour
         }
         GlobalManager.Instance.DBManager.UpdateUserData("CurrentStageId", stageId);
 
-        SetPlayer(playerName);
+        //SetPlayer(heroId);
+        playerCharacter.transform.position = playerSpawnPoint.position;
         SetStage(stageId);
         spawner.SetMonster();
     }
