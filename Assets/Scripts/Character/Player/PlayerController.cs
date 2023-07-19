@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
         playerAnimator = transform.GetComponent<Animator>();
 
         projectilePrefab = Resources.Load<Bullet>("ETC/(TEST)projectile");
-        if(projectilePrefab != null)
+        if (projectilePrefab != null)
         {
             bulletPool = new ObjectPool<Bullet>(projectilePrefab, 30, this.transform);
         }

@@ -15,7 +15,7 @@ public class Bullet : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
 
-        Invoke("Off", 5.0f);
+        Invoke("Off", 4.0f);
     }
     private void Update()
     {

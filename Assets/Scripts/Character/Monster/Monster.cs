@@ -6,10 +6,11 @@ using static GameDataManager;
 
 public class Monster : MonoBehaviour
 {
+    public string Name { get; private set; }
     public double MaxHp { get; private set; }
     public double CurrentHp { get; private set; }
     public double Attack { get; private set; }
-    public double Gold { get; private set; }
+    public double DropGold { get; private set; }
 
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
@@ -39,16 +40,18 @@ public class Monster : MonoBehaviour
     }
     public void SetMonsterStat(int monsterId)
     {
+        Name = MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Name];
         MaxHp = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Hp]);
         Attack = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Attack]);
-        Gold = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Gold]);
-
+        DropGold = double.Parse(MonsterTemplate[monsterId.ToString()][(int)MonsterTemplate_.Gold]);
         CurrentHp = MaxHp;
     }
 
 
     public void TakeDamage(double damageAmount)
     {
+        Debug.Log($"{Name}가 {damageAmount}만큼 피해입음");
+
         CurrentHp -= damageAmount;
         
         if (CurrentHp <= 0)
@@ -59,10 +62,12 @@ public class Monster : MonoBehaviour
 
     private void MonsterDie()
     {
-        boxCollider.enabled = false;
+        Debug.Log($"{Name} 죽음");
 
+        boxCollider.enabled = false;
+        
         monsterController.SetCurrentMonsterState(MonsterState.Dead);
-        MainScene.Instance.GetGoods(Gold);
+        MainScene.Instance.GetGoods(DropGold);
 
         if (this.gameObject.CompareTag("Boss"))
         {

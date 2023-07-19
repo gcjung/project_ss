@@ -8,19 +8,17 @@ public class MonsterSpawner : MonoBehaviour
     [Header("Stage Slider")]
     [SerializeField] private Slider slider;
 
+    [Header("Monster Spawn Point")]
+    [SerializeField] private Transform spawnPoint1;
+    [SerializeField] private Transform spawnPoint2;
+    [SerializeField] private Transform spawnPoint3;
+
     private MainScene mainScene;
 
     private Monster monster;
     private Monster bossMonster;
     private ObjectPool<Monster> monsterPool;
     private ObjectPool<Monster> bossMonsterPool;
-
-    private ObjectPool<Monster> objPool;
-
-    [Header("Monster Spawn Point")]
-    [SerializeField] private Transform spawnPoint1;
-    [SerializeField] private Transform spawnPoint2;
-    [SerializeField] private Transform spawnPoint3;
 
     public static bool IsSpawning { get; set; } = false;
     public static int MonsterCount { get; private set; } = 0;
@@ -60,27 +58,23 @@ public class MonsterSpawner : MonoBehaviour
             monster = Resources.Load<Monster>($"Monster/{monsterName}");          
             var _monster = Instantiate(monster, transform);
             _monster.gameObject.AddComponent<MonsterController>();
-            _monster.SetMonsterStat(mainScene.monsterId);
 
             if (monsterPool != null)
                 Destroy(monsterPool.TrPool.gameObject);
 
-            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
-           
+            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);           
             Destroy(_monster.gameObject);
         }
 
         {//보스몬스터 세팅
             bossMonster = Resources.Load<Monster>($"Monster/{bossName}");     
             var _bossMonster = Instantiate(bossMonster, transform);
-            _bossMonster.gameObject.AddComponent<MonsterController>();
-            _bossMonster.SetMonsterStat(mainScene.bossId);
+            _bossMonster.gameObject.AddComponent<MonsterController>();           
 
             if (bossMonsterPool != null)
                 Destroy(bossMonsterPool.TrPool.gameObject);
 
             bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
-
             Destroy(_bossMonster.gameObject);
         }        
     }
@@ -98,6 +92,7 @@ public class MonsterSpawner : MonoBehaviour
 
             //monsterPool.GetObjectPool().transform.localScale = monster.transform.localScale;
             var _monster = monsterPool.GetObjectPool();
+            _monster.SetMonsterStat(mainScene.monsterId);
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
@@ -114,6 +109,7 @@ public class MonsterSpawner : MonoBehaviour
         slider.gameObject.SetActive(false);
 
         var _bossMonster = bossMonsterPool.GetObjectPool();
+        _bossMonster.SetMonsterStat(mainScene.bossId);
         _bossMonster.transform.localScale = bossMonster.transform.localScale;
         _bossMonster.transform.position = spawnPoint2.position;
         _bossMonster.GetComponent<Monster>().BossMonsterDied += FinishStage;

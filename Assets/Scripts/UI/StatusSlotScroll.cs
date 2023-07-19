@@ -71,35 +71,38 @@ public class StatusSlotScroll : MonoBehaviour
         int level = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(stat, 1);
         var slot = slotObjects[index];
 
-        var levelText = slot.transform.Find("StatusLevel_Text").gameObject;
-        if (levelText != null)
+        double cost = level * cost_calc;
+
+        if(MainScene.Instance.UseGolds(cost))
         {
-            level += 1;
-            levelText.GetComponent<TextMeshProUGUI>().text = $"LV {level}";
-        }
-
-        var valueText = slot.transform.Find("StatusValue_Text").gameObject;
-        if (valueText != null)
-        {
-            double value = level * val_calc;
-
-            valueText.GetComponent<TextMeshProUGUI>().text = Util.BigNumCalculate(value);
-        }
-
-        var button = slot.transform.Find("LevelUp_Button").gameObject;
-        if (button != null)
-        {
-            double cost = level * cost_calc;
-
-            var costText = button.transform.Find("Cost_Text").gameObject;
-            if (costText != null)
+            var levelText = slot.transform.Find("StatusLevel_Text").gameObject;
+            if (levelText != null)
             {
-                costText.GetComponent<TextMeshProUGUI>().text = $"{Util.BigNumCalculate(cost)}  G";
+                level += 1;
+                levelText.GetComponent<TextMeshProUGUI>().text = $"LV {level}";
             }
-        }
 
-        GlobalManager.Instance.DBManager.UpdateUserData(stat, level);
-        MainScene.UpdateStatusLevel(stat);
+            var valueText = slot.transform.Find("StatusValue_Text").gameObject;
+            if (valueText != null)
+            {
+                double value = level * val_calc;
+
+                valueText.GetComponent<TextMeshProUGUI>().text = Util.BigNumCalculate(value);
+            }
+
+            var button = slot.transform.Find("LevelUp_Button").gameObject;
+            if (button != null)
+            {
+                var costText = button.transform.Find("Cost_Text").gameObject;
+                if (costText != null)
+                {
+                    costText.GetComponent<TextMeshProUGUI>().text = $"{Util.BigNumCalculate(cost)}  G";
+                }
+            }
+
+            GlobalManager.Instance.DBManager.UpdateUserData(stat, level);
+            MainScene.Instance.UpdateStatusLevel(stat);
+        }
     }
 
     private void CreateSlots()

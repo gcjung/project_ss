@@ -87,13 +87,13 @@ public class MainScene : MonoBehaviour
             }
         }
     }
-    public static bool IsPlayer { get; private set; } = false;
+    public bool IsPlayer { get; private set; } = false;
 
     //스탯 적용 테스트 중
-    public static int attackLevel;
-    public static int attackSpeedLevel;
-    public static int criticalLevel;
-    public static int hpLevel;
+    public int attackLevel;
+    public int attackSpeedLevel;
+    public int criticalLevel;
+    public int hpLevel;
 
 
     [SerializeField] private GameObject mainUiPanel;
@@ -126,14 +126,14 @@ public class MainScene : MonoBehaviour
         Debug.Log("메인씬 시작");
 
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
-        Debug.Log($"스테이지 ID : {stageId}"); 
-        SetStage(stageId);
+        Debug.Log($"현재 스테이지ID : {stageId}"); 
+        SetStage(stageId);  //스테이지 세팅
 
         heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
-        Debug.Log($"영웅 ID : {heroId}");
-        SetPlayer(heroId); //이것도 유저 테이블에서 유저가 장착 중인 캐릭터 받아서 넣어줄 예정
+        Debug.Log($"현재 영웅ID : {heroId}");
+        SetPlayer(heroId);  //영웅 세팅
 
-        UpdateStatusLevel();
+        UpdateStatusLevel();    //스탯 레벨 세팅
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
@@ -188,7 +188,7 @@ public class MainScene : MonoBehaviour
         map2.sprite = mapSprite;
     }
 
-    public static void UpdateStatusLevel(string statusName = "")    //임시 메서드(존나게 맘에 안듬)
+    public void UpdateStatusLevel(string statusName = "")    //임시 메서드(존나게 맘에 안듬)
     {
         switch (statusName)
         {
@@ -255,7 +255,6 @@ public class MainScene : MonoBehaviour
         int targetLayer = LayerMask.NameToLayer("Over UI");
         var _vsImage = Instantiate(vsImage, upSidePanel.transform);
 
-        playerPref = null;
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
         _playerPref.transform.position = playerPosition.position;
@@ -402,6 +401,8 @@ public class MainScene : MonoBehaviour
     {
         if (getGold > 0)
         {
+            Debug.Log($"{Util.BigNumCalculate(getGold)}G를 획득");
+
             double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
             //goldText.text = $"{(currentGold + getGold)}";
@@ -416,6 +417,46 @@ public class MainScene : MonoBehaviour
             //gemText.text = $"{(currentGem + getGem)}";
             gemText.text = Util.BigNumCalculate(currentGem + getGem);
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem + getGem);
+        }
+    }
+
+    public bool UseGolds(double usedGold)
+    {
+        double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
+
+        if (currentGold - usedGold >= 0)
+        {
+            Debug.Log($"{Util.BigNumCalculate(usedGold)}Gold를 사용");
+            goldText.text = Util.BigNumCalculate(currentGold - usedGold);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold - usedGold);
+
+            return true;
+        }
+        else
+        {
+            Debug.LogError("골드가 부족합니다");
+
+            return false;
+        }
+    }
+
+    public bool UseGems(double usedGem)
+    {
+        double currentGem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
+
+        if (currentGem - usedGem >= 0)
+        {
+            Debug.Log($"{usedGem}Gem을 사용");
+            gemText.text = Util.BigNumCalculate(currentGem - usedGem);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem - usedGem);
+
+            return true;
+        }
+        else
+        {
+            Debug.LogError("젬이 부족합니다");
+
+            return false;
         }
     }
 }
