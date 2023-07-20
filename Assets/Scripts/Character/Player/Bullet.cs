@@ -10,12 +10,13 @@ public class Bullet : MonoBehaviour
     public double Damage { get; private set; }
     public float Speed { get; private set; }
 
-
+    private void OnEnable()
+    {
+        Invoke("Off", 4.0f);
+    }
     private void Awake()
     {
-        rigid = GetComponent<Rigidbody2D>();
-
-        Invoke("Off", 4.0f);
+        rigid = GetComponent<Rigidbody2D>();        
     }
     private void Update()
     {
@@ -39,6 +40,7 @@ public class Bullet : MonoBehaviour
 
     private void Off()
     {
-        this.gameObject.SetActive(false);
+        if (this.gameObject.activeSelf)
+            this.gameObject.SetActive(false);
     }
 }

@@ -69,6 +69,11 @@ public class DBManager : Manager<DBManager>
                     //Debug.Log($"Double : {pair.Key}, {pair.Value}");
 
                 }
+                else if (pair.Value is Int64)
+                {
+                    userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
+                    //Debug.Log($"Double : {pair.Key}, {pair.Value}");
+                }
                 else if (pair.Value is string)
                 {
                     usesrStringDataDic.Add(pair.Key, (string)pair.Value);
