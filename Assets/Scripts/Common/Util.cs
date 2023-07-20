@@ -4,7 +4,16 @@ using UnityEngine;
 
 public class Util
 {
-    
+    public static void ChangeLayer(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+
+        for (int i = 0; i < obj.transform.childCount; i++)
+        {
+            GameObject childObj = obj.transform.GetChild(i).gameObject;
+            ChangeLayer(childObj, layer);
+        }
+    }
     public static T FindChildComponent<T>(Transform parent) where T : Component
     {
         T foundComponent = null;

@@ -90,10 +90,10 @@ public class MainScene : MonoBehaviour
     public bool IsPlayer { get; private set; } = false;
 
     //스탯 적용 테스트 중
-    public int attackLevel;
-    public int attackSpeedLevel;
-    public int criticalLevel;
-    public int hpLevel;
+    [HideInInspector] public int attackLevel;
+    [HideInInspector] public int attackSpeedLevel;
+    [HideInInspector] public int criticalLevel;
+    [HideInInspector] public int hpLevel;
 
 
     [SerializeField] private GameObject mainUiPanel;
@@ -193,26 +193,26 @@ public class MainScene : MonoBehaviour
         switch (statusName)
         {
             case "AttackLevel":
-                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel);
+                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel, 1);
                 Debug.Log($"AttackLevel : {attackLevel}");
                 break;
             case "AttackSpeedLevel":
-                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel);
+                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel, 1);
                 Debug.Log($"AttackSpeedLevel : {attackSpeedLevel}");
                 break;
             case "CriticalLevel":
-                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel);
+                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel, 1);
                 Debug.Log($"CriticalLevel : {criticalLevel}");
                 break;
             case "HpLevel":
-                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel);
+                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel, 1);
                 Debug.Log($"HpLevel : {hpLevel}");
                 break;
             default:
-                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel);
-                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel);
-                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel);
-                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel);
+                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel, 1);
+                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel, 1);
+                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel, 1);
+                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel, 1);
                 Debug.Log($"All Status Update");
                 break;
         }
@@ -236,7 +236,6 @@ public class MainScene : MonoBehaviour
             IsWaveClear = false;
 
             float fadeInTime = 1.0f;
-            float delayTime = 1.0f;
 
             var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
             //fadeImage.transform.SetAsFirstSibling();
@@ -257,13 +256,13 @@ public class MainScene : MonoBehaviour
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
         _playerPref.transform.position = playerPosition.position;
-        ChangeLayer(_playerPref, targetLayer);
+        Util.ChangeLayer(_playerPref, targetLayer);
 
         string bossName = MonsterTemplate[bossId.ToString()][(int)MonsterTemplate_.Name];
         bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
         var _bossPref = Instantiate(bossPref, bossPosition);
         _bossPref.transform.position = bossPosition.position;
-        ChangeLayer(_bossPref, targetLayer);
+        Util.ChangeLayer(_bossPref, targetLayer);
 
         yield return new WaitForSeconds(delayTime);
 
@@ -273,16 +272,7 @@ public class MainScene : MonoBehaviour
 
         spawner.SpawnBossMonster();
     }
-    private void ChangeLayer(GameObject obj, int layer)
-    {
-        obj.layer = layer;
 
-        for (int i = 0; i < obj.transform.childCount; i++)
-        {
-            GameObject childObj = obj.transform.GetChild(i).gameObject;
-            ChangeLayer(childObj, layer);
-        }
-    }
 
     private void StageClear()
     {
@@ -321,7 +311,6 @@ public class MainScene : MonoBehaviour
         }
         GlobalManager.Instance.DBManager.UpdateUserData("CurrentStageId", stageId);
 
-        //SetPlayer(heroId);
         playerCharacter.transform.position = playerSpawnPoint.position;
         SetStage(stageId);
         spawner.SetMonster();
