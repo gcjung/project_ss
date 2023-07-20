@@ -224,7 +224,7 @@ public class MainScene : MonoBehaviour
         double gold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
         double gem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
 
-        goldText.text = Util.BigNumCalculate(gold);
+        goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
     }
 
@@ -240,15 +240,14 @@ public class MainScene : MonoBehaviour
 
             var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
             //fadeImage.transform.SetAsFirstSibling();
-            _fadeImage.DOFade(1f, fadeInTime).OnComplete(() => Destroy(_fadeImage));
-
-            Invoke("StartBossBattle", delayTime);
+            _fadeImage.DOFade(1f, fadeInTime).OnComplete(() =>
+            {
+                Destroy(_fadeImage);
+                StartCoroutine(BossBattle());
+            });
         }
     }
-    private void StartBossBattle()
-    {
-        StartCoroutine(BossBattle());
-    }
+
     private IEnumerator BossBattle()
     {
         float delayTime = 2.0f;
@@ -406,7 +405,7 @@ public class MainScene : MonoBehaviour
             double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
             //goldText.text = $"{(currentGold + getGold)}";
-            goldText.text = Util.BigNumCalculate(currentGold + getGold);
+            goldText.text = $"{Util.BigNumCalculate(currentGold + getGold)} G";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold + getGold);
         }
 
