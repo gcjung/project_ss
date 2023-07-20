@@ -1,6 +1,7 @@
 using DG.Tweening.Core.Easing;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UIElements;
@@ -8,7 +9,7 @@ using UnityEngine.UIElements;
 public class CommonFuntion : MonoBehaviour
 {
     static Dictionary<string, Object> prefabsPool = new Dictionary<string, Object>();
-    static Dictionary<string, Object> atlasPool = new Dictionary<string, Object>();
+    static Dictionary<string, SpriteAtlas> atlasPool = new Dictionary<string, SpriteAtlas>();
 
     public static void LoadPrefab(string prefabName)
     {
@@ -22,6 +23,7 @@ public class CommonFuntion : MonoBehaviour
             GameObject newObj = Resources.Load<GameObject>(prefabName);
             prefabsPool[prefabName] = newObj;
         }
+        
     }
 
     public static GameObject GetPrefab(Object prefab, Transform parentTransform)
@@ -41,15 +43,14 @@ public class CommonFuntion : MonoBehaviour
 
     public static void LoadAtlas(string prefabName)
     {
-        string path = "Atlas/";
         if (!atlasPool.ContainsKey(prefabName))
         {
-            SpriteAtlas newObj = Resources.Load<SpriteAtlas>(path + prefabName);
+            SpriteAtlas newObj = LoadAssetBundle.LoadAtlas(prefabName);
             atlasPool.Add(prefabName, newObj);
         }
         else if (atlasPool[prefabName] == null)
         {
-            SpriteAtlas newObj = Resources.Load<SpriteAtlas>(path + prefabName);
+            SpriteAtlas newObj = LoadAssetBundle.LoadAtlas(prefabName);
             atlasPool[prefabName] = newObj;
         }
     }
@@ -58,7 +59,7 @@ public class CommonFuntion : MonoBehaviour
     {
         LoadAtlas(atlasName);
         
-        SpriteAtlas atlas = atlasPool[atlasName] as SpriteAtlas;
+        SpriteAtlas atlas = atlasPool[atlasName];
 
         if (atlas)
             return atlas.GetSprite(imageName);

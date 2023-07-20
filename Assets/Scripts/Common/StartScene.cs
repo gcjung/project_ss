@@ -7,7 +7,6 @@ using DG.Tweening;
 using Firebase.Auth;
 using UnityEngine.SocialPlatforms;
 using GooglePlayGames;
-using System.Threading.Tasks;
 
 public class StartScene : MonoBehaviour
 {
