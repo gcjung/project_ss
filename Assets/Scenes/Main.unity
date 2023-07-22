@@ -2069,10 +2069,11 @@ MonoBehaviour:
   bossPosition: {fileID: 1424292077}
   movePoint: {fileID: 1242721248}
   victoryText: {fileID: 6669254609789748411, guid: 3b3ca7fda0fcc514698ec2e21119fee7, type: 3}
+  playerName: 
   stageId: 0
   mapName: 
-  monsterName: 
-  bossName: 
+  monsterId: 0
+  bossId: 0
   mainUiPanel: {fileID: 972070603}
 --- !u!1 &838461504
 GameObject:
