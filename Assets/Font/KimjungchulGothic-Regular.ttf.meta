@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d48250a063a0feb47adfa8222ad22233
+guid: 99bade029fed2e349849975d7cc1aa98
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -10,7 +10,8 @@ TrueTypeFontImporter:
   includeFontData: 1
   fontNames:
   - Kim jung chul Gothic
-  fallbackFontReferences: []
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: d48250a063a0feb47adfa8222ad22233, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1

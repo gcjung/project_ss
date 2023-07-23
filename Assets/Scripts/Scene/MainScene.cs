@@ -288,7 +288,8 @@ public class MainScene : MonoBehaviour
     {
         if (category1_UI == null)
         {
-            category1_UI = CommonFuntion.GetPrefab("UI/Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            category1_UI = CommonFuntion.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            //category1_UI.Find("Type1_Character/Character/Level_Text").GetComponent<TMP_Text>().font = "LV 1";
             category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
         }
         else

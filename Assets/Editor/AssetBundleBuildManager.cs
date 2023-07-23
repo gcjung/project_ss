@@ -16,7 +16,7 @@ public class AssetBundleBuildManager
             Directory.CreateDirectory(assetBunbleDirectoty);
 
         BuildPipeline.BuildAssetBundles(assetBunbleDirectoty, BuildAssetBundleOptions.None, BuildTarget.Android);
-        
+     
         List<Task> tasks = new List<Task>();
 
         string firebaseStorageURL = "gs://projectss-c99e7.appspot.com";

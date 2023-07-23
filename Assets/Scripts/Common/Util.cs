@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.TextCore.Text;
+using TMPro;
+
 
 public class Util
 {
@@ -28,6 +31,37 @@ public class Util
 
         return foundComponent;
     }
+    public static void SetFontInChildrenText(Transform parent, TMP_FontAsset font)
+    {
+        var textArr = parent.GetComponentsInChildren<TMP_Text>();
+
+        foreach (var text in textArr)
+        {
+            text.font = font;
+        }
+    }
+    //public static T[] FindChildComponents<T>(Transform parent) where T : Component
+    //{
+    //    T[] foundComponent = null;
+
+    //    for (int i = 0; i < parent.childCount; i++)
+    //    {
+    //        Transform child = parent.GetChild(i);
+
+    //        T component = child.GetComponent<T>();
+    //        if (component != null)
+    //        {
+    //            foundComponent = component;
+    //            break;
+    //        }
+
+    //        foundComponent = FindChildComponents<T>(child);
+    //        if (foundComponent != null)
+    //            break;
+    //    }
+
+    //    return foundComponent;
+    //}
     //public static GameObject ShowMessagePopup(string Title, string Desc, Action ButtonAction = null)
     //{
     //    GameObject obj = null;
@@ -40,7 +74,7 @@ public class Util
     //    obj.transform.Find("AchieveTitle").GetComponent<TextMeshProUGUI>().text = Title;
     //    obj.transform.Find("Desc").GetComponent<TextMeshProUGUI>().text = Desc;
 
-        
+
     //    //var btns = obj.transform.GetComponentsInChildren<CloseButton>();
 
     //    //foreach (var item in btns)
