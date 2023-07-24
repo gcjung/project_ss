@@ -18,3 +18,20 @@ public enum MonsterType
 {
     Skeleton,
 }
+
+public enum ItemType
+{
+    Weapon,
+    Armor,
+    Ring,
+    Rune
+}
+
+public enum ItemGrade
+{
+    D,
+    C,
+    B,
+    A,
+    S
+}
