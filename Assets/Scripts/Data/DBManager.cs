@@ -28,18 +28,27 @@ public enum UserStringDataType
 
 }
 
+public enum GameDataType
+{
+    AssetBundleVersion,
+}
+
 public class DBManager : Manager<DBManager>
 {
     Dictionary<string, double> userDoubleDataDic = new Dictionary<string, double>();
-    Dictionary<string, string> usesrStringDataDic = new Dictionary<string, string>();
-    
+    Dictionary<string, string> userStringDataDic = new Dictionary<string, string>();
+
+    Dictionary<string, object> gameData = new Dictionary<string, object>();
+
     CollectionReference firebaseUserDB;
     DocumentReference uidRef;
+    DocumentReference dataRef;
     UserDatas dataTable;
     
     public void Awake()
     {
         firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
+        dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");
         dataTable = new UserDatas();
     }
     public override void Init()
@@ -50,9 +59,12 @@ public class DBManager : Manager<DBManager>
             return;
         }
 
+        LoadGameData();
+
         if (FirebaseAuthManager.Instance.isCurrentLogin())
         {
             uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
+            
             LoadUserDBFromFirebase();
         }
         else
@@ -62,7 +74,22 @@ public class DBManager : Manager<DBManager>
     }
     public override void InitializedFininsh()
     {
-        //
+
+    }
+    async void LoadGameData()
+    {
+        await dataRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        {
+            DocumentSnapshot snapshot = task.Result;
+            if (snapshot.Exists)
+            {
+                gameData = snapshot.ToDictionary();
+            }
+            else
+            {
+
+            }
+        });
     }
 
     async void LoadUserDBFromFirebase()
@@ -87,7 +114,7 @@ public class DBManager : Manager<DBManager>
                 }
                 else if (pair.Value is string)
                 {
-                    usesrStringDataDic.Add(pair.Key, (string)pair.Value);
+                    userStringDataDic.Add(pair.Key, (string)pair.Value);
                     //Debug.Log($"string : {pair.Key}, {pair.Value}");
                 }
                 else
@@ -129,8 +156,8 @@ public class DBManager : Manager<DBManager>
     public string GetUserStringData(UserDoubleDataType key_, string defaultValue = "")
     {
         string key = key_.ToString();
-        if (usesrStringDataDic.ContainsKey(key))
-            return usesrStringDataDic[key];
+        if (userStringDataDic.ContainsKey(key))
+            return userStringDataDic[key];
         else
             UpdateUserData(key, defaultValue);
 
@@ -138,8 +165,8 @@ public class DBManager : Manager<DBManager>
     }
     public string GetUserStringData(string key, string defaultValue = "")
     {
-        if (usesrStringDataDic.ContainsKey(key))
-            return usesrStringDataDic[key];
+        if (userStringDataDic.ContainsKey(key))
+            return userStringDataDic[key];
         else
             UpdateUserData(key, defaultValue);
 
@@ -167,24 +194,31 @@ public class DBManager : Manager<DBManager>
     public void UpdateUserData(UserDoubleDataType key_, string value)
     {
         string key = key_.ToString();
-        if (usesrStringDataDic.ContainsKey(key))
-            usesrStringDataDic[key] = value;
+        if (userStringDataDic.ContainsKey(key))
+            userStringDataDic[key] = value;
         else
-            usesrStringDataDic.Add(key, value);
+            userStringDataDic.Add(key, value);
 
         UpdateFirebaseUserData(key, value);
     }
     public void UpdateUserData(string key, string value)
     {
-        if (usesrStringDataDic.ContainsKey(key))
-            usesrStringDataDic[key] = value;
+        if (userStringDataDic.ContainsKey(key))
+            userStringDataDic[key] = value;
         else
-            usesrStringDataDic.Add(key, value);
+            userStringDataDic.Add(key, value);
 
         UpdateFirebaseUserData(key, value);
     }
 
-
+    public string GetGameData(GameDataType key_)
+    {
+        string key = key_.ToString();
+        if (gameData.ContainsKey(key.ToString()))
+            return gameData[key.ToString()].ToString();
+        
+        return string.Empty;
+    }
 
 
     #region 제네릭 버전
@@ -209,7 +243,7 @@ public class DBManager : Manager<DBManager>
     //}
     //public void UpdateUserData<T>(string key, T value)
     //{
-        
+
     //    if (typeof(T) == typeof(double))
     //    {
     //        if (userDoubleDataDic.ContainsKey(key))

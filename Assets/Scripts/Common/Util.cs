@@ -40,28 +40,43 @@ public class Util
             text.font = font;
         }
     }
-    //public static T[] FindChildComponents<T>(Transform parent) where T : Component
-    //{
-    //    T[] foundComponent = null;
 
-    //    for (int i = 0; i < parent.childCount; i++)
-    //    {
-    //        Transform child = parent.GetChild(i);
+    // 데이터 용량으로 변환 해주는 함수
+    public static string ConvertBytes(long bytes)
+    {
+        const int scale = 1024;
+        string[] orders = new string[] { "GB", "MB", "KB", "Bytes" };
+        long max = (long)Math.Pow(scale, orders.Length - 1);
 
-    //        T component = child.GetComponent<T>();
-    //        if (component != null)
-    //        {
-    //            foundComponent = component;
-    //            break;
-    //        }
+        foreach (string order in orders)
+        {
+            if (bytes > max)
+                return string.Format("{0:##.##} {1}", decimal.Divide(bytes, max), order);
 
-    //        foundComponent = FindChildComponents<T>(child);
-    //        if (foundComponent != null)
-    //            break;
-    //    }
+            max /= scale;
+        }
 
-    //    return foundComponent;
-    //}
+        return "0 Bytes";
+    }
+    
+    // Text에 숫자가 자연스럽게 올라가는 함수
+    IEnumerator CountingNumber(float target, float current, TMP_Text text)
+    {
+        float duration = 0.5f; // 카운팅에 걸리는 시간 설정. 
+        float offset = (target - current) / duration;
+
+        while (current < target)
+        {
+            current += offset * Time.deltaTime;
+            text.text = ((int)current).ToString();
+            yield return null;
+        }
+
+        current = target;
+        text.text = ((int)current).ToString();
+    }
+
+    #region 사용예정인 공용함수
     //public static GameObject ShowMessagePopup(string Title, string Desc, Action ButtonAction = null)
     //{
     //    GameObject obj = null;
@@ -116,6 +131,7 @@ public class Util
 
     //    return popUpObj;
     //}
+    #endregion 사용예정인 공용함수
 
     static readonly string[] Units = new string[] { "", "A", "B", "C", "D", "E", "F", "G",
         "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",

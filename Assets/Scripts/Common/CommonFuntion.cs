@@ -43,6 +43,7 @@ public class CommonFuntion : MonoBehaviour
             GameObject newObj = ResourceLoader.LoadUiPrefab(prefabName);
             prefabsPool[prefabName] = newObj;
         }
+
     }
 
     public static GameObject GetPrefab(Object prefab, Transform parentTransform, string fontName ="")

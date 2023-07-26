@@ -8,6 +8,12 @@ using GooglePlayGames;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 
+
+public enum LoginType
+{
+    Guest,
+    Google,
+}
 public class FirebaseAuthManager
 {
     private static FirebaseAuthManager instance;
@@ -30,40 +36,9 @@ public class FirebaseAuthManager
         StartScene.logtest(str3: "생성자");
     }
     
-    public enum LoginType
-    {
-        Guest,
-        Google,
-    }
 
-    private GameObject loginPanel = null;
-    public void ShowLoginPanel()
-    {
-        if (!isCurrentLogin())  // 파이어베이스 연동 X
-        {
-            if (loginPanel == null)
-            {
-                loginPanel = CommonFuntion.GetPrefab("UI/Login_Panel", UIManager.instance.transform);
-            }
 
-            loginPanel.transform.Find("LoginSelect_Panel/GoogleLogin_Button").GetComponent<Button>().onClick.AddListener(
-                () => TrySignIn(LoginType.Google));
 
-            loginPanel.transform.Find("LoginSelect_Panel/GuestLogin_Button").GetComponent<Button>().onClick.AddListener(
-                () => TrySignIn(LoginType.Guest));
-        }
-        else                    // 파이어베이스 연동상태
-        {
-            if (!isCurrentUserAnonymous())
-                GPGS.Instance.LoginGoogleAccount();
-        }
-    }
-
-    public void CloseLoginPanel()
-    {
-        loginPanel.gameObject.SetActive(false);
-        loginPanel = null;
-    }
     public void SingOutFirebase()
     {
         auth.SignOut();
@@ -101,7 +76,8 @@ public class FirebaseAuthManager
 
         if(result)
         {
-            CloseLoginPanel();
+            var sc = GameObject.FindObjectOfType<StartScene>();
+            sc.CloseLoginPanel();
         }
         
     }
@@ -363,6 +339,7 @@ public class FirebaseAuthManager
  */
 #endregion
 
+#region 지금은 안씀
 //public void TryFirebaseGoogleLogin(Action<bool> onLoginSuccess = null)
 //{
 //    string idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
@@ -439,3 +416,37 @@ public class FirebaseAuthManager
 //        Debug.LogError("로그인 완료");
 //    });
 //}
+
+//private GameObject loginPanel = null;
+//public void OpenUI_LoginPanel()
+//{
+//    auth.SignOut();
+//    if (!isCurrentLogin())  // 파이어베이스 연동 X
+//    {
+//        if (loginPanel == null)
+//        {
+//            var obj = Resources.Load<GameObject>("UIPrefabs/Login_Panel");
+
+//            //loginPanel = CommonFuntion.GetPrefab("Login_Panel", UIManager.instance.transform);
+//        }
+
+//        loginPanel.transform.Find("LoginSelect_Panel/GoogleLogin_Button").GetComponent<Button>().onClick.AddListener(
+//            () => TrySignIn(LoginType.Google));
+
+//        loginPanel.transform.Find("LoginSelect_Panel/GuestLogin_Button").GetComponent<Button>().onClick.AddListener(
+//            () => TrySignIn(LoginType.Guest));
+//    }
+//    else                    // 파이어베이스 연동상태
+//    {
+//        if (!isCurrentUserAnonymous())
+//            GPGS.Instance.LoginGoogleAccount();
+//    }
+//}
+
+//public void CloseLoginPanel()
+//{
+//    loginPanel.gameObject.SetActive(false);
+//    loginPanel = null;
+//}
+
+#endregion 지금은 안씀
