@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3480494079
+CRC: 2324574494
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0dd9c222556b880d569a84181c8923cb
+    Hash: 4255d73078b97982a0e8ee7c3c005145
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 9f6028859c0796631fd9d16b09611983
+    Hash: beb2f53515ffa5ea3d1e32369b768d43
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -21,6 +21,8 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 50
   Script: {instanceID: 0}
+- Class: 58
+  Script: {instanceID: 0}
 - Class: 114
   Script: {fileID: 11500000, guid: 92345eae69295cc4f830ffe22a3f47ea, type: 3}
 - Class: 115
@@ -31,5 +33,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Prefab/(TEST)projectile.prefab
+- Assets/Resources/ETC/(TEST)projectile.prefab
 Dependencies: []

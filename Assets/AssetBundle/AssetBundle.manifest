@@ -1,7 +1,13 @@
 ManifestFileVersion: 0
-CRC: 59860100
+CRC: 1599201017
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: bullet
+      Dependencies: {}
+    Info_1:
+      Name: atlas
+      Dependencies: {}
+    Info_2:
+      Name: uiprefab
       Dependencies: {}

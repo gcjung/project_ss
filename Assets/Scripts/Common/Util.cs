@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using UnityEngine.TextCore.Text;
+using TMPro;
+
 
 public class Util
 {
@@ -36,24 +40,71 @@ public class Util
 
         return foundComponent;
     }
+    public static void SetFontInChildrenText(Transform parent, TMP_FontAsset font)
+    {
+        var textArr = parent.GetComponentsInChildren<TMP_Text>();
+
+        foreach (var text in textArr)
+        {
+            text.font = font;
+        }
+    }
+
+    // 데이터 용량으로 변환 해주는 함수
+    public static string ConvertBytes(long bytes)
+    {
+        const int scale = 1024;
+        string[] orders = new string[] { "GB", "MB", "KB", "Bytes" };
+        long max = (long)Math.Pow(scale, orders.Length - 1);
+
+        foreach (string order in orders)
+        {
+            if (bytes > max)
+                return string.Format("{0:##.##} {1}", decimal.Divide(bytes, max), order);
+
+            max /= scale;
+        }
+
+        return "0 Bytes";
+    }
+    
+    // Text에 숫자가 자연스럽게 올라가는 함수
+    IEnumerator CountingNumber(float target, float current, TMP_Text text)
+    {
+        float duration = 0.5f; // 카운팅에 걸리는 시간 설정. 
+        float offset = (target - current) / duration;
+
+        while (current < target)
+        {
+            current += offset * Time.deltaTime;
+            text.text = ((int)current).ToString();
+            yield return null;
+        }
+
+        current = target;
+        text.text = ((int)current).ToString();
+    }
+
+    #region 사용예정인 공용함수
     //public static GameObject ShowMessagePopup(string Title, string Desc, Action ButtonAction = null)
     //{
     //    GameObject obj = null;
 
-    //    if (TitleManager.Instance)
-    //        obj = GetPrefab("PopUp/MessagePopUp", TitleManager.Instance.transform.Find("Canvas"));
-    //    else if (UIManager.instance)
-    //        obj = GetPrefab("PopUp/MessagePopUp", UIManager.instance.transform.Find("PopupUI_5"));
+    //    //if (TitleManager.Instance)
+    //    //    obj = GetPrefab("PopUp/MessagePopUp", TitleManager.Instance.transform.Find("Canvas"));
+    //    //else if (UIManager.instance)
+    //        obj = CommonFuntion.GetPrefab("PopUp/MessagePopUp", UIManager.instance.transform.Find("PopupUI_0"));
 
     //    obj.transform.Find("AchieveTitle").GetComponent<TextMeshProUGUI>().text = Title;
     //    obj.transform.Find("Desc").GetComponent<TextMeshProUGUI>().text = Desc;
 
-    //    var btns = obj.transform.GetComponentsInChildren<CloseButton>();
 
-    //    foreach (var item in btns)
-    //    {
-    //        item.closeAction += ButtonAction;
-    //    }
+    //    //var btns = obj.transform.GetComponentsInChildren<CloseButton>();
+
+    //    //foreach (var item in btns)
+    //    //{
+    //    //    item.closeAction += ButtonAction;
+    //    //}
 
     //    return obj;
     //}
@@ -89,6 +140,7 @@ public class Util
 
     //    return popUpObj;
     //}
+    #endregion 사용예정인 공용함수
 
     static readonly string[] Units = new string[] { "", "A", "B", "C", "D", "E", "F", "G",
         "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",

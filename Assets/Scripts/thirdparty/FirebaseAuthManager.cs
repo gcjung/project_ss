@@ -5,9 +5,15 @@ using Firebase.Auth;
 using TMPro;
 using System;
 using GooglePlayGames;
-using GooglePlayGames.BasicApi;
-using UnityEngine.SocialPlatforms;
+using UnityEngine.UI;
+using System.Threading.Tasks;
 
+
+public enum LoginType
+{
+    Guest,
+    Google,
+}
 public class FirebaseAuthManager
 {
     private static FirebaseAuthManager instance;
@@ -27,9 +33,18 @@ public class FirebaseAuthManager
     FirebaseAuthManager()
     {
         auth = FirebaseAuth.DefaultInstance;
+        StartScene.logtest(str3: "생성자");
+    }
+    
+
+
+
+    public void SingOutFirebase()
+    {
+        auth.SignOut();
     }
 
-    public bool isCurrentUserLoggedin()
+    public bool isCurrentLogin()
     {
         if (auth.CurrentUser == null)
             return false;
@@ -37,30 +52,62 @@ public class FirebaseAuthManager
             return true;
     }
 
-    public void SigninFirebaseWithAnonymous(Action action = null)
+    public bool isCurrentUserAnonymous() 
     {
-        if (auth.CurrentUser != null) return;
-
-        auth.SignInAnonymouslyAsync().ContinueWith(task =>
+        if (auth.CurrentUser.IsAnonymous)
+            return true;
+        else
+            return false;
+    }
+    public async void TrySignIn(LoginType type)
+    {
+        bool result = false;
+        switch (type)
         {
-            Debug.Log("SignInAnonymouslyAsync");
+            case LoginType.Guest:
+                result = await SigninFirebaseWithAnonymous();
+                break;
+
+            case LoginType.Google:
+                GPGS.Instance.LoginGoogleAccount();
+                result = await SignInFirebaseWithGoogleAccount();
+                break;
+        }
+
+        if(result)
+        {
+            var sc = GameObject.FindObjectOfType<StartScene>();
+            sc.CloseLoginPanel();
+        }
+        
+    }
+    public async Task<bool> SigninFirebaseWithAnonymous(Action action = null)
+    {
+        bool success = true;
+        if (auth.CurrentUser != null) return success;
+
+        await auth.SignInAnonymouslyAsync().ContinueWith((task =>
+        {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                success = false;
                 return;
             }
             if (task.IsFaulted)
             {
                 Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                success = false;
                 return;
             }
             AuthResult result = task.Result;
-            action?.Invoke();
-
             Debug.LogFormat("User signed in successfully: {0} ({1})",
                 result.User.DisplayName, result.User.UserId);
 
-        });
+            action?.Invoke();
+        }));
+        
+        return success;
     }
 
     public void SignInFirebaseWithPlayGames(Action action = null)
@@ -79,32 +126,43 @@ public class FirebaseAuthManager
                     return;
                 }
                 AuthResult result = task.Result;
-                action?.Invoke();
                 Debug.LogFormat("User signed in successfully: {0} ({1})",
                 result.User.DisplayName, result.User.UserId);
+
+                action?.Invoke();
             });
     }
 
-    public void SignInFirebaseWithGoogleAccount(Action action = null)
+    public async Task<bool> SignInFirebaseWithGoogleAccount(Action action = null)
     {
-        string idToken = ((PlayGamesLocalUser)PlayGamesPlatform.Instance.localUser).GetIdToken();
+        bool result = true;
+        if (auth.CurrentUser != null) return result;
+
+        string idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
+
+        await Task.Delay(1000);
+        idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
 
         Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
-        auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
+        await auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
         {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInWithCredentialAsync was canceled.");
+                result = false;
                 return;
             }
             if (task.IsFaulted)
             {
                 Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
+                result = false;
                 return;
             }
-            
+
             action?.Invoke();
         });
+
+        return result;
     }
     /*
         public void SignInFirebaseWithGoogleAccount(Action action = null)
@@ -281,6 +339,7 @@ public class FirebaseAuthManager
  */
 #endregion
 
+#region 지금은 안씀
 //public void TryFirebaseGoogleLogin(Action<bool> onLoginSuccess = null)
 //{
 //    string idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
@@ -357,3 +416,37 @@ public class FirebaseAuthManager
 //        Debug.LogError("로그인 완료");
 //    });
 //}
+
+//private GameObject loginPanel = null;
+//public void OpenUI_LoginPanel()
+//{
+//    auth.SignOut();
+//    if (!isCurrentLogin())  // 파이어베이스 연동 X
+//    {
+//        if (loginPanel == null)
+//        {
+//            var obj = Resources.Load<GameObject>("UIPrefabs/Login_Panel");
+
+//            //loginPanel = CommonFuntion.GetPrefab("Login_Panel", UIManager.instance.transform);
+//        }
+
+//        loginPanel.transform.Find("LoginSelect_Panel/GoogleLogin_Button").GetComponent<Button>().onClick.AddListener(
+//            () => TrySignIn(LoginType.Google));
+
+//        loginPanel.transform.Find("LoginSelect_Panel/GuestLogin_Button").GetComponent<Button>().onClick.AddListener(
+//            () => TrySignIn(LoginType.Guest));
+//    }
+//    else                    // 파이어베이스 연동상태
+//    {
+//        if (!isCurrentUserAnonymous())
+//            GPGS.Instance.LoginGoogleAccount();
+//    }
+//}
+
+//public void CloseLoginPanel()
+//{
+//    loginPanel.gameObject.SetActive(false);
+//    loginPanel = null;
+//}
+
+#endregion 지금은 안씀

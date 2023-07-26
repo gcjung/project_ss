@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b479b9af247f6dc4eb089c10889afa2b
+guid: b4c07ab68ec26e34baf7457ab37f1d5f
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -10,7 +10,8 @@ TrueTypeFontImporter:
   includeFontData: 1
   fontNames:
   - Kim jung chul Myungjo
-  fallbackFontReferences: []
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: b479b9af247f6dc4eb089c10889afa2b, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1

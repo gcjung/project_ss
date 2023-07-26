@@ -51,23 +51,24 @@ public class GPGS
         }
     }
 
-    
-    public void LoginGoogleAccount()
+    public PlayGamesLocalUser LoginGoogleAccount()
     {
         if (Social.localUser.authenticated) // 로그인 되어 있다면
-            return;
+            return (PlayGamesLocalUser)Social.localUser;
 
         PlayGamesPlatform.Instance.Authenticate(success =>
         {
             if (success)
             {
-
+                
             }
             else
             {
                 
             }
         });
+
+        return (PlayGamesLocalUser)Social.localUser;
     }
 
     [Obsolete("구글로그아웃 사용안함",true)]
