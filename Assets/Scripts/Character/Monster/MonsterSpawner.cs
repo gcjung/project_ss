@@ -24,16 +24,18 @@ public class MonsterSpawner : MonoBehaviour
     public static int MonsterCount { get; private set; } = 0;
     public static int WaveCount { get; private set; } = 0;
 
-    private IEnumerator Start()
+    private void Awake()
     {
         mainScene = transform.parent.GetComponent<MainScene>();
 
         slider = slider.GetComponent<Slider>();
         slider.onValueChanged.AddListener(OnSliderValueChanged);
         slider.interactable = false;
-
+    }
+    private IEnumerator Start()
+    {
         yield return CommonIEnumerator.IEWaitUntil(
-           predicate: () => { return GlobalManager.Instance.Initialized; },
+           predicate: () => { return mainScene.IsPlayer; }, //GlobalManager.Instance.Initialized
            onFinish: () =>
            {
                Init();
