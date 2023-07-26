@@ -11,6 +11,7 @@ public class GlobalManager : SingletonObject<GlobalManager>
     public SceneLoadManager SceneLoadManager { get; set; } = null;
     public DBManager DBManager { get; set; } = null;
     public GameDataManager GameDataManager { get; set; } = null;
+    public ActiveManager ActiveManager { get; set; } = null;
 
     public override void Awake()
     {
@@ -34,6 +35,7 @@ public class GlobalManager : SingletonObject<GlobalManager>
             SceneLoadManager = SceneLoadManager.CreateManager(transform);
             DBManager = DBManager.CreateManager(transform);
             GameDataManager = GameDataManager.CreateManager(transform);
+            ActiveManager = ActiveManager.CreateManager(transform);
         }
         
         yield return new WaitUntil(() =>
@@ -42,13 +44,15 @@ public class GlobalManager : SingletonObject<GlobalManager>
             && SoundManager.Ininialized
             && SceneLoadManager.Ininialized
             && DBManager.Ininialized
-            && GameDataManager.Ininialized;
+            && GameDataManager.Ininialized
+            && ActiveManager.Ininialized;
         });
 
         SoundManager.InitializedFininsh();
         SceneLoadManager.InitializedFininsh();
         DBManager.InitializedFininsh();
         GameDataManager.InitializedFininsh();
+        ActiveManager.InitializedFininsh();
 
         Initialized = true;
         Debug.Log("Global Manager Initialized");

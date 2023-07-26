@@ -93,6 +93,7 @@ public class MainScene : MonoBehaviour
     private TMP_Text goldText;
     private TMP_Text gemText;
     private RectTransform category1_UI;
+    private RectTransform category2_UI; //장비
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -281,6 +282,12 @@ public class MainScene : MonoBehaviour
             case 0:
                 OpenUI_Category1(onClickButton);
                 break;
+            case 1:
+                OpenUI_Category2(onClickButton);
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -329,6 +336,32 @@ public class MainScene : MonoBehaviour
             }
         }
     }
+
+    private void OpenUI_Category2(GameObject clickButton)
+    {
+        //장비 UI
+        if (category2_UI == null)
+        {
+            category2_UI = CommonFuntion.GetPrefab("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
+            category2_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+        }
+        else
+        {
+            bool active = category2_UI.gameObject.activeSelf;
+
+            if (active)
+            {
+                category2_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+            }
+            else
+            {
+                category2_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+            }
+
+            category2_UI.gameObject.SetActive(!active);
+        }
+    }
+
     void ShowUI_Character()
     {
         Debug.Log("ShowUI_Character");
