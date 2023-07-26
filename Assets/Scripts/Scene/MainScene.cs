@@ -127,11 +127,9 @@ public class MainScene : MonoBehaviour
         Debug.Log("메인씬 시작");
 
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
-        Debug.Log($"현재 스테이지ID : {stageId}"); 
         SetStage(stageId);  //스테이지 세팅
 
         heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
-        Debug.Log($"현재 영웅ID : {heroId}");
         SetPlayer(heroId);  //영웅 세팅
 
         UpdateStatusLevel();    //스탯 레벨 세팅
@@ -160,6 +158,8 @@ public class MainScene : MonoBehaviour
     }
     public void SetPlayer(int heroId)
     {
+        Debug.Log($"현재 영웅ID : {heroId}");
+
         if (playerCharacter != null)
             Destroy(playerCharacter.gameObject);
 
@@ -180,6 +180,8 @@ public class MainScene : MonoBehaviour
     }
     public void SetStage(int stageId)
     {
+        Debug.Log($"현재 스테이지ID : {stageId}");
+
         mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵이미지 세팅
         monsterId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Monster]); //몬스터 세팅
         bossId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Boss]); //보스몬스터 세팅
