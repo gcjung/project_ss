@@ -93,6 +93,7 @@ public class StartScene : MonoBehaviour
     private GameObject loginPanel = null;
     public void OpenUI_LoginPanel()
     {
+        //FirebaseAuthManager.Instance.SingOutFirebase();
         if (!FirebaseAuthManager.Instance.isCurrentLogin())  // 파이어베이스 연동 X
         {
             if (loginPanel == null)
@@ -153,22 +154,16 @@ public class StartScene : MonoBehaviour
         var currentValueText = resourceDownSlider.transform.Find("CurrentValue_Text").GetComponent<TMP_Text>();
 
         float downloadPercent = ((float)current / (float)target * 100);
-        resourceDownSlider.value = (float)downloadPercent;
         percentText.text = $"{(int)downloadPercent} %";
         currentValueText.text = Util.ConvertBytes((long)(downloadPercent * target * 0.01f));
+        resourceDownSlider.value = (float)downloadPercent;
     }
 
 
     private void CheckAssetBundleVersion()
     {
-        //PlayerPrefs.DeleteKey("AssetBundleVersion");
-        //PlayerPrefs.SetInt(GameDataType.AssetBundleVersion.ToString(), 1);
-        Debug.Log($"현재 에셋번들 버전 : {GlobalManager.Instance.DBManager.GetGameData(GameDataType.AssetBundleVersion)}");
         if (!PlayerPrefs.HasKey("AssetBundleVersion"))  // 최초 접속
         {
-            var version = GlobalManager.Instance.DBManager.GetGameData(GameDataType.AssetBundleVersion);
-            Debug.Log($"에셋번들버전 : {version}, 최초접속이라 에셋번들 다운받아야함");
-
             OpenUI_ResourceDownPopup();
         }
         else        // 최초 접속 이후
@@ -176,20 +171,13 @@ public class StartScene : MonoBehaviour
             int version = int.Parse(GlobalManager.Instance.DBManager.GetGameData(GameDataType.AssetBundleVersion));
             if (PlayerPrefs.GetInt("AssetBundleVersion") == version)    // 에셋번들 최신버전  
             {
-                
-                Debug.Log("에셋번들이 최신버전입니다.");
-                Debug.Log($"로컬 에셋번들 위치 :  {Application.persistentDataPath}");
-                Debug.Log($"로컬 에셋번들 위치 :  {Application.temporaryCachePath}");
                 ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer : false);
             }
             else
             {
-                Debug.Log("에셋번들이 구버전입니다. 에셋번들 최신버저으로 다운받아야함");
                 OpenUI_ResourceDownPopup("추가 리소스를 다운로드합니다.\n추가 다운로드를 하시겠습니까?");
             }
         }
-
-        //FirebaseAuthManager.Instance.OpenUI_LoginPanel();
     }
     public void DestoryPanel()
     {

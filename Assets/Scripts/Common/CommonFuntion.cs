@@ -88,7 +88,6 @@ public class CommonFuntion : MonoBehaviour
         //LoadPrefab(prefabName);
         LoadFont(prefabName);
 
-        Debug.Log("°ÙÇÁ¸®ÆÕ : " + prefabName);
         return fontPool[prefabName] as TMP_FontAsset;
     }
 
