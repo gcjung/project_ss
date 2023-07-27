@@ -2066,11 +2066,21 @@ MonoBehaviour:
   bossPosition: {fileID: 1424292077}
   movePoint: {fileID: 1242721248}
   victoryText: {fileID: 6669254609789748411, guid: 3b3ca7fda0fcc514698ec2e21119fee7, type: 3}
+  totalDamageText: {fileID: 2067080698}
   heroId: 0
+  heroName: 
   stageId: 0
   mapName: 
   monsterId: 0
   bossId: 0
+  attackLevel: 0
+  attackSpeedLevel: 0
+  criticalLevel: 0
+  hpLevel: 0
+  attack_ratio: 0
+  attackSpeed_ratio: 0
+  critical_ratio: 0
+  hp_ratio: 0
   mainUiPanel: {fileID: 972070603}
 --- !u!1 &838461504
 GameObject:
@@ -5891,8 +5901,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Damage : 123'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2ce90779c436b384f95ca9759074c4de, type: 2}
+  m_sharedMaterial: {fileID: -7909049205895895075, guid: 2ce90779c436b384f95ca9759074c4de, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

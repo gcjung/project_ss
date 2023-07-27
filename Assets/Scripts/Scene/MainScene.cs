@@ -50,6 +50,9 @@ public class MainScene : MonoBehaviour
     [SerializeField] private Transform movePoint;
     [SerializeField] private TextMeshProUGUI victoryText;
 
+    [Header("Total Damage Text")]
+    [SerializeField] private TextMeshProUGUI totalDamageText;
+
     private MonsterSpawner spawner; //스테이지 세팅용
     [HideInInspector] public int heroId;    //임시 테스트용
     [HideInInspector] public string heroName;
@@ -172,11 +175,11 @@ public class MainScene : MonoBehaviour
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
         playerCharacter.AddComponent<PlayerController>();
-        playerCharacter.SetHeroStatus(heroId);
+        playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
 
         IsPlayer = true;
 
-        UpdateStatusLevel();    //영웅 스탯 세팅
+        UpdateStatusLevel();    //최초 1회 스탯 레벨 업데이트
     }
     public void SetStage(int stageId)
     {
@@ -228,6 +231,8 @@ public class MainScene : MonoBehaviour
 
         if (IsPlayer)
             playerCharacter.UpdateHeroStatus(statusName);
+
+        totalDamageText.text = $"총 공격력 : {Util.BigNumCalculate(playerCharacter.TotalAttack)}";
     }
     private void InitUIfromDB()
     {
