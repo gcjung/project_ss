@@ -11,7 +11,7 @@ public class AssetBundleBuildManager
     [MenuItem("CustomTool/AssetBundle Build")]
     static async void AssetBundleBuild()
     {
-        string assetBunbleDirectoty = "Assets/AssetBundle";
+        string assetBunbleDirectoty = Path.Combine(Application.dataPath,"AssetBundle");
         if (!Directory.Exists(assetBunbleDirectoty))
             Directory.CreateDirectory(assetBunbleDirectoty);
 
@@ -22,7 +22,7 @@ public class AssetBundleBuildManager
         string firebaseStorageURL = "gs://projectss-c99e7.appspot.com";
         var storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(firebaseStorageURL);
         
-        DirectoryInfo directoryInfo = new DirectoryInfo(Application.dataPath + "/AssetBundle");
+        DirectoryInfo directoryInfo = new DirectoryInfo(assetBunbleDirectoty);
         var fileList = directoryInfo.GetFiles();
         foreach (FileInfo file in fileList)
         {

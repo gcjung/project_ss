@@ -54,7 +54,10 @@ public class GPGS
     public PlayGamesLocalUser LoginGoogleAccount()
     {
         if (Social.localUser.authenticated) // 로그인 되어 있다면
+        {
+            Debug.Log("구글 로그인 되어 있음");
             return (PlayGamesLocalUser)Social.localUser;
+        }
 
         PlayGamesPlatform.Instance.Authenticate(success =>
         {

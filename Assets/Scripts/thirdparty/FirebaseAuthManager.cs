@@ -52,20 +52,37 @@ public class FirebaseAuthManager
             return true;
     }
 
+    public bool isCurrentUserGoogleLogin()
+    {
+        bool result = false;
+        if (auth.CurrentUser != null)
+        {
+            foreach (var profile in auth.CurrentUser.ProviderData)
+            {
+                if(profile.ProviderId == "google.com")
+                    result = true;
+                //string uid = profile.UserId;
+            }
+        }
+
+        return result;
+
+    }
     public bool isCurrentUserAnonymous() 
     {
         if (auth.CurrentUser.IsAnonymous)
             return true;
         else
             return false;
+
     }
-    public async void TrySignIn(LoginType type)
+    public async void TrySignIn(LoginType type, Action action = null)
     {
         bool result = false;
         switch (type)
         {
             case LoginType.Guest:
-                result = await SigninFirebaseWithAnonymous();
+                result = await SignInFirebaseWithAnonymous();
                 break;
 
             case LoginType.Google:
@@ -76,12 +93,10 @@ public class FirebaseAuthManager
 
         if(result)
         {
-            var sc = GameObject.FindObjectOfType<StartScene>();
-            sc.CloseLoginPanel();
+            action?.Invoke();
         }
-        
     }
-    public async Task<bool> SigninFirebaseWithAnonymous(Action action = null)
+    public async Task<bool> SignInFirebaseWithAnonymous(Action action = null)
     {
         bool success = true;
         if (auth.CurrentUser != null) return success;
@@ -138,11 +153,17 @@ public class FirebaseAuthManager
         bool result = true;
         if (auth.CurrentUser != null) return result;
 
-        string idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
+        string idToken = "";
+        await Task.Run(() =>
+        {
+            while (string.IsNullOrEmpty(idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken()))
+            {
+                //Debug.Log("idtoken : " + idToken);
+            }
+        });
 
-        await Task.Delay(1000);
         idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
-
+       
         Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
         await auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWith(task =>
         {
@@ -164,6 +185,7 @@ public class FirebaseAuthManager
 
         return result;
     }
+
     /*
         public void SignInFirebaseWithGoogleAccount(Action action = null)
     {
