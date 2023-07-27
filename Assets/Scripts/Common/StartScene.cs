@@ -96,7 +96,6 @@ public class StartScene : MonoBehaviour
     private GameObject loginPanel = null;
     public void OpenUI_LoginPanel()
     {
-        FirebaseAuthManager.Instance.SingOutFirebase();
         if (!FirebaseAuthManager.Instance.isCurrentLogin())  // 파이어베이스 연동 X
         {
             if (loginPanel == null)
@@ -249,6 +248,13 @@ public class StartScene : MonoBehaviour
         //    {
         //        log3 = "구글 로그인 안됨";
         //    }
+        //}
+
+        //if (GUILayout.Button("파베 로그아웃"))
+        //{
+        //    startPanel.GetComponent<CanvasGroup>().alpha = 0.3f;
+
+        //    FirebaseAuthManager.Instance.SingOutFirebase();
         //}
 
         //GUILayout.Label(log1);

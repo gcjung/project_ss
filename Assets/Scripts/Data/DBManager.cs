@@ -65,14 +65,17 @@ public class DBManager : Manager<DBManager>
 
         if (FirebaseAuthManager.Instance.isCurrentLogin())
         {
-            uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
-            
-            LoadUserDBFromFirebase();
+            InitUserDBSetting();
         }
         else
         {
             Ininialized = true;
         }
+    }
+    public void InitUserDBSetting()
+    {
+        uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
+        LoadUserDBFromFirebase();
     }
     public override void InitializedFininsh()
     {
@@ -107,26 +110,18 @@ public class DBManager : Manager<DBManager>
                 if (pair.Value is Double)
                 {
                     userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
-                    //Debug.Log($"Double : {pair.Key}, {pair.Value}");
                 }
                 else if (pair.Value is Int64)
                 {
                     userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
-                    //Debug.Log($"Double : {pair.Key}, {pair.Value}");
-                }
-                else if (pair.Value is Int64)
-                {
-                    userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
-                    //Debug.Log($"Double : {pair.Key}, {pair.Value}");
                 }
                 else if (pair.Value is string)
                 {
                     userStringDataDic.Add(pair.Key, (string)pair.Value);
-                    //Debug.Log($"string : {pair.Key}, {pair.Value}");
                 }
                 else
                 {
-                    //Debug.Log($"else : {pair.Key}, {pair.Value}");
+                    Debug.Log($"else : {pair.Key}, {pair.Value}");
                 }
             }
         }

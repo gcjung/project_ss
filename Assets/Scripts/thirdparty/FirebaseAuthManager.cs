@@ -93,6 +93,7 @@ public class FirebaseAuthManager
 
         if(result)
         {
+            GlobalManager.Instance.DBManager.InitUserDBSetting();
             action?.Invoke();
         }
     }
