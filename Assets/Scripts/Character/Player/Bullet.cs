@@ -22,7 +22,7 @@ public class Bullet : MonoBehaviour
     {
         transform.position += Direction * Speed * Time.deltaTime;
     }
-    public void CashingInfo(double damage, Vector3 direction, float speed)
+    public void SettingInfo(double damage, Vector3 direction, float speed)
     {
         Damage = damage;
         Direction = direction;

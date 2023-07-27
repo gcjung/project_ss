@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
+using System.Linq;
 
 public class MainScene : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class MainScene : MonoBehaviour
 
     [Header("Create Player")]
     [SerializeField] private Transform playerSpawnPoint;
-    private GameObject playerCharacter;   
+    private Player playerCharacter;   
 
     [Header("Change Map Sprite")]   
     [SerializeField] private SpriteRenderer map1;
@@ -51,7 +52,7 @@ public class MainScene : MonoBehaviour
 
     private MonsterSpawner spawner; //스테이지 세팅용
     [HideInInspector] public int heroId;    //임시 테스트용
-    [HideInInspector] public string heroName;    //임시 테스트용
+    [HideInInspector] public string heroName;
     [HideInInspector] public int stageId;
     [HideInInspector] public string mapName;
     [HideInInspector] public int monsterId;
@@ -94,6 +95,10 @@ public class MainScene : MonoBehaviour
     [HideInInspector] public int attackSpeedLevel;
     [HideInInspector] public int criticalLevel;
     [HideInInspector] public int hpLevel;
+    [HideInInspector] public float attack_ratio;
+    [HideInInspector] public float attackSpeed_ratio;
+    [HideInInspector] public float critical_ratio;
+    [HideInInspector] public float hp_ratio;
 
 
     [SerializeField] private GameObject mainUiPanel;
@@ -130,9 +135,7 @@ public class MainScene : MonoBehaviour
         SetStage(stageId);  //스테이지 세팅
 
         heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
-        SetPlayer(heroId);  //영웅 세팅
-
-        UpdateStatusLevel();    //스탯 레벨 세팅
+        SetPlayer(heroId);  //영웅 세팅      
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
@@ -164,19 +167,16 @@ public class MainScene : MonoBehaviour
             Destroy(playerCharacter.gameObject);
 
         heroName = HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Name];
-        double attack = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Attack]);
-        double attackSpeed = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.AttackSpeed]);
-        double critical = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Critical]);
-        double hp = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Hp]);
 
-        var _playerCharacter = Resources.Load<GameObject>($"Player/{heroName}");   //플레이어 캐릭터 세팅
+        var _playerCharacter = Resources.Load<Player>($"Player/{heroName}");   //플레이어 캐릭터 세팅
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
-        playerCharacter.AddComponent<Player>();
         playerCharacter.AddComponent<PlayerController>();
-        playerCharacter.GetComponent<Player>().SetHeroStatus(attack, attackSpeed, critical, hp);
+        playerCharacter.SetHeroStatus(heroId);
 
         IsPlayer = true;
+
+        UpdateStatusLevel();    //영웅 스탯 세팅
     }
     public void SetStage(int stageId)
     {
@@ -191,34 +191,43 @@ public class MainScene : MonoBehaviour
         map2.sprite = mapSprite;
     }
 
-    public void UpdateStatusLevel(string statusName = "")    //임시 메서드(존나게 맘에 안듬)
+    public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
     {
         switch (statusName)
         {
             case "AttackLevel":
-                attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel, 1);
+                attackLevel = level;
                 Debug.Log($"AttackLevel : {attackLevel}");
                 break;
             case "AttackSpeedLevel":
-                attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel, 1);
+                attackSpeedLevel = level;
                 Debug.Log($"AttackSpeedLevel : {attackSpeedLevel}");
                 break;
             case "CriticalLevel":
-                criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel, 1);
+                criticalLevel = level;
                 Debug.Log($"CriticalLevel : {criticalLevel}");
                 break;
             case "HpLevel":
-                hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel, 1);
+                hpLevel = level;
                 Debug.Log($"HpLevel : {hpLevel}");
                 break;
-            default:
+            default:    //최초 1회 실행으로 모든 스탯값 세팅
                 attackLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackLevel, 1);
                 attackSpeedLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.AttackSpeedLevel, 1);
                 criticalLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CriticalLevel, 1);
                 hpLevel = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.HpLevel, 1);
-                Debug.Log($"All Status Update");
+
+                attack_ratio = float.Parse(StatusTemplate["Attack"][(int)StatusTemplate_.Value_Calc]);
+                attackSpeed_ratio = float.Parse(StatusTemplate["AttackSpeed"][(int)StatusTemplate_.Value_Calc]);
+                critical_ratio = float.Parse(StatusTemplate["Critical"][(int)StatusTemplate_.Value_Calc]);
+                hp_ratio = float.Parse(StatusTemplate["Hp"][(int)StatusTemplate_.Value_Calc]);
+
+                Debug.Log($"All Status Updated");
                 break;
         }
+
+        if (IsPlayer)
+            playerCharacter.UpdateHeroStatus(statusName);
     }
     private void InitUIfromDB()
     {
@@ -451,7 +460,7 @@ public class MainScene : MonoBehaviour
         if (currentGold - usedGold >= 0)
         {
             Debug.Log($"{Util.BigNumCalculate(usedGold)}Gold를 사용");
-            goldText.text = Util.BigNumCalculate(currentGold - usedGold);
+            goldText.text = $"{Util.BigNumCalculate(currentGold - usedGold)} G";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold - usedGold);
 
             return true;
@@ -471,7 +480,7 @@ public class MainScene : MonoBehaviour
         if (currentGem - usedGem >= 0)
         {
             Debug.Log($"{usedGem}Gem을 사용");
-            gemText.text = Util.BigNumCalculate(currentGem - usedGem);
+            gemText.text = $"{Util.BigNumCalculate(currentGem - usedGem)}";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem - usedGem);
 
             return true;
