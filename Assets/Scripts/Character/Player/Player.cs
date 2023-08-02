@@ -91,6 +91,7 @@ public class Player : MonoBehaviour
                 break;
             case "CriticalLevel":               
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
+                Debug.Log($"크리티컬 : {TotalCritical}");
                 break;
             case "HpLevel":                
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
