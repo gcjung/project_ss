@@ -439,7 +439,7 @@ public class MainScene : MonoBehaviour
     {
         if (getGold > 0)
         {
-            Debug.Log($"{Util.BigNumCalculate(getGold)}G¸¦ È¹µæ");
+            Debug.Log($"{Util.BigNumCalculate(getGold)} G¸¦ È¹µæ");
 
             double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
