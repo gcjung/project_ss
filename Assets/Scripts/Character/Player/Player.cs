@@ -85,9 +85,11 @@ public class Player : MonoBehaviour
         {
             case "AttackLevel":                
                 TotalAttack = Math.Round(Attack * attackLevel * attack_ratio, 2);
+                Debug.Log($"공격력 : {TotalAttack}");
                 break;
-            case "AttackSpeedLevel":                
-                TotalAttackSpeed = Math.Round(AttackSpeed * attackSpeedLevel * attackSpeed_ratio, 2);
+            case "AttackSpeedLevel":
+                TotalAttackSpeed = Math.Round(AttackSpeed + (attackSpeedLevel * attackSpeed_ratio), 2); //공격속도는 합연산
+                Debug.Log($"공격속도 : {TotalAttackSpeed}");
                 break;
             case "CriticalLevel":               
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
@@ -95,14 +97,16 @@ public class Player : MonoBehaviour
                 break;
             case "HpLevel":                
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
+                Debug.Log($"최대체력 : {TotalHp}");
                 break;
             default:    //캐릭터 첫 세팅 or 교체 시에만 실행
                 TotalAttack = Math.Round(Attack * attackLevel * attack_ratio, 2);
-                TotalAttackSpeed = Math.Round(AttackSpeed * attackSpeedLevel * attackSpeed_ratio, 2);
+                TotalAttackSpeed = Math.Round(AttackSpeed + (attackSpeedLevel * attackSpeed_ratio), 2);
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
                 CurrentHp = TotalHp;
+                Debug.Log($"All Status Updated2");
                 break;
-        }
+        }       
     }
 }
