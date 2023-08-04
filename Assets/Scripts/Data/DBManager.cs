@@ -27,7 +27,7 @@ public enum UserDoubleDataType
 }
 public enum UserStringDataType
 {
-
+    EquippedSkill,
 }
 
 public enum GameDataType
@@ -42,17 +42,8 @@ public class DBManager : Manager<DBManager>
 
     Dictionary<string, object> gameData = new Dictionary<string, object>();
 
-    CollectionReference firebaseUserDB;
     DocumentReference uidRef;
-    DocumentReference dataRef;
-    UserDatas dataTable;
-    
-    public void Awake()
-    {
-        firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
-        dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");
-        dataTable = new UserDatas();
-    }
+
     public override void Init()
     {
         if (Ininialized)
@@ -60,7 +51,6 @@ public class DBManager : Manager<DBManager>
             Debug.Log("DBManager already Initialized");
             return;
         }
-
         LoadGameData();
 
         if (FirebaseAuthManager.Instance.isCurrentLogin())
@@ -74,6 +64,7 @@ public class DBManager : Manager<DBManager>
     }
     public void InitUserDBSetting()
     {
+        CollectionReference firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
         uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
         LoadUserDBFromFirebase();
     }
@@ -83,6 +74,7 @@ public class DBManager : Manager<DBManager>
     }
     async void LoadGameData()
     {
+        DocumentReference dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");
         await dataRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             DocumentSnapshot snapshot = task.Result;
@@ -111,7 +103,7 @@ public class DBManager : Manager<DBManager>
                 {
                     userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
                 }
-                else if (pair.Value is Int64)
+                else if (pair.Value is Int64)   // firestore에서 값변경했을 때
                 {
                     userDoubleDataDic.Add(pair.Key, Convert.ToDouble(pair.Value));
                 }
@@ -127,7 +119,7 @@ public class DBManager : Manager<DBManager>
         }
         else            // 최초 접속시
         {
-            await uidRef.SetAsync(dataTable).ContinueWithOnMainThread(t =>
+            await uidRef.SetAsync(new UserDatas()).ContinueWithOnMainThread(t =>
             {
                 Debug.Log($"처음 접속 시, UserDB 초기화");
             });
@@ -155,7 +147,7 @@ public class DBManager : Manager<DBManager>
 
         return defaultValue;
     }
-    public string GetUserStringData(UserDoubleDataType key_, string defaultValue = "")
+    public string GetUserStringData(UserStringDataType key_, string defaultValue = "")
     {
         string key = key_.ToString();
         if (userStringDataDic.ContainsKey(key))
@@ -174,6 +166,8 @@ public class DBManager : Manager<DBManager>
 
         return defaultValue;
     }
+
+
     public void UpdateUserData(UserDoubleDataType key_, double value)
     {
         string key = key_.ToString();
@@ -193,7 +187,7 @@ public class DBManager : Manager<DBManager>
 
         UpdateFirebaseUserData(key, value);
     }
-    public void UpdateUserData(UserDoubleDataType key_, string value)
+    public void UpdateUserData(UserStringDataType key_, string value)
     {
         string key = key_.ToString();
         if (userStringDataDic.ContainsKey(key))
@@ -279,12 +273,7 @@ public class DBManager : Manager<DBManager>
     }
     public async void UpdateFirebaseUserData<T>(string key, T value)
     {
-        Dictionary<string, object> updates = new Dictionary<string, object>
-        { 
-            { key, value }
-        };
-
-        await uidRef.UpdateAsync(updates).ContinueWithOnMainThread(task =>
+        await uidRef.UpdateAsync(key, value).ContinueWith(task =>
         {
             //Debug.Log($"{key} : {value} Update");
         });
@@ -296,6 +285,21 @@ public class DBManager : Manager<DBManager>
 
 }
 
+#region 아마 안씀
+/*
+    public async void UpdateFirebaseUserData<T>(string key, T value)
+    {
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        { 
+            { key, value }
+        };
+        await uidRef.UpdateAsync(updates).ContinueWith(task =>
+        {
+            //Debug.Log($"{key} : {value} Update");
+        });
+    }
+ 
+ */
 
 /// DB읽어올때 object형으로 안읽으려고 다양한 시도..?
 /*
@@ -321,3 +325,4 @@ public class DBManager : Manager<DBManager>
             //    Debug.Log($"{value.Key} : {value.Value}");
             //}
  */
+#endregion 아마 안씀

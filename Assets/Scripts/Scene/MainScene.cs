@@ -99,8 +99,9 @@ public class MainScene : MonoBehaviour
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
     private TMP_Text gemText;
-    private RectTransform category1_UI;
-    private RectTransform category2_UI; //장비
+    private Image[] skillSprite = null;
+    private RectTransform category1_UI = null;
+    private RectTransform category2_UI = null; //장비
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -137,8 +138,19 @@ public class MainScene : MonoBehaviour
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
 
+        var skillPanel = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel");
+        
+        skillSprite = new Image[skillPanel.childCount];
+        for (int i = 1; i < skillPanel.childCount; i++)
+        {
+            //Debug.Log($"{skillPanel.GetChild(i)}, {skillPanel.childCount}");
+            skillSprite[i] = skillPanel.GetChild(i).GetComponent<Image>();
+            
+        }
+        
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
+
 
         // 바텀 카테고리 버튼
         Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
@@ -174,6 +186,7 @@ public class MainScene : MonoBehaviour
         playerCharacter.transform.position = playerSpawnPoint.position;
         playerCharacter.AddComponent<Player>();
         playerCharacter.AddComponent<PlayerController>();
+        playerCharacter.AddComponent<SkillController>();
         playerCharacter.GetComponent<Player>().SetHeroStatus(attack, attackSpeed, critical, hp);
 
         IsPlayer = true;
@@ -189,6 +202,16 @@ public class MainScene : MonoBehaviour
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //맵 세팅
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
+    }
+    public void SetSkill(string[] equipedSkill)
+    {
+        for (int i = 0; i < equipedSkill.Length; i++)
+        {
+            Debug.Log($"equipedSkill : {equipedSkill[i]}");
+            string spriteName = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.SpriteName];
+            skillSprite[i].sprite = CommonFuntion.GetSprite_Atlas(spriteName, "SkillAtlas");
+        }
+        
     }
 
     public void UpdateStatusLevel(string statusName = "")    //임시 메서드(존나게 맘에 안듬)
@@ -229,6 +252,12 @@ public class MainScene : MonoBehaviour
 
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
+
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        
+        //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
+        SetSkill(equippedSkill);
+
     }
 
     private void EnterBossRoom()
@@ -472,7 +501,7 @@ public class MainScene : MonoBehaviour
         {
             Debug.Log($"{usedGem}Gem을 사용");
             gemText.text = Util.BigNumCalculate(currentGem - usedGem);
-            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem - usedGem);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem, currentGem - usedGem);
 
             return true;
         }

@@ -37,6 +37,7 @@ public class ResourceLoader : MonoBehaviour
         assetBundleArr = new AssetBundle[Enum.GetValues(typeof(BundleType)).Length];
         downloadedResourceSize = new long[Enum.GetValues(typeof(BundleType)).Length];
         storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(firebaseStorageURL);
+        Debug.Log("@@@");
     }
     public enum BundleType
     {
@@ -49,6 +50,11 @@ public class ResourceLoader : MonoBehaviour
     public static SpriteAtlas LoadAtlas(string atlasName)
     {
         SpriteAtlas obj = assetBundleArr[(int)BundleType.atlas].LoadAsset(atlasName) as SpriteAtlas;
+
+        for (int i = 0; i< assetBundleArr.Length;i++)
+        {
+            Debug.Log(assetBundleArr[i]+"!!@@@@@@");
+        }
         return obj;
     }
     public static GameObject LoadUiPrefab(string prefabName)

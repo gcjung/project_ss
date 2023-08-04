@@ -1,0 +1,8 @@
+﻿index,grade,name,order,cooltime,damage,spriteName,desc
+1,common,히드라소환,1,5,150,Arrow_Barrage,이건 이러 이러한 효과가 있습니다
+2,uncommon,구체던지기,2,10,200,Beam,구체 던지기 입니다
+3,rare,,3,,,,
+4,epic,,4,,,,
+5,legendary,,5,,,,
+6,mythic,,6,,,,
+7,transcendence,,7,,,,

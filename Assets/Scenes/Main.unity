@@ -788,7 +788,7 @@ GameObject:
   - component: {fileID: 150188924}
   - component: {fileID: 150188923}
   m_Layer: 5
-  m_Name: Skill_Image (1)
+  m_Name: Skill_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -940,7 +940,7 @@ GameObject:
   - component: {fileID: 216367341}
   - component: {fileID: 216367340}
   m_Layer: 5
-  m_Name: Skill_Image (5)
+  m_Name: Skill_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1654,7 +1654,7 @@ GameObject:
   - component: {fileID: 674337864}
   - component: {fileID: 674337863}
   m_Layer: 5
-  m_Name: Skill_Image (2)
+  m_Name: Skill_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1730,7 +1730,7 @@ GameObject:
   - component: {fileID: 702526317}
   - component: {fileID: 702526316}
   m_Layer: 5
-  m_Name: Skill_Image (3)
+  m_Name: Skill_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1850,7 +1850,7 @@ GameObject:
   - component: {fileID: 759530844}
   - component: {fileID: 759530843}
   m_Layer: 5
-  m_Name: Skill_Image (6)
+  m_Name: Skill_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2067,10 +2067,15 @@ MonoBehaviour:
   movePoint: {fileID: 1242721248}
   victoryText: {fileID: 6669254609789748411, guid: 3b3ca7fda0fcc514698ec2e21119fee7, type: 3}
   heroId: 0
+  heroName: 
   stageId: 0
   mapName: 
   monsterId: 0
   bossId: 0
+  attackLevel: 0
+  attackSpeedLevel: 0
+  criticalLevel: 0
+  hpLevel: 0
   mainUiPanel: {fileID: 972070603}
 --- !u!1 &838461504
 GameObject:
@@ -2576,7 +2581,7 @@ GameObject:
   - component: {fileID: 922524953}
   - component: {fileID: 922524956}
   m_Layer: 5
-  m_Name: SKill_Panel
+  m_Name: Skill_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5767,7 +5772,7 @@ GameObject:
   - component: {fileID: 2034022178}
   - component: {fileID: 2034022177}
   m_Layer: 5
-  m_Name: Skill_Image (4)
+  m_Name: Skill_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
