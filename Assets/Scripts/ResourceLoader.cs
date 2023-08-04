@@ -37,6 +37,11 @@ public class ResourceLoader : MonoBehaviour
         assetBundleArr = new AssetBundle[Enum.GetValues(typeof(BundleType)).Length];
         downloadedResourceSize = new long[Enum.GetValues(typeof(BundleType)).Length];
         storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(firebaseStorageURL);
+
+        for (int i = 0; i < assetBundleArr.Length; i++)
+        {
+            Debug.Log(assetBundleArr[i] + "!!@@@@@@");
+        }
         Debug.Log("@@@");
     }
     public enum BundleType
@@ -51,10 +56,6 @@ public class ResourceLoader : MonoBehaviour
     {
         SpriteAtlas obj = assetBundleArr[(int)BundleType.atlas].LoadAsset(atlasName) as SpriteAtlas;
 
-        for (int i = 0; i< assetBundleArr.Length;i++)
-        {
-            Debug.Log(assetBundleArr[i]+"!!@@@@@@");
-        }
         return obj;
     }
     public static GameObject LoadUiPrefab(string prefabName)
@@ -86,8 +87,7 @@ public class ResourceLoader : MonoBehaviour
     }
     public void LoadLocalAssetBundle(BundleType bundleType)
     {
-        string localPath = Application.temporaryCachePath;
-        
+        string localPath = Application.persistentDataPath;
         if (File.Exists(Path.Combine(localPath,bundleType.ToString()))) // 로컬에 번들 다운로드
         {
             assetBundleArr[(int)bundleType] ??= AssetBundle.LoadFromFile(localPath + "/" + bundleType);
@@ -182,7 +182,8 @@ public class ResourceLoader : MonoBehaviour
                 PlayerPrefs.SetInt(GameDataType.AssetBundleVersion.ToString(), version);
             }
 
-            string localPath = Application.temporaryCachePath;
+            //string localPath = Application.temporaryCachePath;
+            string localPath = Application.persistentDataPath;
             if (!Directory.Exists(localPath)) //폴더가 존재하지 않으면
             {
                 Directory.CreateDirectory(localPath); //폴더 생성

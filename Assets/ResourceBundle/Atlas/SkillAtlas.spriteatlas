@@ -55,17 +55,43 @@ SpriteAtlas:
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
+  - {fileID: 21300000, guid: ad86d6912de0a804bb6d6c327e6c7f10, type: 3}
+  - {fileID: 21300000, guid: 2fd3e1c2c4a763f4986c5b8cae6e5709, type: 3}
   - {fileID: 21300000, guid: b450d0b398880cb458f83d1a01b399ca, type: 3}
+  - {fileID: 21300000, guid: 38dcad9457ec5624b86ce5879fda3df5, type: 3}
+  - {fileID: 21300000, guid: 48fda2a4dade54c4f93a01728b6f7599, type: 3}
   - {fileID: 21300000, guid: eed44235dcbd621438f7c0c4f05e2356, type: 3}
+  - {fileID: 21300000, guid: fb5ff8c7b14edbc45ab80580f3d60cb2, type: 3}
+  - {fileID: 21300000, guid: 29e00938e3697fa4c9dc7c5bbddfba5f, type: 3}
+  - {fileID: 21300000, guid: 7cf851098effcd9439a2ed6e57befa62, type: 3}
+  - {fileID: 21300000, guid: fed1ab89a289a1745a4a930d4116d557, type: 3}
+  - {fileID: 21300000, guid: 5e6e0ad95b684b34cbec6ed3eeea39d5, type: 3}
   - {fileID: 21300000, guid: a2563f2b8dbc4044b9a50537d3a29962, type: 3}
   - {fileID: 21300000, guid: 125bb49b217257347be09ede099b888d, type: 3}
+  - {fileID: 21300000, guid: 0d1cb54c07e521342a8109384fecd414, type: 3}
+  - {fileID: 21300000, guid: e62f8c3d863254b45a4804bdb972a906, type: 3}
+  - {fileID: 21300000, guid: 479974ddc06bb4846a305a8c37d7f63f, type: 3}
   - {fileID: 21300000, guid: 08c71e4e0565fe4469d1e0a593047156, type: 3}
+  - {fileID: 21300000, guid: 08ddf5cec7e68e74faa2c0c83e958bf7, type: 3}
   m_PackedSpriteNamesToIndex:
+  - Heal
+  - Recon
   - Beam
+  - Pound
+  - SpiritArrows
   - Blackhole
+  - Dash
+  - Slash
+  - Reflect
+  - Slide
+  - Fly
   - Buff
   - Arrow_Barrage
+  - Punches
+  - PsycicAttack
+  - MeteorShower
   - Chop
+  - Claw
   m_RenderDataMap: {}
   m_Tag: SkillAtlas
   m_IsVariant: 0

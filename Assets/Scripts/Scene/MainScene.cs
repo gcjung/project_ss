@@ -140,14 +140,14 @@ public class MainScene : MonoBehaviour
 
         var skillPanel = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel");
         
-        skillSprite = new Image[skillPanel.childCount];
-        for (int i = 1; i < skillPanel.childCount; i++)
+        skillSprite = new Image[skillPanel.childCount -1];
+        for (int i = 0; i < skillPanel.childCount - 1; i++)
         {
-            //Debug.Log($"{skillPanel.GetChild(i)}, {skillPanel.childCount}");
-            skillSprite[i] = skillPanel.GetChild(i).GetComponent<Image>();
             
+            skillSprite[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
+            Debug.Log($"skillSprite[i].name : {skillSprite[i].name}");
         }
-        
+
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
 
@@ -207,8 +207,8 @@ public class MainScene : MonoBehaviour
     {
         for (int i = 0; i < equipedSkill.Length; i++)
         {
-            Debug.Log($"equipedSkill : {equipedSkill[i]}");
             string spriteName = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.SpriteName];
+
             skillSprite[i].sprite = CommonFuntion.GetSprite_Atlas(spriteName, "SkillAtlas");
         }
         
