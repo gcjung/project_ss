@@ -170,12 +170,12 @@ public class StartScene : MonoBehaviour
         }
         else        // 최초 접속 이후
         {
-            int version = int.Parse(GlobalManager.Instance.DBManager.GetGameData(GameDataType.AssetBundleVersion));
+            int version = GlobalManager.Instance.DBManager.GetGameData<int>(GameDataType.AssetBundleVersion);
             if (PlayerPrefs.GetInt("AssetBundleVersion") == version)    // 에셋번들 최신버전  
             {
                 // [추가예정] 여기에 로컬에 진짜 에셋번들이 있는지 확인이 필요할듯?
-                ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer : false);
-                
+                ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
+
             }
             else
             {

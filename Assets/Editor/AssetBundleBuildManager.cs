@@ -5,6 +5,8 @@ using UnityEngine;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Firebase.Extensions;
+using Firebase.Firestore;
+using System;
 
 public class AssetBundleBuildManager
 {
@@ -16,7 +18,30 @@ public class AssetBundleBuildManager
             Directory.CreateDirectory(assetBunbleDirectoty);
 
         BuildPipeline.BuildAssetBundles(assetBunbleDirectoty, BuildAssetBundleOptions.None, BuildTarget.Android);
-     
+
+        DocumentReference dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");
+
+
+        int assetBundleVersion;
+        var t = await dataRef.GetSnapshotAsync();
+        if (t.Exists)
+        {
+            var dic = t.ToDictionary();
+            if(dic.ContainsKey(GameDataType.AssetBundleVersion.ToString()))
+            {
+                assetBundleVersion = Convert.ToInt32(dic[GameDataType.AssetBundleVersion.ToString()]);
+                //assetBundleVersion = int.Parse(dic[GameDataType.AssetBundleVersion.ToString()]);
+            }
+        }
+        else
+        {
+
+        }
+
+
+
+
+
         List<Task> tasks = new List<Task>();
 
         string firebaseStorageURL = "gs://projectss-c99e7.appspot.com";

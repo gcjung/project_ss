@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using static SOGamdData;
 
 [FirestoreData]
 public class UserDatas
@@ -210,11 +211,23 @@ public class DBManager : Manager<DBManager>
     public string GetGameData(GameDataType key_)
     {
         string key = key_.ToString();
-        if (gameData.ContainsKey(key.ToString()))
+        if (gameData.ContainsKey(key))
             return gameData[key.ToString()].ToString();
         
         return string.Empty;
     }
+    public T GetGameData<T>(GameDataType key_)
+    {
+        string key = key_.ToString();
+
+        if (gameData.ContainsKey(key))
+        {
+            return (T)Convert.ChangeType(gameData[key], typeof(T));
+        }
+
+        return default;
+    }
+
 
 
     #region 제네릭 버전
