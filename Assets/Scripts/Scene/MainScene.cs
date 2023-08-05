@@ -254,9 +254,9 @@ public class MainScene : MonoBehaviour
         gemText.text = Util.BigNumCalculate(gem);
 
         var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
-        
-        //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
         SetSkill(equippedSkill);
+        //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
+
 
     }
 
