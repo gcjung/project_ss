@@ -162,6 +162,8 @@ public class StartScene : MonoBehaviour
 
     private void CheckAssetBundleVersion()
     {
+        PlayerPrefs.DeleteKey("AssetBundleVersion");
+
         if (!PlayerPrefs.HasKey("AssetBundleVersion"))  // 최초 접속
         {
             OpenUI_ResourceDownPopup();

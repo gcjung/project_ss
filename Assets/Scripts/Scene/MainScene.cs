@@ -53,10 +53,14 @@ public class MainScene : MonoBehaviour
     [Header("Total Damage Text")]
     [SerializeField] private TextMeshProUGUI totalDamageText;
 
+    [Header("Stage Text")]
+    private GameObject stageText;
     private MonsterSpawner spawner; //스테이지 세팅용
+
     [HideInInspector] public int heroId;    //임시 테스트용
     [HideInInspector] public string heroName;
     [HideInInspector] public int stageId;
+    [HideInInspector] public string stageName;
     [HideInInspector] public string mapName;
     [HideInInspector] public int monsterId;
     [HideInInspector] public int bossId;
@@ -91,6 +95,20 @@ public class MainScene : MonoBehaviour
             }
         }
     }
+    private bool isPlayerDead = false;
+    public bool IsPlayerDead
+    {
+        get { return isPlayerDead; }
+        set
+        {
+            if (value)
+            {
+                isPlayerDead = value;
+                StartCoroutine(RestartStage());
+            }
+        }
+    }
+    public StageState CurrentStageState { get; private set; }
     public bool IsPlayer { get; private set; } = false;
 
     //스탯 적용 테스트 중
@@ -133,6 +151,8 @@ public class MainScene : MonoBehaviour
             instance = this;
 
         Debug.Log("메인씬 시작");
+
+        SetCurrentStageState(StageState.NormalWave);
 
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
         SetStage(stageId);  //스테이지 세팅
@@ -184,6 +204,14 @@ public class MainScene : MonoBehaviour
     public void SetStage(int stageId)
     {
         Debug.Log($"현재 스테이지ID : {stageId}");
+
+        stageName = StageTemplate[stageId.ToString()][(int)StageTemplate_.Stage];
+
+        if (stageText != null)
+            Destroy(stageText.gameObject);
+
+        stageText = CommonFuntion.GetPrefab("StageName_Text", upSidePanel.transform);
+        stageText.GetComponent<TextMeshProUGUI>().text = stageName;
 
         mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵이미지 세팅
         monsterId = int.Parse(StageTemplate[stageId.ToString()][(int)StageTemplate_.Monster]); //몬스터 세팅
@@ -252,6 +280,8 @@ public class MainScene : MonoBehaviour
             Debug.Log("보스방 입장");
             IsWaveClear = false;
 
+            SetCurrentStageState(StageState.BossRoom);
+
             float fadeInTime = 1.0f;
 
             var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
@@ -296,6 +326,7 @@ public class MainScene : MonoBehaviour
         float fadeTime = 1.0f;
 
         var _victoryText = Instantiate(victoryText, upSidePanel.transform);
+        _victoryText.text = "Victory";
 
         Color color = _victoryText.color;    //알파값 0으로 초기화
         color.a = 0f;
@@ -331,6 +362,42 @@ public class MainScene : MonoBehaviour
         playerCharacter.transform.position = playerSpawnPoint.position;
         SetStage(stageId);
         spawner.SetMonster();
+    }
+
+    public IEnumerator RestartStage()
+    {
+        isPlayerDead = false;
+
+        switch (CurrentStageState)
+        {
+            case StageState.NormalWave:
+                break;
+            case StageState.BossRoom:
+                SetCurrentStageState(StageState.InfinityWave);
+                break;
+            case StageState.InfinityWave:
+                break;
+        }
+
+        float durationTime = 1.0f;
+        bool fadeFinish = false;
+
+        var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
+        _fadeImage.DOFade(1f, durationTime).OnComplete(() =>
+        {
+            Destroy(_fadeImage);
+            fadeFinish = true;
+        });
+
+        yield return CommonIEnumerator.IEWaitUntil(
+          predicate: () => { return fadeFinish; },
+          onFinish: () =>
+          {
+              SetPlayer(heroId);
+              SetStage(stageId);
+              spawner.SetMonster();
+          }
+       );        
     }
 
     int invisiblePosY = -1700;
@@ -496,5 +563,9 @@ public class MainScene : MonoBehaviour
 
             return false;
         }
+    }
+    public void SetCurrentStageState(StageState state)
+    {
+        CurrentStageState = state;
     }
 }

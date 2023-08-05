@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour
 
     private void OnEnable()
     {
-        Invoke("Off", 4.0f);
+        Invoke(nameof(Off), 4.0f);
     }
     private void Awake()
     {

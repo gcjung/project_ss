@@ -7,6 +7,7 @@ public class MonsterSpawner : MonoBehaviour
 {
     [Header("Stage Slider")]
     [SerializeField] private Slider slider;
+    private StageSlider stageSlider;
 
     [Header("Monster Spawn Point")]
     [SerializeField] private Transform spawnPoint1;
@@ -28,14 +29,14 @@ public class MonsterSpawner : MonoBehaviour
     {
         mainScene = transform.parent.GetComponent<MainScene>();
 
-        slider = slider.GetComponent<Slider>();
+        stageSlider = slider.gameObject.GetComponent<StageSlider>();
         slider.onValueChanged.AddListener(OnSliderValueChanged);
         slider.interactable = false;
     }
     private IEnumerator Start()
     {
         yield return CommonIEnumerator.IEWaitUntil(
-           predicate: () => { return mainScene.IsPlayer; }, //GlobalManager.Instance.Initialized
+           predicate: () => { return mainScene.IsPlayer; },
            onFinish: () =>
            {
                Init();
@@ -53,11 +54,14 @@ public class MonsterSpawner : MonoBehaviour
         if (!slider.IsActive())
             slider.gameObject.SetActive(true);
 
+        stageSlider.ResetSlider();
+
         string monsterName = MonsterTemplate[mainScene.monsterId.ToString()][(int)MonsterTemplate_.Name];
         string bossName = MonsterTemplate[mainScene.bossId.ToString()][(int)MonsterTemplate_.Name];
 
         {//일반몬스터 세팅   
-            monster = Resources.Load<Monster>($"Monster/{monsterName}");          
+            monster = Resources.Load<Monster>($"Monster/{monsterName}");      
+            
             var _monster = Instantiate(monster, transform);
             _monster.gameObject.AddComponent<MonsterController>();
 
@@ -69,7 +73,8 @@ public class MonsterSpawner : MonoBehaviour
         }
 
         {//보스몬스터 세팅
-            bossMonster = Resources.Load<Monster>($"Monster/{bossName}");     
+            bossMonster = Resources.Load<Monster>($"Monster/{bossName}");  
+            
             var _bossMonster = Instantiate(bossMonster, transform);
             _bossMonster.gameObject.AddComponent<MonsterController>();           
 
@@ -92,7 +97,6 @@ public class MonsterSpawner : MonoBehaviour
             int randomIndex = Random.Range(1, 4);
             Transform spawnPoint = GetSpawnPoint(randomIndex);
 
-            //monsterPool.GetObjectPool().transform.localScale = monster.transform.localScale;
             var _monster = monsterPool.GetObjectPool();
             _monster.SetMonsterStat(mainScene.monsterId);
             _monster.transform.localScale = monster.transform.localScale;
