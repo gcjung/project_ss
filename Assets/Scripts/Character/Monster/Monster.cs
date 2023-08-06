@@ -51,7 +51,7 @@ public class Monster : MonoBehaviour
 
     public void TakeDamage(double damageAmount)
     {
-        Debug.Log($"{Name}가 {damageAmount}만큼 피해입음");
+        //Debug.Log($"{Name}가 {damageAmount}만큼 피해입음");
 
         CurrentHp -= damageAmount;
         
@@ -63,7 +63,7 @@ public class Monster : MonoBehaviour
 
     private void MonsterDie()
     {
-        Debug.Log($"{Name} 죽음");
+        //Debug.Log($"{Name} 죽음");
 
         boxCollider.enabled = false;
         

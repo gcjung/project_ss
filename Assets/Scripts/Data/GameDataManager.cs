@@ -53,11 +53,26 @@ public class GameDataManager : Manager<GameDataManager>
 
         Max,
     }
+    public enum SkillTemplate_
+    {
+        None = -1,
+        Index,
+        Grade,
+        Name,
+        Rrder,
+        Cooltime,
+        Damage,
+        SpriteName,
+        Desc,
+
+        Max,
+    }
 
     public static Dictionary<string, string[]> HeroTemplate;
     public static Dictionary<string, string[]> MonsterTemplate;
     public static Dictionary<string, string[]> StatusTemplate;
     public static Dictionary<string, string[]> StageTemplate;
+    public static Dictionary<string, string[]> SkillTemplate;
 
     public override void Init()
     {       
@@ -70,6 +85,7 @@ public class GameDataManager : Manager<GameDataManager>
         MonsterTemplate = CSVRead("data/Monster_Template");
         StatusTemplate = CSVRead("data/Status_Template");
         StageTemplate = CSVRead("data/Stage_Template");
+        SkillTemplate = CSVRead("data/Skill_Template");
 
         Ininialized = true;
     }
@@ -81,7 +97,6 @@ public class GameDataManager : Manager<GameDataManager>
 
     const string COMMA_SPLIT = @"\s*,\s*";
     const string LINE_SPLIT = @"\r\n|\n\r|\n|\r";
-
     public Dictionary<string, string[]> CSVRead(string file)
     {
         var dic = new Dictionary<string, string[]>();
@@ -93,7 +108,8 @@ public class GameDataManager : Manager<GameDataManager>
         var header = Regex.Split(lines[0], COMMA_SPLIT);
         for (var i = 1; i < lines.Length; i++)
         {
-            var values = Regex.Split(Regex.Replace(lines[i], @"\s+", string.Empty), COMMA_SPLIT); // csv 데이터 공백없애기
+            //var values = Regex.Split(Regex.Replace(lines[i], @"\s+", string.Empty), COMMA_SPLIT); // csv 데이터 공백없애기
+            var values = Regex.Split(lines[i], COMMA_SPLIT); 
             
             if (values.Length < header.Length) continue;
 

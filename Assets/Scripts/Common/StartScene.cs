@@ -47,16 +47,18 @@ public class StartScene : MonoBehaviour
            }
         );
 
-        StartCoroutine(InitializeApplicationSetting());
+        StartCoroutine(InitializeApplication());
     }
-    IEnumerator InitializeApplicationSetting()  // 로그인, 리소스 패치
+    IEnumerator InitializeApplication()  // 로그인, 리소스 패치
     {
-        yield return CommonIEnumerator.IEWaitUntil(() => { return loadingComplete; }, () => OpenUI_LoginPanel());
+        yield return CommonIEnumerator.IEWaitUntil(() => { return loadingComplete; },
+            () => OpenUI_LoginPanel());
         
-        yield return CommonIEnumerator.IEWaitUntil(() => { return FirebaseAuthManager.Instance.isCurrentLogin(); }, () => CheckAssetBundleVersion());
+        yield return CommonIEnumerator.IEWaitUntil(() => { return FirebaseAuthManager.Instance.isCurrentLogin(); },
+            () => CheckAssetBundleVersion());
         
-        yield return CommonIEnumerator.IEWaitUntil(() => { return ResourceLoader.Instance.downloadComplete; }, () => 
-            {
+        yield return CommonIEnumerator.IEWaitUntil(() => { return ResourceLoader.Instance.downloadComplete; }, 
+            () => {
                 var startBtn = startPanel.transform.Find("GameStart_Image");
                 startBtn.gameObject.SetActive(true);
 
@@ -90,10 +92,10 @@ public class StartScene : MonoBehaviour
         }));
     }
 
+    
     private GameObject loginPanel = null;
     public void OpenUI_LoginPanel()
     {
-        //FirebaseAuthManager.Instance.SingOutFirebase();
         if (!FirebaseAuthManager.Instance.isCurrentLogin())  // 파이어베이스 연동 X
         {
             if (loginPanel == null)
@@ -103,14 +105,14 @@ public class StartScene : MonoBehaviour
             }
 
             loginPanel.transform.Find("LoginSelect_Panel/GoogleLogin_Button").GetComponent<Button>().onClick.AddListener(
-                () => FirebaseAuthManager.Instance.TrySignIn(LoginType.Google));
+                () => FirebaseAuthManager.Instance.TrySignIn(LoginType.Google, CloseLoginPanel));
 
             loginPanel.transform.Find("LoginSelect_Panel/GuestLogin_Button").GetComponent<Button>().onClick.AddListener(
-                () => FirebaseAuthManager.Instance.TrySignIn(LoginType.Guest));
+                () => FirebaseAuthManager.Instance.TrySignIn(LoginType.Guest, CloseLoginPanel));
         }
         else                    // 파이어베이스 연동상태
         {
-            if (!FirebaseAuthManager.Instance.isCurrentUserAnonymous())
+            if (FirebaseAuthManager.Instance.isCurrentUserGoogleLogin())
                 GPGS.Instance.LoginGoogleAccount();
         }
     }
@@ -145,7 +147,6 @@ public class StartScene : MonoBehaviour
                 
                 ResourceLoader.Instance.LoadAllAssetBundle(true);
             }
-   
         }); 
     }
     public void SetResourceDownloadSlider(long current, long target)
@@ -158,28 +159,33 @@ public class StartScene : MonoBehaviour
         currentValueText.text = Util.ConvertBytes((long)(downloadPercent * target * 0.01f));
         resourceDownSlider.value = (float)downloadPercent;
     }
-
+    
 
     private void CheckAssetBundleVersion()
     {
-        PlayerPrefs.DeleteKey("AssetBundleVersion");
-
+#if UNITY_EDITOR
+        ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
+#else
+        //PlayerPrefs.DeleteKey("AssetBundleVersion");
         if (!PlayerPrefs.HasKey("AssetBundleVersion"))  // 최초 접속
         {
             OpenUI_ResourceDownPopup();
         }
         else        // 최초 접속 이후
         {
-            int version = int.Parse(GlobalManager.Instance.DBManager.GetGameData(GameDataType.AssetBundleVersion));
+            int version = GlobalManager.Instance.DBManager.GetGameData<int>(GameDataType.AssetBundleVersion);
             if (PlayerPrefs.GetInt("AssetBundleVersion") == version)    // 에셋번들 최신버전  
             {
-                ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer : false);
+                // [추가예정] 여기에 로컬에 진짜 에셋번들이 있는지 확인이 필요할듯?
+                ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
+
             }
             else
             {
                 OpenUI_ResourceDownPopup("추가 리소스를 다운로드합니다.\n추가 다운로드를 하시겠습니까?");
             }
         }
+#endif
     }
     public void DestoryPanel()
     {
@@ -205,54 +211,61 @@ public class StartScene : MonoBehaviour
     }
     void OnGUI()
     {
-        GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one * 2);
+        //GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one * 2);
 
-        if (GUILayout.Button("ClearLog"))
-        {
-            log1 = "";
-            log2 = "";
-            startPanel.GetComponent<CanvasGroup>().alpha = 1f;
-        }
-
-
-        if (GUILayout.Button("로그인 Check"))
-        {
-            startPanel.GetComponent<CanvasGroup>().alpha = 0.3f;
+        //if (GUILayout.Button("ClearLog"))
+        //{
+        //    log1 = "";
+        //    log2 = "";
+        //    startPanel.GetComponent<CanvasGroup>().alpha = 1f;
+        //}
 
 
-            if (FirebaseAuthManager.Instance.isCurrentLogin())
-            {
-                log1 = $"파이어베이스 등록 OK, uid : {FirebaseAuth.DefaultInstance.CurrentUser.UserId}";
-            }
-            else
-            {
-                log1 = "파이어베이스 등록 NO";
-            }
+        //if (GUILayout.Button("로그인 Check"))
+        //{
+        //    startPanel.GetComponent<CanvasGroup>().alpha = 0.3f;
 
-            ILocalUser storeUser = Social.localUser;
 
-            //if (storeUser.authenticated == true)
-            //{
-            //    log2 = $"플레이스토어 name : {storeUser.userName}, 로그인상태 : {storeUser.authenticated}";
-            //}
-            //else
-            //{
-            //    log2 = "플레이스토어 로그인 안됨";
-            //}
-            ILocalUser googleUser = PlayGamesPlatform.Instance.localUser;
-            if (googleUser.authenticated == true)
-            {
-                log3 = $"구글 name : {googleUser.userName}, 로그인상태 : {googleUser.authenticated}";
-            }
-            else
-            {
-                log3 = "구글 로그인 안됨";
-            }
-        }
+        //    if (FirebaseAuthManager.Instance.isCurrentLogin())
+        //    {
+        //        log1 = $"파이어베이스 등록 OK, uid : {FirebaseAuth.DefaultInstance.CurrentUser.UserId}";
+        //    }
+        //    else
+        //    {
+        //        log1 = "파이어베이스 등록 NO";
+        //    }
 
-        GUILayout.Label(log1);
-        GUILayout.Label(log2);
-        GUILayout.Label(log3);
+        //    ILocalUser storeUser = Social.localUser;
+
+        //    //if (storeUser.authenticated == true)
+        //    //{
+        //    //    log2 = $"플레이스토어 name : {storeUser.userName}, 로그인상태 : {storeUser.authenticated}";
+        //    //}
+        //    //else
+        //    //{
+        //    //    log2 = "플레이스토어 로그인 안됨";
+        //    //}
+        //    ILocalUser googleUser = PlayGamesPlatform.Instance.localUser;
+        //    if (googleUser.authenticated == true)
+        //    {
+        //        log3 = $"구글 name : {googleUser.userName}, 로그인상태 : {googleUser.authenticated}";
+        //    }
+        //    else
+        //    {
+        //        log3 = "구글 로그인 안됨";
+        //    }
+        //}
+
+        //if (GUILayout.Button("파베 로그아웃"))
+        //{
+        //    startPanel.GetComponent<CanvasGroup>().alpha = 0.3f;
+
+        //    FirebaseAuthManager.Instance.SingOutFirebase();
+        //}
+
+        //GUILayout.Label(log1);
+        //GUILayout.Label(log2);
+        //GUILayout.Label(log3);
     }
     #endregion 테스트용
 }

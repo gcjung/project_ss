@@ -113,11 +113,15 @@ public class CommonFuntion : MonoBehaviour
         //LoadObj(atlasPool, imageName);
 
         SpriteAtlas atlas = atlasPool[atlasName] as SpriteAtlas;
+        var t = atlas.GetSprite("Buff");
 
         if (atlas)
             return atlas.GetSprite(imageName);
         else
+        {
+            Debug.Log($"!@#!@#{atlasPool[atlasName]}!!!!");
             return null;
+        }
     }
 
 

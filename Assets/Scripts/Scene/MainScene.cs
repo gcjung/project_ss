@@ -125,8 +125,9 @@ public class MainScene : MonoBehaviour
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
     private TMP_Text gemText;
-    private RectTransform category1_UI;
-    private RectTransform category2_UI; //Àåºñ
+    private Image[] skillSprite = null;
+    private RectTransform category1_UI = null;
+    private RectTransform category2_UI = null; //Àåºñ
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -163,8 +164,17 @@ public class MainScene : MonoBehaviour
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
 
+        var skillPanel = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel");
+        
+        skillSprite = new Image[skillPanel.childCount -1];
+        for (int i = 0; i < skillPanel.childCount - 1; i++)
+        { 
+            skillSprite[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
+        }
+
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
+
 
         // ¹ÙÅÒ Ä«Å×°í¸® ¹öÆ°
         Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
@@ -195,7 +205,10 @@ public class MainScene : MonoBehaviour
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
         playerCharacter.AddComponent<PlayerController>();
+
+        playerCharacter.AddComponent<SkillController>();
         playerCharacter.SetHeroStatus(heroId);  //¿µ¿õ ±âº» ½ºÅÈ ¼¼ÆÃ
+
 
         IsPlayer = true;
 
@@ -220,6 +233,16 @@ public class MainScene : MonoBehaviour
         mapSprite = Resources.Load<Sprite>($"Sprite/{mapName}"); //¸Ê ¼¼ÆÃ
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
+    }
+    public void SetSkill(string[] equipedSkill)
+    {
+        for (int i = 0; i < equipedSkill.Length; i++)
+        {
+            string spriteName = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.SpriteName];
+
+            skillSprite[i].sprite = CommonFuntion.GetSprite_Atlas(spriteName, "SkillAtlas");
+        }
+        
     }
 
     public void UpdateStatusLevel(string statusName = "", int level = 1)    //ÀÓ½Ã ¸Þ¼­µå(Á¸³ª°Ô ¸¾¿¡ ¾Èµë)
@@ -264,13 +287,17 @@ public class MainScene : MonoBehaviour
     }
     private void InitUIfromDB()
     {
-        Debug.Log("InitUIfromDB");
-
         double gold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
         double gem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
 
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
+
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        SetSkill(equippedSkill);
+        //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
+
+
     }
 
     private void EnterBossRoom()
@@ -506,7 +533,7 @@ public class MainScene : MonoBehaviour
     {
         if (getGold > 0)
         {
-            Debug.Log($"{Util.BigNumCalculate(getGold)} G¸¦ È¹µæ");
+            //Debug.Log($"{Util.BigNumCalculate(getGold)}G¸¦ È¹µæ");
 
             double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
@@ -552,8 +579,9 @@ public class MainScene : MonoBehaviour
         if (currentGem - usedGem >= 0)
         {
             Debug.Log($"{usedGem}GemÀ» »ç¿ë");
-            gemText.text = $"{Util.BigNumCalculate(currentGem - usedGem)}";
-            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem.ToString(), currentGem - usedGem);
+            gemText.text = Util.BigNumCalculate(currentGem - usedGem);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gem, currentGem - usedGem);
+
 
             return true;
         }

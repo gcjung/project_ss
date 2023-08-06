@@ -42,18 +42,20 @@ public class ResourceLoader : MonoBehaviour
     {
         atlas = 0,
         uiPrefab,
+        font,
     }
 
 
     public static SpriteAtlas LoadAtlas(string atlasName)
     {
         SpriteAtlas obj = assetBundleArr[(int)BundleType.atlas].LoadAsset(atlasName) as SpriteAtlas;
+
         return obj;
     }
     public static GameObject LoadUiPrefab(string prefabName)
     {
         GameObject obj = assetBundleArr[(int)BundleType.uiPrefab].LoadAsset(prefabName) as GameObject;
-
+        Debug.Log($"UI 에셋불러오기 : {obj.name}");
         return obj;
     }
 
@@ -76,13 +78,10 @@ public class ResourceLoader : MonoBehaviour
 
             downloadComplete = true;
         }
-
     }
     public void LoadLocalAssetBundle(BundleType bundleType)
     {
-        string localPath = Application.temporaryCachePath;
-        
-        
+        string localPath = Application.persistentDataPath;
         if (File.Exists(Path.Combine(localPath,bundleType.ToString()))) // 로컬에 번들 다운로드
         {
             assetBundleArr[(int)bundleType] ??= AssetBundle.LoadFromFile(localPath + "/" + bundleType);
@@ -99,7 +98,6 @@ public class ResourceLoader : MonoBehaviour
     }
 
 
-    [HideInInspector]
     long totalResourceSize = 0;
     public async Task<long> GetTotalResourceSize()
     {
@@ -143,12 +141,12 @@ public class ResourceLoader : MonoBehaviour
         });
 
         if (builder != null)
-            StartCoroutine(GetAssetBundleFromUri(bundleType, builder.Uri));
+            StartCoroutine(GetAssetBundleFromUrl(bundleType, builder.Uri));
     }
 
     [HideInInspector]
     public bool downloadComplete = false;
-    private IEnumerator GetAssetBundleFromUri(BundleType bundleType, Uri uri)
+    private IEnumerator GetAssetBundleFromUrl(BundleType bundleType, Uri uri)
     {
         var startTime = Time.time;
         var sc = FindObjectOfType<StartScene>();
@@ -156,19 +154,18 @@ public class ResourceLoader : MonoBehaviour
 
         // 다운로드 시작
         unityWebRequest.SendWebRequest();
+
         while (!unityWebRequest.isDone)
         {
             downloadedResourceSize[(int)bundleType] = (long)unityWebRequest.downloadedBytes;
             sc.SetResourceDownloadSlider(downloadedResourceSize.Sum(x => x), totalResourceSize);
-            
+
             yield return CommonIEnumerator.WaitForEndOfFrame;
         }
 
         downloadedResourceSize[(int)bundleType] = (long)unityWebRequest.downloadedBytes;
         sc.SetResourceDownloadSlider(downloadedResourceSize.Sum(x => x), totalResourceSize);
 
-        //Debug.Log($"다운로드 끝, {bundleType} : {downloadedResourceSize[(int)bundleType]}, sum : {downloadedResourceSize.Sum(x => x)}, total : {totalResourceSize} ");
-        
         if (unityWebRequest.error == null)
         {
             if (downloadedResourceSize.Sum(x => x) == totalResourceSize) // 에셋번들 다 다운받은 경우
@@ -179,7 +176,8 @@ public class ResourceLoader : MonoBehaviour
                 PlayerPrefs.SetInt(GameDataType.AssetBundleVersion.ToString(), version);
             }
 
-            string localPath = Application.temporaryCachePath;
+            //string localPath = Application.temporaryCachePath;
+            string localPath = Application.persistentDataPath;
             if (!Directory.Exists(localPath)) //폴더가 존재하지 않으면
             {
                 Directory.CreateDirectory(localPath); //폴더 생성
