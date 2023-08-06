@@ -142,10 +142,8 @@ public class MainScene : MonoBehaviour
         
         skillSprite = new Image[skillPanel.childCount -1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
-        {
-            
+        { 
             skillSprite[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
-            Debug.Log($"skillSprite[i].name : {skillSprite[i].name}");
         }
 
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
@@ -245,8 +243,6 @@ public class MainScene : MonoBehaviour
     }
     private void InitUIfromDB()
     {
-        Debug.Log("InitUIfromDB");
-
         double gold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
         double gem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
 

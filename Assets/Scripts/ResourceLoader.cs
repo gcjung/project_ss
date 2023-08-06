@@ -37,12 +37,6 @@ public class ResourceLoader : MonoBehaviour
         assetBundleArr = new AssetBundle[Enum.GetValues(typeof(BundleType)).Length];
         downloadedResourceSize = new long[Enum.GetValues(typeof(BundleType)).Length];
         storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(firebaseStorageURL);
-
-        for (int i = 0; i < assetBundleArr.Length; i++)
-        {
-            Debug.Log(assetBundleArr[i] + "!!@@@@@@");
-        }
-        Debug.Log("@@@");
     }
     public enum BundleType
     {

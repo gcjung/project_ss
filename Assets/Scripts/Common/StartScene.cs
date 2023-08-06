@@ -163,6 +163,9 @@ public class StartScene : MonoBehaviour
 
     private void CheckAssetBundleVersion()
     {
+#if UNITY_EDITOR
+        ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
+#else
         //PlayerPrefs.DeleteKey("AssetBundleVersion");
         if (!PlayerPrefs.HasKey("AssetBundleVersion"))  // 최초 접속
         {
@@ -182,6 +185,7 @@ public class StartScene : MonoBehaviour
                 OpenUI_ResourceDownPopup("추가 리소스를 다운로드합니다.\n추가 다운로드를 하시겠습니까?");
             }
         }
+#endif
     }
     public void DestoryPanel()
     {

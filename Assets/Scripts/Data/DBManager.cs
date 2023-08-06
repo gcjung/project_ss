@@ -222,7 +222,8 @@ public class DBManager : Manager<DBManager>
 
         if (gameData.ContainsKey(key))
         {
-            return (T)Convert.ChangeType(gameData[key], typeof(T));
+            return (T)gameData[key];
+            //return (T)Convert.ChangeType(gameData[key], typeof(T));
         }
 
         return default;
