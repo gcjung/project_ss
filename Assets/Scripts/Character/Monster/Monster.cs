@@ -33,6 +33,7 @@ public class Monster : MonoBehaviour
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider2D>();
+
         if (TryGetComponent<MonsterController>(out var controller))
         {
             monsterController = controller;

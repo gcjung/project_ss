@@ -155,6 +155,14 @@ public class Util
         string numString = string.Empty;
         string unitString = string.Empty;
 
+        if (number < 1)
+        {
+            numString = number.ToString("F");
+            unitString = Units[0];
+
+            return string.Format("{0}{1}", numString, unitString);
+        }
+
         string[] splitNum = number.ToString("E").Split('+');
 
         int.TryParse(splitNum[1], out int result);

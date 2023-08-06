@@ -88,6 +88,9 @@ public class PlayerController : MonoBehaviour
                 if (CanSeeTarget())
                 {
                     playerAnimator.SetTrigger("Attack");
+
+                    float animationSpeed = (float)player.TotalAttackSpeed / 1.0f;
+                    playerAnimator.SetFloat("AttackSpeedMultiplier", animationSpeed);
                 }
                 else if(!CanSeeTarget() && !MonsterSpawner.IsSpawning)
                 {
@@ -113,13 +116,29 @@ public class PlayerController : MonoBehaviour
     {
         if (enemyList.Count > 0)
         {
+            double damage;
+            bool isCritical;
+            double critical = UnityEngine.Random.value;            
+
+            if(critical <= player.TotalCritical)
+            {
+                damage = player.TotalAttack * 1.5f;
+                isCritical = true;
+            }
+            else
+            {
+                damage = player.TotalAttack;
+                isCritical = false;
+            }
+
             target = enemyList[0].transform;
 
             Vector3 direction = (target.position - transform.position).normalized;
 
             Bullet bullet = bulletPool.GetObjectPool();
             bullet.transform.localScale = projectilePrefab.transform.localScale;
-            bullet.CashingInfo(player.Attack, direction, projectileSpeed);
+            bullet.SettingInfo(damage, isCritical, direction, projectileSpeed);
+            Debug.Log($"{bullet.Damage}");
             //bullet.Rigid.velocity = direction * projectileSpeed;      
         }
         else

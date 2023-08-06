@@ -8,6 +8,7 @@ public class Bullet : MonoBehaviour
     public Rigidbody2D Rigid { get { return rigid; } set { rigid = value; } }
     public Vector3 Direction { get; private set; }
     public double Damage { get; private set; }
+    public bool IsCritical { get; private set; }
     public float Speed { get; private set; }
 
     private void OnEnable()
@@ -22,9 +23,10 @@ public class Bullet : MonoBehaviour
     {
         transform.position += Direction * Speed * Time.deltaTime;
     }
-    public void CashingInfo(double damage, Vector3 direction, float speed)
+    public void SettingInfo(double damage, bool isCritical, Vector3 direction, float speed)
     {
         Damage = damage;
+        IsCritical = isCritical;
         Direction = direction;
         Speed = speed;
     }

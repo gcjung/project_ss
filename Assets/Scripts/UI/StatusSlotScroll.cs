@@ -101,7 +101,7 @@ public class StatusSlotScroll : MonoBehaviour
             }
 
             GlobalManager.Instance.DBManager.UpdateUserData(stat, level);
-            MainScene.Instance.UpdateStatusLevel(stat);
+            MainScene.Instance.UpdateStatusLevel(stat, level);
         }
     }
 
