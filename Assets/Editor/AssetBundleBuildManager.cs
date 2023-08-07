@@ -15,8 +15,8 @@ public class AssetBundleBuildManager
     static void AssetBundleBuild()
     {
         string assetBunbleDirectoty = Application.persistentDataPath;
-        Debug.Log(assetBunbleDirectoty);
         //string assetBunbleDirectoty = Path.Combine(Application.dataPath,"AssetBundle");
+
         if (!Directory.Exists(assetBunbleDirectoty))
             Directory.CreateDirectory(assetBunbleDirectoty);
 
@@ -30,28 +30,11 @@ public class AssetBundleBuildManager
     {
         string assetBunbleDirectoty = Application.persistentDataPath;
         //string assetBunbleDirectoty = Path.Combine(Application.dataPath, "AssetBundle");
+
         string firebaseStorageURL = "gs://projectss-c99e7.appspot.com";
         var storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(firebaseStorageURL);
 
-        DocumentReference dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");
-
-        int assetBundleVersion;
-        var t = await dataRef.GetSnapshotAsync();
-        if (t.Exists)
-        {
-            var dic = t.ToDictionary();
-            if (dic.ContainsKey(GameDataType.AssetBundleVersion.ToString()))
-            {
-                assetBundleVersion = Convert.ToInt32(dic[GameDataType.AssetBundleVersion.ToString()]);
-                await dataRef.UpdateAsync(GameDataType.AssetBundleVersion.ToString(), assetBundleVersion + 1);
-            }
-            else
-                await dataRef.UpdateAsync(GameDataType.AssetBundleVersion.ToString(), 1);
-        }
-        else
-        {
-            await dataRef.UpdateAsync(GameDataType.AssetBundleVersion.ToString(), 1);
-        }
+        UpdateAssetBundleVersion();
 
         List<Task> tasks = new List<Task>();
         DirectoryInfo directoryInfo = new DirectoryInfo(assetBunbleDirectoty);
@@ -80,5 +63,24 @@ public class AssetBundleBuildManager
         EditorUtility.DisplayDialog("에셋 번들 업로드", "에셋 번들 업로드 완료", "완료");
     }
 
-
+    static async void UpdateAssetBundleVersion()
+    {
+        DocumentReference dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");
+        var t = await dataRef.GetSnapshotAsync();
+        if (t.Exists)
+        {
+            var dic = t.ToDictionary();
+            if (dic.ContainsKey(GameDataType.AssetBundleVersion.ToString()))
+            {
+                int assetBundleVersion = Convert.ToInt32(dic[GameDataType.AssetBundleVersion.ToString()]);
+                await dataRef.UpdateAsync(GameDataType.AssetBundleVersion.ToString(), assetBundleVersion + 1);
+            }
+            else
+                await dataRef.UpdateAsync(GameDataType.AssetBundleVersion.ToString(), 1);
+        }
+        else
+        {
+            await dataRef.UpdateAsync(GameDataType.AssetBundleVersion.ToString(), 1);
+        }
+    }
 }
