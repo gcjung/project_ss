@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
         Debug.Log("플레이어 사망");
     }
 
-    public void SetPlayerDead()
+    public void SetPlayerDead()     //애니메이션 이벤트로 사용 중
     {
         MainScene.Instance.IsPlayerDead = true;
     }

@@ -73,11 +73,8 @@ public class MainScene : MonoBehaviour
         {
             if (value)
             {
-                if (MonsterSpawner.WaveCount == 5)
-                {
-                    isWaveClear = value;
-                    EnterBossRoom();
-                }
+                isWaveClear = value;
+                EnterBossRoom();
             }
         }
     }
@@ -205,10 +202,8 @@ public class MainScene : MonoBehaviour
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
         playerCharacter.AddComponent<PlayerController>();
-
         playerCharacter.AddComponent<SkillController>();
         playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
-
 
         IsPlayer = true;
 
@@ -218,11 +213,10 @@ public class MainScene : MonoBehaviour
     {
         Debug.Log($"현재 스테이지ID : {stageId}");
 
-        stageName = StageTemplate[stageId.ToString()][(int)StageTemplate_.Stage];
-
         if (stageText != null)
             Destroy(stageText.gameObject);
 
+        stageName = StageTemplate[stageId.ToString()][(int)StageTemplate_.Stage];
         stageText = CommonFuntion.GetPrefab("StageName_Text", upSidePanel.transform);
         stageText.GetComponent<TextMeshProUGUI>().text = stageName;
 
@@ -293,8 +287,8 @@ public class MainScene : MonoBehaviour
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
 
-        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
-        SetSkill(equippedSkill);
+        //var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        //SetSkill(equippedSkill);
         //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
 
 

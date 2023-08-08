@@ -43,6 +43,8 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        CurrentPlayerState = PlayerState.Idle;
+
         playerAnimator = transform.GetComponent<Animator>();
 
         projectilePrefab = Resources.Load<Bullet>("ETC/(TEST)projectile");
@@ -116,29 +118,13 @@ public class PlayerController : MonoBehaviour
     {
         if (enemyList.Count > 0)
         {
-            double damage;
-            bool isCritical;
-            double critical = UnityEngine.Random.value;            
-
-            if(critical <= player.TotalCritical)
-            {
-                damage = player.TotalAttack * 1.5f;
-                isCritical = true;
-            }
-            else
-            {
-                damage = player.TotalAttack;
-                isCritical = false;
-            }
-
             target = enemyList[0].transform;
 
             Vector3 direction = (target.position - transform.position).normalized;
 
             Bullet bullet = bulletPool.GetObjectPool();
             bullet.transform.localScale = projectilePrefab.transform.localScale;
-            bullet.SettingInfo(damage, isCritical, direction, projectileSpeed);
-            Debug.Log($"{bullet.Damage}");
+            bullet.SettingInfo(player.TotalAttack, Critical(player.TotalCritical), direction, projectileSpeed);
             //bullet.Rigid.velocity = direction * projectileSpeed;      
         }
         else
@@ -146,7 +132,22 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("적이 없음");
         }
     }
+    public bool Critical(double critical)
+    {
+        bool isCritical;
+        double criticalPercent = UnityEngine.Random.value;
 
+        if (criticalPercent <= critical)
+        {
+            isCritical = true;
+        }
+        else
+        {
+            isCritical = false;
+        }
+
+        return isCritical;
+    }
     public void SetCurrentPlayerState(PlayerState state)
     {
         CurrentPlayerState = state;

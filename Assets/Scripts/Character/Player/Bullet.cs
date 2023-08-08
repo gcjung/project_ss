@@ -25,7 +25,15 @@ public class Bullet : MonoBehaviour
     }
     public void SettingInfo(double damage, bool isCritical, Vector3 direction, float speed)
     {
-        Damage = damage;
+        if(isCritical)
+        {
+            Damage = damage * 1.5f;
+        }
+        else
+        {
+            Damage = damage;
+        }
+        
         IsCritical = isCritical;
         Direction = direction;
         Speed = speed;
@@ -35,7 +43,9 @@ public class Bullet : MonoBehaviour
     {
         if (collision.TryGetComponent<Monster>(out var monster))
         {
-            monster.TakeDamage((int)Damage);
+            Debug.Log($"{monster.Name}에게 {Damage}만큼 피해");
+
+            monster.TakeDamage(Damage);
             gameObject.SetActive(false);
         }
     }

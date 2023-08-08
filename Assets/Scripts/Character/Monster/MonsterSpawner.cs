@@ -21,6 +21,11 @@ public class MonsterSpawner : MonoBehaviour
     private ObjectPool<Monster> monsterPool;
     private ObjectPool<Monster> bossMonsterPool;
 
+    private Coroutine spawnCoroutine;
+    private Coroutine infinitySpawnCoroutine;
+
+    private GameObject bossRoomButton;
+
     public static bool IsSpawning { get; set; } = false;
     public static int MonsterCount { get; private set; } = 0;
     public static int WaveCount { get; private set; } = 0;
@@ -65,7 +70,7 @@ public class MonsterSpawner : MonoBehaviour
             var _monster = Instantiate(monster, transform);
             _monster.gameObject.AddComponent<MonsterController>();
 
-            if (monsterPool != null)
+            if (monsterPool != null && monsterPool.TrPool != null && monsterPool.TrPool.gameObject != null)
                 Destroy(monsterPool.TrPool.gameObject);
 
             monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);           
@@ -83,12 +88,44 @@ public class MonsterSpawner : MonoBehaviour
 
             bossMonsterPool = new ObjectPool<Monster>(_bossMonster, 1, this.transform);
             Destroy(_bossMonster.gameObject);
-        }        
+        }
+
+        switch (MainScene.Instance.CurrentStageState)
+        {
+            case StageState.NormalWave:
+                break;
+            case StageState.BossRoom:
+                break;
+            case StageState.InfinityWave:
+                slider.gameObject.SetActive(false);
+
+                bossRoomButton = CommonFuntion.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
+                bossRoomButton.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    FinishWave();
+
+                    StopAllCoroutines();    //InfinitySpawnMonster, SpawnMonster
+                    infinitySpawnCoroutine = null;
+
+                    //monsterPool.ClearPool();
+                    Destroy(monsterPool.TrPool.gameObject);
+                    Destroy(bossRoomButton.gameObject);
+                });
+
+                if (infinitySpawnCoroutine != null)
+                {
+                    StopCoroutine(infinitySpawnCoroutine);
+                    infinitySpawnCoroutine = null;
+                }
+
+                infinitySpawnCoroutine = StartCoroutine(InfinitySpawnMonster());
+                break;
+        }
     }
     private IEnumerator SpawnMonster()
     {
         IsSpawning = true;
-        MonsterCount = 6;
+        MonsterCount = 3;
 
         float spawnTime = 1.5f;
 
@@ -119,6 +156,20 @@ public class MonsterSpawner : MonoBehaviour
         _bossMonster.transform.localScale = bossMonster.transform.localScale;
         _bossMonster.transform.position = spawnPoint2.position;
         _bossMonster.GetComponent<Monster>().BossMonsterDied += FinishStage;
+    }
+
+    public IEnumerator InfinitySpawnMonster()
+    {
+        float delayTime = 3.0f;
+
+        while(mainScene.CurrentStageState == StageState.InfinityWave)
+        {
+            yield return new WaitForSeconds(delayTime);
+
+            StartCoroutine(SpawnMonster());
+
+            yield return new WaitUntil(() => !IsSpawning);            
+        }
     }
     public void OnSliderValueChanged(float value)
     {
