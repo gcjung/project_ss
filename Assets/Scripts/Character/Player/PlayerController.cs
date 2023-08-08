@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviour
             Bullet bullet = bulletPool.GetObjectPool();
             bullet.transform.localScale = projectilePrefab.transform.localScale;
             bullet.SettingInfo(damage, isCritical, direction, projectileSpeed);
-            Debug.Log($"{bullet.Damage}");
+            //Debug.Log($"{bullet.Damage}");
             //bullet.Rigid.velocity = direction * projectileSpeed;      
         }
         else

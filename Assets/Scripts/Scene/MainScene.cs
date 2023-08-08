@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
 using System.Linq;
+using UnityEditor;
 
 public class MainScene : MonoBehaviour
 {
@@ -108,8 +109,8 @@ public class MainScene : MonoBehaviour
     private TMP_Text goldText;
     private TMP_Text gemText;
     private Image[] skillSprite = null;
-    private RectTransform category1_UI = null;
-    private RectTransform category2_UI = null; //장비
+    private RectTransform category1_UI = null;  // 캐릭터, 장비
+    private RectTransform category2_UI = null;  //장비
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -210,9 +211,17 @@ public class MainScene : MonoBehaviour
     {
         for (int i = 0; i < equipedSkill.Length; i++)
         {
-            string spriteName = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.SpriteName];
+            if (string.IsNullOrEmpty(equipedSkill[i]))
+            {
+                Debug.Log($"{i + 1}번째 장착스킬없음");
+                continue;
+            }
+            string icon = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.Icon];
 
-            skillSprite[i].sprite = CommonFuntion.GetSprite_Atlas(spriteName, "SkillAtlas");
+            string[] iconDatas = icon.Split('/');
+            string spriteName = iconDatas[0];
+            string atlasName = iconDatas[1];
+            skillSprite[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
         }
         
     }
@@ -264,8 +273,8 @@ public class MainScene : MonoBehaviour
 
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
-
-        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill,"@@@@@").Split('@');
         SetSkill(equippedSkill);
         //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
 
@@ -381,7 +390,10 @@ public class MainScene : MonoBehaviour
     {
         if (category1_UI == null)
         {
-            category1_UI = CommonFuntion.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            category1_UI = CommonFunction.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            
+            //var obj = Resources.Load<GameObject>("UI/CategoryTest");
+            //category1_UI = Instantiate(obj, popupUI_0.transform).GetComponent<RectTransform>();
             //category1_UI.Find("Type1_Character/Character/Level_Text").GetComponent<TMP_Text>().font = "LV 1";
             category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
         }
@@ -428,7 +440,7 @@ public class MainScene : MonoBehaviour
         //장비 UI
         if (category2_UI == null)
         {
-            category2_UI = CommonFuntion.GetPrefab("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
+            category2_UI = CommonFunction.GetPrefab("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
             category2_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
         }
         else
@@ -460,6 +472,26 @@ public class MainScene : MonoBehaviour
         Debug.Log("ShowUI_Skill");
         category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
         category1_UI.Find("Type1_Character").gameObject.SetActive(false);
+
+        Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
+        Util.InitGrid(grid);
+
+        //var obj = Resources.Load<GameObject>("UI/Skill_IconTest");
+        Debug.Log("리소스로드");
+         
+
+        foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
+        {
+            var skill = CommonFunction.GetPrefab("Skill_Icon", grid);
+            //var skill = Instantiate(obj, grid).GetComponent<RectTransform>();
+
+            string icon = item.Value[(int)SkillTemplate_.Icon];
+            string[] iconDatas = icon.Split('/');
+            string spriteName = iconDatas[0];
+            string atlasName = iconDatas[1];
+            skill.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+        }
+
     }
 
     public void GetGoods(double getGold = 0, double getGem = 0)

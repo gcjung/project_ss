@@ -59,10 +59,10 @@ public class GameDataManager : Manager<GameDataManager>
         Index,
         Grade,
         Name,
-        Rrder,
+        Order,
         Cooltime,
         Damage,
-        SpriteName,
+        Icon,
         Desc,
 
         Max,
