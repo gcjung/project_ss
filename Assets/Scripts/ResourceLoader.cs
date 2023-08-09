@@ -55,7 +55,7 @@ public class ResourceLoader : MonoBehaviour
     public static GameObject LoadUiPrefab(string prefabName)
     {
         GameObject obj = assetBundleArr[(int)BundleType.uiPrefab].LoadAsset(prefabName) as GameObject;
-        Debug.Log($"UI 에셋불러오기 : {obj.name}");
+        //Debug.Log($"UI 에셋불러오기 : {obj.name}");
         return obj;
     }
 

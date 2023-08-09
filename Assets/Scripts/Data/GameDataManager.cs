@@ -56,7 +56,7 @@ public class GameDataManager : Manager<GameDataManager>
     public enum SkillTemplate_
     {
         None = -1,
-        Index,
+        SkillId,
         Grade,
         Name,
         Order,

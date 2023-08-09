@@ -134,14 +134,6 @@ public class MainScene : MonoBehaviour
         if (instance == null)
             instance = this;
 
-        Debug.Log("메인씬 시작");
-
-        stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
-        SetStage(stageId);  //스테이지 세팅
-
-        heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
-        SetPlayer(heroId);  //영웅 세팅      
-
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
 
@@ -149,17 +141,14 @@ public class MainScene : MonoBehaviour
         
         skillSprite = new Image[skillPanel.childCount -1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
-        { 
             skillSprite[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
-        }
-
+        
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
 
-
         // 바텀 카테고리 버튼
-        Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
-        int categoryButtonCount = bottomCategortButton.childCount;
+        Transform bottomCategory = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
+        int categoryButtonCount = bottomCategory.childCount;
         for (int i = 0; i < categoryButtonCount; i++)
         {
             int index = i;
@@ -168,7 +157,7 @@ public class MainScene : MonoBehaviour
             entry.eventID = EventTriggerType.PointerUp;
             entry.callback.AddListener((eventData) => OnClickCategory(index, eventData.selectedObject));
 
-            EventTrigger button = bottomCategortButton.GetChild(i).GetComponent<EventTrigger>();
+            EventTrigger button = bottomCategory.GetChild(i).GetComponent<EventTrigger>();
             button.triggers.Add(entry);
         }
 
@@ -273,12 +262,15 @@ public class MainScene : MonoBehaviour
 
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
-        
+
+        stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
+        SetStage(stageId);  //스테이지 세팅
+
+        heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
+        SetPlayer(heroId);  //영웅 세팅  
+
         var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill,"@@@@@").Split('@');
-        SetSkill(equippedSkill);
-        //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
-
-
+        SetSkill(equippedSkill);    // 스킬 세팅
     }
 
     private void EnterBossRoom()
@@ -388,27 +380,23 @@ public class MainScene : MonoBehaviour
 
     void OpenUI_Category1(GameObject clickButton)
     {
+        bool isFirstOpen = false;
         if (category1_UI == null)
         {
             category1_UI = CommonFunction.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
-            
-            //var obj = Resources.Load<GameObject>("UI/CategoryTest");
-            //category1_UI = Instantiate(obj, popupUI_0.transform).GetComponent<RectTransform>();
-            //category1_UI.Find("Type1_Character/Character/Level_Text").GetComponent<TMP_Text>().font = "LV 1";
             category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+
+            isFirstOpen = true;
+            ShowUI_Character(true);
         }
         else
         {
             bool active = category1_UI.gameObject.activeSelf;
 
             if (active)
-            {
                 category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
-            }
             else
-            {
                 category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
-            }
 
             category1_UI.gameObject.SetActive(!active);
         }
@@ -426,10 +414,10 @@ public class MainScene : MonoBehaviour
             switch (index)
             {
                 case 0:
-                    button.onClick.AddListener(ShowUI_Character);
+                    button.onClick.AddListener(() => ShowUI_Character(isFirstOpen));
                     break;
                 case 1:
-                    button.onClick.AddListener(ShowUI_Skill);
+                    button.onClick.AddListener(() => ShowUI_Skill(isFirstOpen));
                     break;
             }
         }
@@ -460,38 +448,60 @@ public class MainScene : MonoBehaviour
         }
     }
 
-    void ShowUI_Character()
+    void ShowUI_Character(bool isFirst)
     {
         Debug.Log("ShowUI_Character");
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
     }
 
-    void ShowUI_Skill()
+    void ShowUI_Skill(bool isFirst)
     {
         Debug.Log("ShowUI_Skill");
         category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
         category1_UI.Find("Type1_Character").gameObject.SetActive(false);
 
         Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
-        Util.InitGrid(grid);
 
-        //var obj = Resources.Load<GameObject>("UI/Skill_IconTest");
-        Debug.Log("리소스로드");
-         
-
-        foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
+        if (isFirst)
         {
-            var skill = CommonFunction.GetPrefab("Skill_Icon", grid);
-            //var skill = Instantiate(obj, grid).GetComponent<RectTransform>();
+            Util.InitGrid(grid);
 
-            string icon = item.Value[(int)SkillTemplate_.Icon];
-            string[] iconDatas = icon.Split('/');
-            string spriteName = iconDatas[0];
-            string atlasName = iconDatas[1];
-            skill.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+            foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
+            {
+                var skill = CommonFunction.GetPrefab("Skill_Icon", grid);
+
+                string grade = item.Value[(int)SkillTemplate_.Grade];
+                string icon = item.Value[(int)SkillTemplate_.Icon];
+
+                skill.GetComponent<Image>().color = ConvertGradeToColor(grade);
+                string[] iconDatas = icon.Split('/');
+                string spriteName = iconDatas[0];
+                string atlasName = iconDatas[1];
+                skill.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+            }
         }
 
+    }
+
+    Color ConvertGradeToColor(string grade)
+    {
+        if(grade == "common")
+        {
+            return Color.white;
+        }
+        else if(grade == "uncommon")
+        {
+            return Color.green;
+        }
+        else if (grade == "rare")
+        {
+            return Color.cyan;
+        }
+        else
+        {
+            return Color.white;
+        }
     }
 
     public void GetGoods(double getGold = 0, double getGem = 0)
