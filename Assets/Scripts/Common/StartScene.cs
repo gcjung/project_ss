@@ -163,30 +163,33 @@ public class StartScene : MonoBehaviour
 
     private void CheckAssetBundleVersion()
     {
-#if UNITY_EDITOR
-        ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
-#else
-        //PlayerPrefs.DeleteKey("AssetBundleVersion");
-        if (!PlayerPrefs.HasKey("AssetBundleVersion"))  // 최초 접속
+        if (Application.platform == RuntimePlatform.Android)// 안드로이드 플랫폼
         {
-            OpenUI_ResourceDownPopup();
+            //PlayerPrefs.DeleteKey("AssetBundleVersion");
+            if (!PlayerPrefs.HasKey("AssetBundleVersion"))  // 최초 접속
+            {
+                OpenUI_ResourceDownPopup();
+            }
+            else                                            // 최초 접속 이후
+            {
+                int version = GlobalManager.Instance.DBManager.GetGameData<int>(GameDataType.AssetBundleVersion);
+                if (PlayerPrefs.GetInt("AssetBundleVersion") == version)    // 에셋번들 최신버전 확인 
+                {
+                    // [추가예정] 여기에 로컬에 진짜 에셋번들이 있는지 확인이 필요할듯?
+                    ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
+                }
+                else
+                {
+                    OpenUI_ResourceDownPopup("추가 리소스를 다운로드합니다.\n추가 다운로드를 하시겠습니까?");
+                }
+            }
         }
-        else        // 최초 접속 이후
+        else            // 유니티 에디터 플랫폼
         {
-            int version = GlobalManager.Instance.DBManager.GetGameData<int>(GameDataType.AssetBundleVersion);
-            if (PlayerPrefs.GetInt("AssetBundleVersion") == version)    // 에셋번들 최신버전  
-            {
-                // [추가예정] 여기에 로컬에 진짜 에셋번들이 있는지 확인이 필요할듯?
-                ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
-
-            }
-            else
-            {
-                OpenUI_ResourceDownPopup("추가 리소스를 다운로드합니다.\n추가 다운로드를 하시겠습니까?");
-            }
+            ResourceLoader.Instance.LoadAllAssetBundle(loadFromServer: false);
         }
-#endif
     }
+
     public void DestoryPanel()
     {
         Destroy(logoPanel);

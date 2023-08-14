@@ -16,8 +16,7 @@ public class SkillController : MonoBehaviour
 
 
         //foreach (var data in SkillTemplate)
-        //{
-        //    //Debug.Log($"data.Key : {data.Key}");
+        //{        //    //Debug.Log($"data.Key : {data.Key}");
         //    for (int i = 0; i < data.Value.Length; i++)
         //    {
         //        Debug.Log($"data.Key : {data.Key}, value : {data.Value[i]}");

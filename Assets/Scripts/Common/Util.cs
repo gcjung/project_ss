@@ -67,7 +67,23 @@ public class Util
 
         return "0 Bytes";
     }
-    
+
+    public static void InitGrid(Transform gridTr)
+    {
+        if (gridTr == null)
+            return;
+
+        if (gridTr.childCount > 0)
+        {
+            while (gridTr.childCount != 0)
+            {
+                Transform child = gridTr.GetChild(0);
+                child.SetParent(null);
+                UnityEngine.Object.Destroy(child.gameObject);
+            }
+        }
+    }
+
     // Text에 숫자가 자연스럽게 올라가는 함수
     IEnumerator CountingNumber(float target, float current, TMP_Text text)
     {

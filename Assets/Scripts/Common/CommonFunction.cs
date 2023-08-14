@@ -1,13 +1,12 @@
-using DG.Tweening.Core.Easing;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.U2D;
 using TMPro;
-using System.Runtime.CompilerServices;
 
-public class CommonFuntion : MonoBehaviour
+
+public class CommonFunction : MonoBehaviour
 {
     static Dictionary<string, Object> prefabsPool = new Dictionary<string, Object>();
     static Dictionary<string, Object> atlasPool = new Dictionary<string, Object>();
@@ -113,16 +112,13 @@ public class CommonFuntion : MonoBehaviour
         //LoadObj(atlasPool, imageName);
 
         SpriteAtlas atlas = atlasPool[atlasName] as SpriteAtlas;
-        var t = atlas.GetSprite("Buff");
-
+  
         if (atlas)
             return atlas.GetSprite(imageName);
         else
-        {
-            Debug.Log($"!@#!@#{atlasPool[atlasName]}!!!!");
             return null;
-        }
     }
+
 
 
 }

@@ -55,7 +55,7 @@ public class ResourceLoader : MonoBehaviour
     public static GameObject LoadUiPrefab(string prefabName)
     {
         GameObject obj = assetBundleArr[(int)BundleType.uiPrefab].LoadAsset(prefabName) as GameObject;
-        Debug.Log($"UI 에셋불러오기 : {obj.name}");
+        //Debug.Log($"UI 에셋불러오기 : {obj.name}");
         return obj;
     }
 
@@ -172,11 +172,10 @@ public class ResourceLoader : MonoBehaviour
             {
                 downloadComplete = true;
 
-                int version = int.Parse(GlobalManager.Instance.DBManager.GetGameData(GameDataType.AssetBundleVersion));
+                int version = GlobalManager.Instance.DBManager.GetGameData<int>(GameDataType.AssetBundleVersion);
                 PlayerPrefs.SetInt(GameDataType.AssetBundleVersion.ToString(), version);
             }
 
-            //string localPath = Application.temporaryCachePath;
             string localPath = Application.persistentDataPath;
             if (!Directory.Exists(localPath)) //폴더가 존재하지 않으면
             {

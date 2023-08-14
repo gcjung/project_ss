@@ -56,13 +56,13 @@ public class GameDataManager : Manager<GameDataManager>
     public enum SkillTemplate_
     {
         None = -1,
-        Index,
+        SkillId,
         Grade,
         Name,
-        Rrder,
+        Order,
         Cooltime,
         Damage,
-        SpriteName,
+        Icon,
         Desc,
 
         Max,

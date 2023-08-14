@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
 using System.Linq;
+using UnityEditor;
 
 public class MainScene : MonoBehaviour
 {
@@ -123,8 +124,8 @@ public class MainScene : MonoBehaviour
     private TMP_Text goldText;
     private TMP_Text gemText;
     private Image[] skillSprite = null;
-    private RectTransform category1_UI = null;
-    private RectTransform category2_UI = null; //장비
+    private RectTransform category1_UI = null;  // 캐릭터, 장비
+    private RectTransform category2_UI = null;  //장비
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -165,17 +166,14 @@ public class MainScene : MonoBehaviour
         
         skillSprite = new Image[skillPanel.childCount -1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
-        { 
             skillSprite[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
-        }
-
+        
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
 
-
         // 바텀 카테고리 버튼
-        Transform bottomCategortButton = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
-        int categoryButtonCount = bottomCategortButton.childCount;
+        Transform bottomCategory = mainUiPanel.transform.Find("DownSide_Panel/Category_Image");
+        int categoryButtonCount = bottomCategory.childCount;
         for (int i = 0; i < categoryButtonCount; i++)
         {
             int index = i;
@@ -184,7 +182,7 @@ public class MainScene : MonoBehaviour
             entry.eventID = EventTriggerType.PointerUp;
             entry.callback.AddListener((eventData) => OnClickCategory(index, eventData.selectedObject));
 
-            EventTrigger button = bottomCategortButton.GetChild(i).GetComponent<EventTrigger>();
+            EventTrigger button = bottomCategory.GetChild(i).GetComponent<EventTrigger>();
             button.triggers.Add(entry);
         }
 
@@ -217,7 +215,7 @@ public class MainScene : MonoBehaviour
             Destroy(stageText.gameObject);
 
         stageName = StageTemplate[stageId.ToString()][(int)StageTemplate_.Stage];
-        stageText = CommonFuntion.GetPrefab("StageName_Text", upSidePanel.transform);
+        stageText = CommonFunction.GetPrefab("StageName_Text", upSidePanel.transform);
         stageText.GetComponent<TextMeshProUGUI>().text = stageName;
 
         mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵이미지 세팅
@@ -232,11 +230,16 @@ public class MainScene : MonoBehaviour
     {
         for (int i = 0; i < equipedSkill.Length; i++)
         {
-            string spriteName = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.SpriteName];
+            if (string.IsNullOrEmpty(equipedSkill[i]))
+                continue;
 
-            skillSprite[i].sprite = CommonFuntion.GetSprite_Atlas(spriteName, "SkillAtlas");
+            string icon = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.Icon];
+
+            string[] iconDatas = icon.Split('/');
+            string spriteName = iconDatas[0];
+            string atlasName = iconDatas[1];
+            skillSprite[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
         }
-        
     }
 
     public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
@@ -284,14 +287,11 @@ public class MainScene : MonoBehaviour
         double gold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
         double gem = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gem);
 
-        goldText.text = $"{Util.BigNumCalculate(gold)} G";
+        goldText.text = $"{Util.BigNumCalculate(gold)}";
         gemText.text = Util.BigNumCalculate(gem);
 
-        //var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
-        //SetSkill(equippedSkill);
-        //SetSkill(Array.ConvertAll(equippedSkill, s => int.Parse(s)));
-
-
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        SetSkill(equippedSkill);    // 스킬 세팅
     }
 
     private void EnterBossRoom()
@@ -442,22 +442,20 @@ public class MainScene : MonoBehaviour
     {
         if (category1_UI == null)
         {
-            category1_UI = CommonFuntion.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
-            //category1_UI.Find("Type1_Character/Character/Level_Text").GetComponent<TMP_Text>().font = "LV 1";
+            category1_UI = CommonFunction.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
             category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+
+            ShowUI_Character(true);
+            ShowUI_Skill(true);
         }
         else
         {
             bool active = category1_UI.gameObject.activeSelf;
 
             if (active)
-            {
                 category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
-            }
             else
-            {
                 category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
-            }
 
             category1_UI.gameObject.SetActive(!active);
         }
@@ -475,10 +473,10 @@ public class MainScene : MonoBehaviour
             switch (index)
             {
                 case 0:
-                    button.onClick.AddListener(ShowUI_Character);
+                    button.onClick.AddListener(() => ShowUI_Character());
                     break;
                 case 1:
-                    button.onClick.AddListener(ShowUI_Skill);
+                    button.onClick.AddListener(() => ShowUI_Skill());
                     break;
             }
         }
@@ -489,7 +487,7 @@ public class MainScene : MonoBehaviour
         //장비 UI
         if (category2_UI == null)
         {
-            category2_UI = CommonFuntion.GetPrefab("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
+            category2_UI = CommonFunction.GetPrefab("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
             category2_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
         }
         else
@@ -509,18 +507,87 @@ public class MainScene : MonoBehaviour
         }
     }
 
-    void ShowUI_Character()
+    void ShowUI_Character(bool isFirst = false)
     {
         Debug.Log("ShowUI_Character");
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
     }
 
-    void ShowUI_Skill()
+    void ShowUI_Skill(bool isFirst = false)
     {
-        Debug.Log("ShowUI_Skill");
-        category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
-        category1_UI.Find("Type1_Character").gameObject.SetActive(false);
+        if (isFirst)        // 최초 1회만 실행
+        {
+            // 스킬 목록
+            Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
+            Util.InitGrid(grid);
+            foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
+            {
+                var skill_Icon = CommonFunction.GetPrefab("Skill_Icon", grid);
+
+                string grade = item.Value[(int)SkillTemplate_.Grade];
+                string icon = item.Value[(int)SkillTemplate_.Icon];
+
+                skill_Icon.GetComponent<Image>().color = ConvertGradeToColor(grade);
+                string[] iconDatas = icon.Split('/');
+                string spriteName = iconDatas[0];
+                string atlasName = iconDatas[1];
+                skill_Icon.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+
+                skill_Icon.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    var skill_Icon = CommonFunction.GetPrefab("Skill_Detail", popupUI_1.transform);
+
+                });
+
+
+            }
+        }
+        else
+        {
+            category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
+            category1_UI.Find("Type1_Character").gameObject.SetActive(false);
+
+            Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
+            Image[] equippedSkill_Image = new Image[equippedSkillGroup.childCount];
+            for (int i = 0; i < equippedSkillGroup.childCount; i++)
+                equippedSkill_Image[i] = equippedSkillGroup.GetChild(i).GetComponent<Image>();
+
+            var userEquippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+            for (int i = 0; i < userEquippedSkillData.Length; i++)
+            {
+                if (string.IsNullOrEmpty(userEquippedSkillData[i]))
+                    continue;
+
+                string icon = SkillTemplate[userEquippedSkillData[i]][(int)SkillTemplate_.Icon];
+
+                string[] iconDatas = icon.Split('/');
+                string spriteName = iconDatas[0];
+                string atlasName = iconDatas[1];
+                equippedSkill_Image[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+            }
+        }
+
+    }
+
+    Color ConvertGradeToColor(string grade)
+    {
+        if(grade == "common")
+        {
+            return Color.white;
+        }
+        else if(grade == "uncommon")
+        {
+            return Color.green;
+        }
+        else if (grade == "rare")
+        {
+            return Color.cyan;
+        }
+        else
+        {
+            return Color.red;
+        }
     }
 
     public void GetGoods(double getGold = 0, double getGem = 0)
@@ -532,7 +599,7 @@ public class MainScene : MonoBehaviour
             double currentGold = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.Gold);
 
             //goldText.text = $"{(currentGold + getGold)}";
-            goldText.text = $"{Util.BigNumCalculate(currentGold + getGold)} G";
+            goldText.text = $"{Util.BigNumCalculate(currentGold + getGold)}";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold + getGold);
         }
 
@@ -553,7 +620,7 @@ public class MainScene : MonoBehaviour
         if (currentGold - usedGold >= 0)
         {
             Debug.Log($"{Util.BigNumCalculate(usedGold)}Gold를 사용");
-            goldText.text = $"{Util.BigNumCalculate(currentGold - usedGold)} G";
+            goldText.text = $"{Util.BigNumCalculate(currentGold - usedGold)}";
             GlobalManager.Instance.DBManager.UpdateUserData(UserDoubleDataType.Gold.ToString(), currentGold - usedGold);
 
             return true;

@@ -1,7 +1,7 @@
-﻿index,grade,name,order,cooltime,damage,spriteName,desc
-1,common,히드라소환,1,5,150,Arrow_Barrage,이건 이러 이러한 효과가 있습니다
-2,uncommon,구체던지기,2,10,200,Beam,이영종이영종
-3,rare,,3,,,,
+﻿skill_ID,grade,name,order,cooltime,damage,icon,desc
+1,common,히드라소환,1,5,150,Arrow_Barrage/SkillAtlas,이건 이러 이러한 효과가 있습니다
+2,uncommon,구체던지기,2,10,200,Beam/SkillAtlas,요런 요런 효과가 있어요
+3,rare,레어스킬,3,12,250,Blackhole/SkillAtlas,블랙홀 스킬입니다
 4,epic,,4,,,,
 5,legendary,,5,,,,
 6,mythic,,6,,,,
