@@ -460,16 +460,24 @@ public class MainScene : MonoBehaviour
             Util.InitGrid(grid);
             foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
             {
-                var skill = CommonFunction.GetPrefab("Skill_Icon", grid);
+                var skill_Icon = CommonFunction.GetPrefab("Skill_Icon", grid);
 
                 string grade = item.Value[(int)SkillTemplate_.Grade];
                 string icon = item.Value[(int)SkillTemplate_.Icon];
 
-                skill.GetComponent<Image>().color = ConvertGradeToColor(grade);
+                skill_Icon.GetComponent<Image>().color = ConvertGradeToColor(grade);
                 string[] iconDatas = icon.Split('/');
                 string spriteName = iconDatas[0];
                 string atlasName = iconDatas[1];
-                skill.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+                skill_Icon.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+
+                skill_Icon.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    var skill_Icon = CommonFunction.GetPrefab("Skill_Detail", popupUI_1.transform);
+
+                });
+
+
             }
         }
         else

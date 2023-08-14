@@ -16,6 +16,7 @@ public class AssetBundleBuildManager
     {
         string assetBunbleDirectoty = Application.persistentDataPath;
         //string assetBunbleDirectoty = Path.Combine(Application.dataPath,"AssetBundle");
+        Debug.Log(assetBunbleDirectoty);
 
         if (!Directory.Exists(assetBunbleDirectoty))
             Directory.CreateDirectory(assetBunbleDirectoty);
