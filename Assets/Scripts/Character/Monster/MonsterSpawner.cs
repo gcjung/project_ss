@@ -140,11 +140,11 @@ public class MonsterSpawner : MonoBehaviour
 
             MonsterCount--;
 
-            yield return new WaitForSeconds(spawnTime);
-           
-        }
+            if (MonsterCount == 0)
+                IsSpawning = false;
 
-        IsSpawning = false;
+            yield return new WaitForSeconds(spawnTime);           
+        }
     }
     public void SpawnBossMonster()
     {

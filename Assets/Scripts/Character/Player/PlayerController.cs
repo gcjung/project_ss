@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.TryGetComponent<MonsterController>(out var monster))
         {
-            if ((enemyList.Count - 1) == 0 && !MonsterSpawner.IsSpawning)
+            if ((enemyList.Count - 1) == 0 && MonsterSpawner.MonsterCount == 0)
             {
                 StartCoroutine(DelayChangeState(monster));
             }
@@ -155,8 +155,7 @@ public class PlayerController : MonoBehaviour
 
             Bullet bullet = bulletPool.GetObjectPool();
             bullet.transform.localScale = projectilePrefab.transform.localScale;
-            bullet.SettingInfo(player.TotalAttack, Critical(player.TotalCritical), direction, projectileSpeed);
-            //bullet.Rigid.velocity = direction * projectileSpeed;      
+            bullet.SettingInfo(player.TotalAttack, Critical(player.TotalCritical), direction, projectileSpeed); 
         }
         else
         {
