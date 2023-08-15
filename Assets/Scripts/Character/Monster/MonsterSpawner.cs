@@ -142,7 +142,7 @@ public class MonsterSpawner : MonoBehaviour
 
             if (MonsterCount == 0)
                 IsSpawning = false;
-
+               
             yield return new WaitForSeconds(spawnTime);           
         }
     }
@@ -159,7 +159,7 @@ public class MonsterSpawner : MonoBehaviour
 
     public IEnumerator InfinitySpawnMonster()
     {
-        float delayTime = 3.0f;
+        float delayTime = 4.0f;
 
         while(mainScene.CurrentStageState == StageState.InfinityWave)
         {

@@ -18,19 +18,19 @@ public class PlayerController : MonoBehaviour
     private float projectileSpeed = 5.0f;
     private Transform target;
 
+    public bool IsWaveFinish { get; private set; }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.TryGetComponent<MonsterController>(out var monster))
         {
             enemyList.Add(monster);
-
-            Debug.Log($"현재 감지된 몬스터 수 : {enemyList.Count}");
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.TryGetComponent<MonsterController>(out var monster))
+        if (collision.TryGetComponent<MonsterController>(out var monster))
         {
             if ((enemyList.Count - 1) == 0 && MonsterSpawner.MonsterCount == 0)
             {
@@ -40,11 +40,8 @@ public class PlayerController : MonoBehaviour
             {
                 enemyList.Remove(monster);
             }
-
-            Debug.Log($"현재 감지된 몬스터 수 : {enemyList.Count}");
         }
     }
-
     void Start()
     {
         CurrentPlayerState = PlayerState.Idle;
@@ -72,45 +69,44 @@ public class PlayerController : MonoBehaviour
                 {
                     if (MonsterSpawner.IsSpawning)
                     {
-                        CurrentPlayerState = PlayerState.Idle;
+                        SetCurrentPlayerState(PlayerState.Idle);
                         playerAnimator.SetTrigger("Idle");
                     }
                     else if (!MonsterSpawner.IsSpawning)
                     {
-                        CurrentPlayerState = PlayerState.Moving;
+                        SetCurrentPlayerState(PlayerState.Moving);
                         playerAnimator.SetTrigger("Run");
                     }
                 }
                 else
                 {
-                    if (MonsterSpawner.IsSpawning)
+                    if (IsWaveFinish)
                     {
-                        CurrentPlayerState = PlayerState.Attacking;
-                        playerAnimator.SetTrigger("Attack");
-                    }
-                    else if (!MonsterSpawner.IsSpawning)
-                    {
-                        CurrentPlayerState = PlayerState.Idle;
+                        SetCurrentPlayerState(PlayerState.Idle);
                         playerAnimator.SetTrigger("Idle");
-                    }                   
+                        break;
+                    }
+
+                    SetCurrentPlayerState(PlayerState.Attacking);
+                    playerAnimator.SetTrigger("Attack");             
                 }
                 break;
             case PlayerState.Moving:
                 if (CanSeeTarget())
                 {
-                    CurrentPlayerState = PlayerState.Attacking;
+                    SetCurrentPlayerState(PlayerState.Attacking);
                     playerAnimator.SetTrigger("Attack");
                 }
                 else
                 {
-                    CurrentPlayerState = PlayerState.Moving;
+                    SetCurrentPlayerState(PlayerState.Moving);
                     playerAnimator.SetTrigger("Run");
                 }
                 break;
             case PlayerState.Attacking:
                 if (CanSeeTarget())
                 {
-                    CurrentPlayerState = PlayerState.Attacking;
+                    SetCurrentPlayerState(PlayerState.Attacking);
                     playerAnimator.SetTrigger("Attack");
 
                     float animationSpeed = (float)player.TotalAttackSpeed / 1.0f;
@@ -120,12 +116,12 @@ public class PlayerController : MonoBehaviour
                 {
                     if (MonsterSpawner.IsSpawning)
                     {
-                        CurrentPlayerState = PlayerState.Idle;
+                        SetCurrentPlayerState(PlayerState.Idle);
                         playerAnimator.SetTrigger("Idle");
                     }
                     else if (!MonsterSpawner.IsSpawning)
                     {
-                        CurrentPlayerState = PlayerState.Moving;
+                        SetCurrentPlayerState(PlayerState.Moving);
                         playerAnimator.SetTrigger("Run");
                     }
                 }
@@ -152,10 +148,11 @@ public class PlayerController : MonoBehaviour
             target = enemyList[0].transform;
 
             Vector3 direction = (target.position - transform.position).normalized;
+            float bulletSpeed = projectileSpeed + (float)player.TotalAttackSpeed;
 
             Bullet bullet = bulletPool.GetObjectPool();
             bullet.transform.localScale = projectilePrefab.transform.localScale;
-            bullet.SettingInfo(player.TotalAttack, Critical(player.TotalCritical), direction, projectileSpeed); 
+            bullet.SettingInfo(player.TotalAttack, Critical(player.TotalCritical), direction, bulletSpeed); 
         }
         else
         {
@@ -186,10 +183,15 @@ public class PlayerController : MonoBehaviour
     private IEnumerator DelayChangeState(MonsterController enemy)
     {
         float delayTime = 2.0f;
+        IsWaveFinish = true;
 
         yield return CommonIEnumerator.IETimeout(
             onStart: () => { SetCurrentPlayerState(PlayerState.Idle); },
-            onFinish: () => { enemyList.Remove(enemy); }, delayTime);
+            onFinish: () =>
+            {
+                enemyList.Remove(enemy);
+                IsWaveFinish = false;
+            }, delayTime);
     }
 
     private void ResetAllTriggers()
