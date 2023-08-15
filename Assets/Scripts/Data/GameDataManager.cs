@@ -68,11 +68,27 @@ public class GameDataManager : Manager<GameDataManager>
         Max,
     }
 
+    public enum ItemTemplate_
+    {
+        None = -1,
+        ItemId,
+        ItemType,
+        ItemGrade,
+        ItemName,
+        ItemLevel,
+        ItemAtk,
+        ItemDef,
+        ItemIcon,
+        Desc,
+        Max,
+    }
+
     public static Dictionary<string, string[]> HeroTemplate;
     public static Dictionary<string, string[]> MonsterTemplate;
     public static Dictionary<string, string[]> StatusTemplate;
     public static Dictionary<string, string[]> StageTemplate;
     public static Dictionary<string, string[]> SkillTemplate;
+    public static Dictionary<string, string[]> ItemTemplate;
 
     public override void Init()
     {       
@@ -86,6 +102,7 @@ public class GameDataManager : Manager<GameDataManager>
         StatusTemplate = CSVRead("data/Status_Template");
         StageTemplate = CSVRead("data/Stage_Template");
         SkillTemplate = CSVRead("data/Skill_Template");
+        ItemTemplate = CSVRead("data/Item_Template");
 
         Ininialized = true;
     }
