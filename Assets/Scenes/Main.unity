@@ -2083,6 +2083,7 @@ MonoBehaviour:
   critical_ratio: 0
   hp_ratio: 0
   mainUiPanel: {fileID: 972070603}
+  itemPanel: {fileID: 0}
 --- !u!1 &838461504
 GameObject:
   m_ObjectHideFlags: 0
@@ -2279,7 +2280,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 2
   m_TargetDisplay: 0

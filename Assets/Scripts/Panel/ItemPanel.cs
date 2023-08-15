@@ -5,8 +5,9 @@ public class ItemPanel : PanelBase
 {
     [SerializeField] private Transform buttonTrasform;
     [SerializeField] private Transform goTrasform;
-    [SerializeField] private Button[] buttons;
-    [SerializeField] private GameObject[] gameObjects;
+    [SerializeField] private WeaponeListPanel weaponeListPanel;
+    private Button[] buttons;
+    private GameObject[] gameObjects;
 
     public override void InitPanel()
     {
@@ -51,6 +52,11 @@ public class ItemPanel : PanelBase
                 }
             });
         }
+    }
+
+    public void GetItemData()
+    {
+        weaponeListPanel.GetWeaponeData();
     }
 
     public override void OpenPanel()
