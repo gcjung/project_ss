@@ -7,10 +7,7 @@ using DG.Tweening;
 using static GameDataManager;
 using Unity.VisualScripting;
 using UnityEngine.EventSystems;
-using UnityEngine.Events;
-using System;
 using System.Linq;
-using UnityEditor;
 
 public class MainScene : MonoBehaviour
 {
@@ -111,6 +108,8 @@ public class MainScene : MonoBehaviour
     private Image[] skillSprite = null;
     private RectTransform category1_UI = null;  // 캐릭터, 장비
     private RectTransform category2_UI = null;  //장비
+    private Transform SkillDetail_Popup = null;
+
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -455,28 +454,43 @@ public class MainScene : MonoBehaviour
     {
         if (isFirst)        // 최초 1회만 실행
         {
-            // 스킬 목록
             Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
             Util.InitGrid(grid);
             foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
             {
-                var skill_Icon = CommonFunction.GetPrefab("Skill_Icon", grid);
-
+                string id = item.Value[(int)SkillTemplate_.SkillId];
+                string skillName = item.Value[(int)SkillTemplate_.Name];
                 string grade = item.Value[(int)SkillTemplate_.Grade];
                 string icon = item.Value[(int)SkillTemplate_.Icon];
+                string desc = item.Value[(int)SkillTemplate_.Desc];
+                string cooltime = item.Value[(int)SkillTemplate_.Cooltime];
 
+                GameObject skill_Icon = CommonFunction.GetPrefab("Skill_Icon", grid);
+
+                // 등급 색
                 skill_Icon.GetComponent<Image>().color = ConvertGradeToColor(grade);
+
+                // 스킬 아이콘 적용
                 string[] iconDatas = icon.Split('/');
                 string spriteName = iconDatas[0];
                 string atlasName = iconDatas[1];
                 skill_Icon.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
 
+                // 스킬 아이콘 선택 시 (상세보기)
                 skill_Icon.GetComponent<Button>().onClick.AddListener(() =>
                 {
-                    var skill_Icon = CommonFunction.GetPrefab("Skill_Detail", popupUI_1.transform);
-
+                    if (SkillDetail_Popup == null)
+                        SkillDetail_Popup = CommonFunction.GetPrefab("Skill_Detail", popupUI_1.transform).transform;
+                    else
+                        SkillDetail_Popup.gameObject.SetActive(true);
+                    
+                    SkillDetail_Popup.Find("Icon").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+                    SkillDetail_Popup.Find("SkillName_Text").GetComponent<TMP_Text>().text = skillName;
+                    SkillDetail_Popup.Find("Grade_Text").GetComponent<TMP_Text>().color = ConvertGradeToColor(grade);
+                    SkillDetail_Popup.Find("Grade_Text").GetComponent<TMP_Text>().text = grade;
+                    SkillDetail_Popup.Find("DescBG/Desc_Text").GetComponent<TMP_Text>().text = desc;
+                    SkillDetail_Popup.Find("DescBG/CoolTime_Text").GetComponent<TMP_Text>().text = $"{cooltime}초";
                 });
-
 
             }
         }
@@ -509,15 +523,15 @@ public class MainScene : MonoBehaviour
 
     Color ConvertGradeToColor(string grade)
     {
-        if(grade == "common")
+        if(grade == "일반")
         {
             return Color.white;
         }
-        else if(grade == "uncommon")
+        else if(grade == "고급")
         {
             return Color.green;
         }
-        else if (grade == "rare")
+        else if (grade == "희귀")
         {
             return Color.cyan;
         }
