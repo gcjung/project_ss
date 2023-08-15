@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
 { 
-    public static PlayerState CurrentPlayerState { get; private set; } = PlayerState.Idle;
+    public static PlayerState CurrentPlayerState { get; private set; }
     private Animator playerAnimator;
     private Player player;
 
@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
         if (collision.TryGetComponent<MonsterController>(out var monster))
         {
             enemyList.Add(monster);
+
+            Debug.Log($"현재 감지된 몬스터 수 : {enemyList.Count}");
         }
     }
 
@@ -30,14 +32,16 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.TryGetComponent<MonsterController>(out var monster))
         {
-            if ((enemyList.Count - 1) == 0 && MonsterSpawner.MonsterCount == 0)
+            if ((enemyList.Count - 1) == 0 && !MonsterSpawner.IsSpawning)
             {
                 StartCoroutine(DelayChangeState(monster));
             }
             else
             {
                 enemyList.Remove(monster);
-            }         
+            }
+
+            Debug.Log($"현재 감지된 몬스터 수 : {enemyList.Count}");
         }
     }
 
@@ -66,37 +70,64 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Idle:
                 if (!CanSeeTarget())
                 {
-                    CurrentPlayerState = PlayerState.Moving;                   
+                    if (MonsterSpawner.IsSpawning)
+                    {
+                        CurrentPlayerState = PlayerState.Idle;
+                        playerAnimator.SetTrigger("Idle");
+                    }
+                    else if (!MonsterSpawner.IsSpawning)
+                    {
+                        CurrentPlayerState = PlayerState.Moving;
+                        playerAnimator.SetTrigger("Run");
+                    }
                 }
                 else
                 {
-                    CurrentPlayerState = PlayerState.Idle;
-
-                    ResetAllTriggers();
-                    playerAnimator.SetTrigger("Idle");
+                    if (MonsterSpawner.IsSpawning)
+                    {
+                        CurrentPlayerState = PlayerState.Attacking;
+                        playerAnimator.SetTrigger("Attack");
+                    }
+                    else if (!MonsterSpawner.IsSpawning)
+                    {
+                        CurrentPlayerState = PlayerState.Idle;
+                        playerAnimator.SetTrigger("Idle");
+                    }                   
                 }
                 break;
             case PlayerState.Moving:
                 if (CanSeeTarget())
                 {
                     CurrentPlayerState = PlayerState.Attacking;
+                    playerAnimator.SetTrigger("Attack");
                 }
                 else
                 {
+                    CurrentPlayerState = PlayerState.Moving;
                     playerAnimator.SetTrigger("Run");
                 }
                 break;
             case PlayerState.Attacking:
                 if (CanSeeTarget())
                 {
+                    CurrentPlayerState = PlayerState.Attacking;
                     playerAnimator.SetTrigger("Attack");
 
                     float animationSpeed = (float)player.TotalAttackSpeed / 1.0f;
                     playerAnimator.SetFloat("AttackSpeedMultiplier", animationSpeed);
                 }
-                else if(!CanSeeTarget() && !MonsterSpawner.IsSpawning)
+                else if (!CanSeeTarget())
                 {
-                    CurrentPlayerState = PlayerState.Moving;
+                    if (MonsterSpawner.IsSpawning)
+                    {
+                        CurrentPlayerState = PlayerState.Idle;
+                        playerAnimator.SetTrigger("Idle");
+                    }
+                    else if (!MonsterSpawner.IsSpawning)
+                    {
+                        CurrentPlayerState = PlayerState.Moving;
+                        playerAnimator.SetTrigger("Run");
+                    }
                 }
                 break;
             case PlayerState.Dead:

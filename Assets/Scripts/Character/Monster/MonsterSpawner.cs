@@ -54,12 +54,11 @@ public class MonsterSpawner : MonoBehaviour
 
     public void SetMonster()
     {
-        ClearWaveTrigger();
-
         if (!slider.IsActive())
             slider.gameObject.SetActive(true);
 
         stageSlider.ResetSlider();
+        ClearWaveTrigger();
 
         string monsterName = MonsterTemplate[mainScene.monsterId.ToString()][(int)MonsterTemplate_.Name];
         string bossName = MonsterTemplate[mainScene.bossId.ToString()][(int)MonsterTemplate_.Name];
@@ -99,12 +98,12 @@ public class MonsterSpawner : MonoBehaviour
             case StageState.InfinityWave:
                 slider.gameObject.SetActive(false);
 
-                bossRoomButton = CommonFuntion.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
+                bossRoomButton = CommonFunction.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
                 bossRoomButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     FinishWave();
 
-                    StopAllCoroutines();    //InfinitySpawnMonster, SpawnMonster
+                    StopAllCoroutines();    // Stop InfinitySpawnMonster, SpawnMonster
                     infinitySpawnCoroutine = null;
 
                     //monsterPool.ClearPool();

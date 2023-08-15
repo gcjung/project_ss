@@ -4,4 +4,4 @@ monsterId,name,hp,attack,gold
 3,testMonster,,,
 4,SkeletonWarrior,150,45,200
 5,Zombie,50,50,50
-6,ZombieBoss,300,70,320
+6,ZombieBoss,30000,7000,320
