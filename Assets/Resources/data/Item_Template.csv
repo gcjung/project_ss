@@ -1,0 +1,6 @@
+ItemId,ItemType,ItemGrade,ItemName,ItemLevel,ItemAtk,ItemDef,ItemIcon,desc
+1,Weapon,1001,흔한지팡이,1,10,,,
+2,Weapon,2001,흔하지 않은 지팡이,1,20,,,
+3,Weapon,3001,레어지팡이,1,50,,,
+4,Weapon,4001,에픽지팡이,1,100,,,
+5,Weapon,5001,전설지팡이,1,200,,,

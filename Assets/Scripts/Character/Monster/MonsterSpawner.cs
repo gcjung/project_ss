@@ -99,7 +99,7 @@ public class MonsterSpawner : MonoBehaviour
             case StageState.InfinityWave:
                 slider.gameObject.SetActive(false);
 
-                bossRoomButton = CommonFuntion.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
+                bossRoomButton = CommonFunction.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
                 bossRoomButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     FinishWave();
