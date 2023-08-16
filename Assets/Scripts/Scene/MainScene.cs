@@ -195,14 +195,14 @@ public class MainScene : MonoBehaviour
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
     }
-    public void SetSkill(string[] equipedSkill)
+    public void SetSkill(string[] equippedSkill)
     {
-        for (int i = 0; i < equipedSkill.Length; i++)
+        for (int i = 0; i < equippedSkill.Length; i++)
         {
-            if (string.IsNullOrEmpty(equipedSkill[i]))
+            if (string.IsNullOrEmpty(equippedSkill[i]))
                 continue;
 
-            string icon = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.Icon];
+            string icon = SkillTemplate[equippedSkill[i]][(int)SkillTemplate_.Icon];
 
             string[] iconDatas = icon.Split('/');
             string spriteName = iconDatas[0];
@@ -490,6 +490,20 @@ public class MainScene : MonoBehaviour
                     SkillDetail_Popup.Find("Grade_Text").GetComponent<TMP_Text>().text = grade;
                     SkillDetail_Popup.Find("DescBG/Desc_Text").GetComponent<TMP_Text>().text = desc;
                     SkillDetail_Popup.Find("DescBG/CoolTime_Text").GetComponent<TMP_Text>().text = $"{cooltime}초";
+
+
+                    SkillDetail_Popup.Find("Left_Button").GetComponent<Button>().onClick.AddListener(() =>
+                    {
+                        Debug.Log("왼쪽버튼 클릭");
+                        EquipSkill(id);
+
+                    });
+
+                    SkillDetail_Popup.Find("Light_Button").GetComponent<Button>().onClick.AddListener(() =>
+                    {
+                        Debug.Log("오른쪽버튼 클릭");
+                        UnequipSkill(id);
+                    });
                 });
 
             }
@@ -520,6 +534,29 @@ public class MainScene : MonoBehaviour
         }
 
     }
+    void EquipSkill(string skillId)
+    {
+       
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill,"@@@@@").Split('@');
+        
+        // 장착할 공간이 있을 때 => 비어있는 칸에 장착
+        for (int i = 0; i < equippedSkill.Length; i++)
+        {
+            if (string.IsNullOrEmpty(equippedSkill[i]))
+            {
+                // 비어있으니 여기에 장착
+            }
+        }
+
+        // 장착할 공간이 없을 때. => 6칸 중에 선택해서 교체하도록 해야됨
+        
+    }
+
+    void UnequipSkill(string skillId)
+    {
+
+    }
+
 
     Color ConvertGradeToColor(string grade)
     {
