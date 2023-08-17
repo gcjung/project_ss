@@ -169,7 +169,7 @@ public class MonsterSpawner : MonoBehaviour
     }
     public void FinishStage()
     {
-        Debug.Log("스테이지 클리어");
+        //Debug.Log("스테이지 클리어");
         mainScene.IsStageClear = true;
     }
     public void ClearWaveTrigger()

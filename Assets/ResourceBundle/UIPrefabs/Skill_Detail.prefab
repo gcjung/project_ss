@@ -569,7 +569,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   isDontDestroy: 1
-  DestroyTarget: {fileID: 0}
+  destroyTarget: {fileID: 0}
 --- !u!1 &2971095785512640819
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,7 +870,7 @@ GameObject:
   - component: {fileID: 4032925449194735277}
   - component: {fileID: 7628795117434833643}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1005,7 +1005,7 @@ GameObject:
   - component: {fileID: 4081577127105544311}
   - component: {fileID: 7149443283317468411}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2414,7 +2414,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   isDontDestroy: 1
-  DestroyTarget: {fileID: 0}
+  destroyTarget: {fileID: 0}
 --- !u!1 &8270126190952880461
 GameObject:
   m_ObjectHideFlags: 0
