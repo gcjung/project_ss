@@ -156,7 +156,7 @@ public class SkillSlot : MonoBehaviour
     }
     public void SetEquip(bool isEquip)
     {
-        if (isEquip)
+        if (isEquip)    // 간편 장착/해제버튼 수정예정 스프라이트를 돌려쓸까?
         {
             isEquipped = true;
             transform.Find("Equip_Text").gameObject.SetActive(true);

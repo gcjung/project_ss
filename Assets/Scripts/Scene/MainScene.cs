@@ -478,7 +478,8 @@ public class MainScene : MonoBehaviour
                 });
 
                 skill_Icon.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() =>{
-                    //EquipSkill(slot, id); 장비 상태에 따라 장착/해제
+                    //EquipSkill(slot, id);
+                    // 장비 상태에 따라 장착/해제 (수정예정)
                     Debug.Log("간편장착버튼 누름@@@");
                 });
 
@@ -598,7 +599,8 @@ public class MainScene : MonoBehaviour
 
             UpgradeSkill(slot,skillId);
         });
-    
+
+        
     }
     void UpgradeSkill(SkillSlot slot, string skillId)
     {
