@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("적이 없음");
+            //Debug.LogError("적이 없음");
         }
     }
 

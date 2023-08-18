@@ -245,8 +245,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: -4.9999847, y: 0}
-  m_SizeDelta: {x: -20, y: 0}
+  m_AnchoredPosition: {x: 2.5, y: 0}
+  m_SizeDelta: {x: -5, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &707806377075828029
 GameObject:
@@ -337,7 +337,7 @@ GameObject:
   - component: {fileID: 3049593892331482674}
   - component: {fileID: 5818221959156438275}
   m_Layer: 5
-  m_Name: Left_Button
+  m_Name: EquipButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -583,7 +583,7 @@ GameObject:
   - component: {fileID: 155288954040933021}
   - component: {fileID: 8939075288485702410}
   m_Layer: 5
-  m_Name: Light_Button
+  m_Name: UpgradeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -784,7 +784,7 @@ GameObject:
   - component: {fileID: 7696506488390987862}
   - component: {fileID: 9008186103962972663}
   m_Layer: 5
-  m_Name: Skill_Detail
+  m_Name: SkillDetailPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1216,7 +1216,7 @@ GameObject:
   - component: {fileID: 2217451933230134948}
   - component: {fileID: 7919676485630670800}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ButtonImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1940,7 +1940,7 @@ GameObject:
   - component: {fileID: 7147573886835299601}
   - component: {fileID: 3837810020156886087}
   m_Layer: 5
-  m_Name: Obtained_Slider
+  m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2540,7 +2540,7 @@ GameObject:
   - component: {fileID: 5259351575976912817}
   - component: {fileID: 8597979277083435388}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ButtonImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2594,7 +2594,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6900647849bf74c2daec9082ae11cc1c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6a63ef398306547be8cad5f83b8994a3, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -84,6 +84,26 @@ public class Util
         }
     }
 
+    public static Color ConvertGradeToColor(string grade)
+    {
+        if (grade == "일반")
+        {
+            return Color.white;
+        }
+        else if (grade == "고급")
+        {
+            return Color.green;
+        }
+        else if (grade == "희귀")
+        {
+            return Color.cyan;
+        }
+        else
+        {
+            return Color.red;
+        }
+    }
+
     // Text에 숫자가 자연스럽게 올라가는 함수
     IEnumerator CountingNumber(float target, float current, TMP_Text text)
     {

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using static GameDataManager;
 using static SOGamdData;
 
 [FirestoreData]
@@ -29,6 +30,7 @@ public enum UserDoubleDataType
 public enum UserStringDataType
 {
     EquippedSkill,
+    SkillData,
 }
 
 public enum GameDataType
@@ -71,7 +73,7 @@ public class DBManager : Manager<DBManager>
     }
     public override void InitializedFininsh()
     {
-
+        SetDB_SkillObtainedCount();
     }
     async void LoadGameData()
     {
@@ -228,7 +230,39 @@ public class DBManager : Manager<DBManager>
         return default;
     }
 
+    void SetDB_SkillObtainedCount() 
+    {
+        var skillObtainCountData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
 
+        //Debug.Log($"skillObtainCount.Length : {skillObtainCountData.Length}, SkillTemplate.Count : {SkillTemplate.Count}");
+        if (skillObtainCountData.Length == 1)       // skillObtainCountData가 없을 경우
+        {
+            string[] temp = new string[SkillTemplate.Count];
+            for (int i = 0; i < temp.Length; i++)
+            {
+                int skillLevel = 1;
+                int obtainCount = 0;
+                temp[i] = $"{skillLevel},{obtainCount}";
+            }
+
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', temp));
+        }
+        else if (skillObtainCountData.Length < SkillTemplate.Count)   // 템플릿에 새로운 테이블 추가됐을 경우
+        {
+            //Debug.Log($"@@@");
+            string[] temp = new string[SkillTemplate.Count];
+            for (int i = skillObtainCountData.Length; i < temp.Length; i++)
+            {
+                int skillLevel = 1;
+                int obtainCount = 0;
+                temp[i] = $"{skillLevel},{obtainCount}";
+            }
+
+            skillObtainCountData.CopyTo(temp, 0);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', temp));
+        }
+        //Debug.Log("test : " + GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillObtainCount));
+    }
 
     #region 제네릭 버전
     //public T GetUserData<T>(string key)
