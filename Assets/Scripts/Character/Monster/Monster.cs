@@ -14,6 +14,7 @@ public class Monster : MonoBehaviour
 
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
+    private SkinnedMeshRenderer skinnedMesh;
 
     public Action BossMonsterDied;
     private void OnEnable()
@@ -28,16 +29,17 @@ public class Monster : MonoBehaviour
         if (monsterController != null)
         {
             monsterController.SetCurrentMonsterState(MonsterState.Idle);
-        }
+        }       
     }
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider2D>();
+        skinnedMesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
 
         if (TryGetComponent<MonsterController>(out var controller))
         {
             monsterController = controller;
-        }
+        }       
     }
     public void SetMonsterStat(int monsterId)
     {
@@ -51,8 +53,6 @@ public class Monster : MonoBehaviour
 
     public void TakeDamage(double damageAmount)
     {
-        //Debug.Log($"{Name}가 {damageAmount}만큼 피해입음");
-
         CurrentHp -= damageAmount;
         
         if (CurrentHp <= 0)
@@ -63,8 +63,6 @@ public class Monster : MonoBehaviour
 
     private void MonsterDie()
     {
-        //Debug.Log($"{Name} 죽음");
-
         boxCollider.enabled = false;
         
         monsterController.SetCurrentMonsterState(MonsterState.Dead);
