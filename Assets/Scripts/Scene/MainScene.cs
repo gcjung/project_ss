@@ -602,6 +602,7 @@ public class MainScene : MonoBehaviour
 
         
     }
+    
     void UpgradeSkill(SkillSlot slot, string skillId)
     {
         slot.UpgradeSkill();
