@@ -203,6 +203,11 @@ public class MainScene : MonoBehaviour
         playerCharacter.AddComponent<SkillController>();
         playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
 
+        var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Hero", upSidePanel.transform);   //체력바 세팅
+        hpBar.GetComponent<HpSlider>().SetTarget(playerCharacter.gameObject);
+        Vector3 hpBarScale = new Vector3(50f, 50f, 1f);
+        hpBar.transform.localScale = hpBarScale;
+
         IsPlayer = true;
 
         UpdateStatusLevel();    //최초 1회 스탯 레벨 업데이트
