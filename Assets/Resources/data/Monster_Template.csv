@@ -1,7 +1,7 @@
 monsterId,name,hp,attack,gold
-1,Skeleton,35,1,30
+1,Skeleton,30,30,30
 2,mong ,1.4,2.141,45
 3,testMonster,,,
-4,SkeletonWarrior,150,15,200
-5,Zombie,50,3,50
-6,ZombieBoss,200,25,320
+4,SkeletonWarrior,150,45,200
+5,Zombie,50,50,50
+6,ZombieBoss,30000,7000,320

@@ -44,6 +44,9 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(double damageAmount)
     {
+        Debug.Log($"플레이어가 {damageAmount}만큼 피해를 입음.");
+        Debug.Log($"남은 체력 : {CurrentHp}");
+
         CurrentHp -= damageAmount;
 
         if (CurrentHp <= 0)
@@ -57,6 +60,11 @@ public class Player : MonoBehaviour
         playerController.SetCurrentPlayerState(PlayerState.Dead);
 
         Debug.Log("플레이어 사망");
+    }
+
+    public void SetPlayerDead()     //애니메이션 이벤트로 사용 중
+    {
+        MainScene.Instance.IsPlayerDead = true;
     }
 
     public void SetHeroStatus(int heroId)

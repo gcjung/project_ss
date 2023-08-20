@@ -14,9 +14,11 @@ public enum MonsterState
     Dead
 }
 
-public enum MonsterType
+public enum StageState
 {
-    Skeleton,
+    NormalWave,
+    BossRoom,
+    InfinityWave
 }
 
 public enum ItemType

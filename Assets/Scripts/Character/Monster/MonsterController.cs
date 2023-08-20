@@ -7,8 +7,8 @@ public class MonsterController : MonoBehaviour
 
     private Animator monsterAnimator;
 
-    private GameObject player;
-    private Player target;
+    private GameObject target;
+    private Player player;
 
     private Monster monster;
 
@@ -22,10 +22,10 @@ public class MonsterController : MonoBehaviour
     }
     void Start()
     {
-        player = GameObject.FindWithTag("Player");
-        if (player.gameObject.TryGetComponent<Player>(out var value))
+        target = GameObject.FindWithTag("Player");
+        if (target.gameObject.TryGetComponent<Player>(out var value))
         {
-            target = value;
+            player = value;
         }
     }
 
@@ -45,8 +45,12 @@ public class MonsterController : MonoBehaviour
                     ResetAllTriggers();
                     monsterAnimator.SetTrigger("Walk");
 
-                    transform.position = Vector3.MoveTowards(transform.position, player.transform.position, moveSpeed * Time.deltaTime);
-                    if (Mathf.Abs(Vector3.Distance(transform.position, player.transform.position)) <= attackRange)
+                    if (target == null)
+                        FindTarget();
+
+                    transform.position = Vector3.MoveTowards(transform.position, target.transform.position, moveSpeed * Time.deltaTime);
+
+                    if (Mathf.Abs(Vector3.Distance(transform.position, target.transform.position)) <= attackRange)
                     {
                         CurrentMonsterState = MonsterState.Attacking;
                     }
@@ -62,7 +66,7 @@ public class MonsterController : MonoBehaviour
                     ResetAllTriggers();
                     monsterAnimator.SetTrigger("Attack");
 
-                    if (Vector3.Distance(transform.position, player.transform.position) > attackRange)
+                    if (Vector3.Distance(transform.position, target.transform.position) > attackRange)
                     {
                         CurrentMonsterState = MonsterState.Moving;
                     }
@@ -87,11 +91,20 @@ public class MonsterController : MonoBehaviour
             return false;
     }
 
+    private void FindTarget()
+    {
+        target = GameObject.FindWithTag("Player");
+        if (target.gameObject.TryGetComponent<Player>(out var value))
+        {
+            player = value;
+        }
+    }
+
     public void GiveDamage()    //애니메이션 이벤트로 사용중!!!
     {
         if (PlayerController.CurrentPlayerState != PlayerState.Dead)
         {
-            target.TakeDamage(monster.Attack);
+            player.TakeDamage(monster.Attack);
         }
         else
         {

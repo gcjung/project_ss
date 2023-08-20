@@ -72,4 +72,14 @@ public class StageSlider : MonoBehaviour
         StopCoroutine(waveCoroutine);
         waveCoroutine = null;
     }
+
+    public void ResetSlider()
+    {
+        StopCoroutine(waveCoroutine);
+        waveCoroutine = null;
+
+        slider.value = 0.0f;
+
+        waveCoroutine = StartCoroutine(FilledSlider());
+    }
 }
