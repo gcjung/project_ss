@@ -5,28 +5,13 @@ using UnityEngine.UI;
 using TMPro;
 public class HpSlider : MonoBehaviour
 {
+    private IHpProvider hpProvider;
+
     private GameObject target;
     private Transform targetTransform;
 
-    public float sliderValue;
-    private float SliderValue
-    {
-        get { return sliderValue; }
-        set
-        {
-            sliderValue = value;
-            Debug.Log($"현재 체력 : {sliderValue}");
-
-            if (sliderValue <= 0)
-            {
-                Destroy(gameObject);
-            }            
-        }
-    }
-
     private Vector3 offset = new Vector3(0, -0.3f, 0);
     private Slider slider;
-    private RectTransform sliderRect;
     private TextMeshProUGUI hpText;
 
     private void Update()
@@ -41,21 +26,43 @@ public class HpSlider : MonoBehaviour
 
     public void SetTarget(GameObject _target)
     {
-        if (_target.TryGetComponent<Player>(out var player))
+        slider = GetComponent<Slider>();
+        slider.value = 1.0f;
+
+        target = _target;
+        targetTransform = _target.transform;      
+
+        if (transform.Find("Hp_Text").TryGetComponent<TextMeshProUGUI>(out var _hpText))
         {
-            slider = GetComponent<Slider>();
-            sliderRect = GetComponent<RectTransform>();
+            hpText = _hpText;
+        }
 
-            if (transform.Find("Hp_Text").TryGetComponent<TextMeshProUGUI>(out var _hpText))
-            {
-                hpText = _hpText;
-            }
+        if (_target.TryGetComponent<Player>(out var _player))
+        {
+            hpText.text = Util.BigNumCalculate(_player.CurrentHp);
+        }
+        else if (_target.TryGetComponent<Monster>(out var _monster))
+        {
+            hpText.text = Util.BigNumCalculate(_monster.CurrentHp);
+        }
 
-            target = _target;
-            targetTransform = _target.transform;
+        if (_target.TryGetComponent<IHpProvider>(out var _hpProvider))
+        {
+            this.hpProvider = _hpProvider;
+            this.hpProvider.OnHealthChanged += UpdateHealth;
+        }
+    }
 
-            sliderValue = (float)player.CurrentHp;
-            //sliderValue = (float)(player.CurrentHp / player.TotalHp);
+    private void UpdateHealth(double curHp, double maxHp)
+    {
+        slider.value = (float)(curHp / maxHp);
+        hpText.text = Util.BigNumCalculate(curHp);
+
+        if (curHp <= 0)
+        {
+            this.hpProvider.OnHealthChanged -= UpdateHealth;
+
+            Destroy(this.gameObject, 1.0f);
         }
     }
 }

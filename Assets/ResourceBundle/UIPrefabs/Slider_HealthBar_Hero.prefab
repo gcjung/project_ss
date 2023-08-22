@@ -105,7 +105,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3ef34c9b191d2b479c32e3e1b09ffef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sliderValue: 0
 --- !u!1 &1907263434869294143
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,7 +132,7 @@ RectTransform:
   m_GameObject: {fileID: 1907263434869294143}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
+  m_LocalScale: {x: 0.42729, y: 0.42729, z: 1.4243}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1907263434328913503}

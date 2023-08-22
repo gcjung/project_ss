@@ -138,6 +138,11 @@ public class MonsterSpawner : MonoBehaviour
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
+            var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+            hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
+            Vector3 hpBarScale = new Vector3(45f, 45f, 1f);
+            hpBar.transform.localScale = hpBarScale;
+
             MonsterCount--;
 
             if (MonsterCount == 0)
@@ -155,6 +160,11 @@ public class MonsterSpawner : MonoBehaviour
         _bossMonster.transform.localScale = bossMonster.transform.localScale;
         _bossMonster.transform.position = spawnPoint2.position;
         _bossMonster.GetComponent<Monster>().BossMonsterDied += FinishStage;
+
+        var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Boss", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+        hpBar.GetComponent<HpSlider>().SetTarget(_bossMonster.gameObject);
+        Vector3 hpBarScale = new Vector3(25f, 25f, 1f);
+        hpBar.transform.localScale = hpBarScale;
     }
 
     public IEnumerator InfinitySpawnMonster()

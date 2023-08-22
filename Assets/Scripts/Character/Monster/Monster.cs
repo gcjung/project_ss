@@ -4,11 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using static GameDataManager;
 
-public class Monster : MonoBehaviour
+public class Monster : MonoBehaviour, IHpProvider
 {
+    public event Action<double, double> OnHealthChanged;
     public string Name { get; private set; }
     public double MaxHp { get; private set; }
-    public double CurrentHp { get; private set; }
+    private double currentHp;
+    public double CurrentHp
+    {
+        get { return currentHp; }
+        private set
+        {
+            if (value >= MaxHp)
+            {
+                currentHp = MaxHp;
+            }
+            else if (value <= 0)
+            {
+                currentHp = 0;
+                MonsterDie();
+            }
+            else
+            {
+                currentHp = value;
+            }
+
+            OnHealthChanged?.Invoke(currentHp, MaxHp);
+        }
+    }
     public double Attack { get; private set; }
     public double DropGold { get; private set; }
 
@@ -54,11 +77,6 @@ public class Monster : MonoBehaviour
     public void TakeDamage(double damageAmount)
     {
         CurrentHp -= damageAmount;
-        
-        if (CurrentHp <= 0)
-        {
-            MonsterDie();
-        }
     }
 
     private void MonsterDie()

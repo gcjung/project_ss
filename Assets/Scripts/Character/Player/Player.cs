@@ -3,40 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using static GameDataManager;
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IHpProvider
 {
+    public event Action<double, double> OnHealthChanged;
     public double Attack { get; private set; }
     public double TotalAttack { get; private set; }
     public double AttackSpeed { get; private set; }
     public double TotalAttackSpeed { get; private set; }
     public double Critical { get; private set; }
     public double TotalCritical { get; private set; }
-    public double Hp { get; private set; }
+    public double Hp { get; private set; }  // 캐릭터 기본 체력
 
-    private double currentHp;
+    private double currentHp;   //캐릭터 현재 체력
     public double CurrentHp
     {
         get { return currentHp; }
         private set
         {
-            if (value > TotalHp)
+            if (value >= TotalHp)
             {
                 currentHp = TotalHp;
+            }
+            else if(value <= 0)
+            {
+                currentHp = 0;
+                PlayerDie();
             }
             else
             {
                 currentHp = value;
             }
+
+            OnHealthChanged?.Invoke(currentHp, TotalHp);
         }
     }
-    public double TotalHp { get; private set; }
+    public double TotalHp { get; private set; } //캐릭터 총합 체력
 
 
     private PlayerController playerController;
 
     private void Start()
-    {       
-        if(TryGetComponent<PlayerController>(out var controller))
+    {
+        if (TryGetComponent<PlayerController>(out var controller))
         {
             playerController = controller;
         }
@@ -48,11 +56,6 @@ public class Player : MonoBehaviour
         Debug.Log($"남은 체력 : {CurrentHp}");
 
         CurrentHp -= damageAmount;
-
-        if (CurrentHp <= 0)
-        {
-            PlayerDie();
-        }
     }
 
     private void PlayerDie()
@@ -113,7 +116,6 @@ public class Player : MonoBehaviour
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
                 CurrentHp = TotalHp;
-                Debug.Log($"All Status Updated2");
                 break;
         }       
     }
