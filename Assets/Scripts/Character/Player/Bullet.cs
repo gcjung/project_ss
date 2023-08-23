@@ -43,7 +43,7 @@ public class Bullet : MonoBehaviour
     {
         if (collision.TryGetComponent<Monster>(out var monster))
         {
-            Debug.Log($"{monster.Name}에게 {Damage}만큼 피해");
+            //Debug.Log($"{monster.Name}에게 {Damage}만큼 피해");
 
             monster.TakeDamage(Damage);
             gameObject.SetActive(false);

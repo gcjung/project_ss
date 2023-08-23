@@ -9,6 +9,22 @@ using static GameDataManager;
 
 public class SkillSlot : MonoBehaviour
 {
+    public enum SlotState
+    {
+        Lock,           // Ω∫≈≥ πÃ»πµÊ (¿·±Ë ªÛ≈¬)
+        Equipped,       // ¿Â¬¯¡ﬂ
+        Unequipped,     // πÃ¿Â¬¯¡ﬂ
+
+        IsUpgradeable,
+    }
+    // if (!druidStatus.state.HasFlag(MONSTER_STATE.Walk))
+
+    private SlotState slotState;
+    public SlotState State
+    {
+        get { return slotState; }
+        private set { slotState = value; }
+    }
     string skillID;
     bool isEquipped = false;
     bool isLocked = true;
@@ -46,6 +62,14 @@ public class SkillSlot : MonoBehaviour
 
     public void Init(string skillId)
     {
+        //SlotState slotTest = SlotState.Lock;
+        //Debug.Log($"{slotTest}, 111 : {slotTest.HasFlag(SlotState.IsUpgradeable)}");
+        //slotTest |= SlotState.IsUpgradeable;
+        //Debug.Log($"{slotTest}, 222 : {slotTest.HasFlag(SlotState.IsUpgradeable)}");
+        //Debug.Log($"{slotTest}, 333 : {slotTest.HasFlag(SlotState.Lock)}");
+        //slotTest = SlotState.Equipped;
+        //Debug.Log($"{slotTest}, 444 : {slotTest.HasFlag(SlotState.IsUpgradeable)}");
+
         skillID = skillId;
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
         var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
@@ -61,21 +85,28 @@ public class SkillSlot : MonoBehaviour
         transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
         transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {tartgetValue}";
         transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)tartgetValue;
-        
+        Debug.Log($"{skillId}, 111 : {State}");
         if(holdingCount >= tartgetValue)
         {
-            
+            State |= SlotState.IsUpgradeable;
             PossibleUpgrade(true);
             
         }
+        Debug.Log($"{skillId}, 2222 : {State}");
 
         // ∑π∫ß ≈ÿΩ∫∆Æ
         transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV {currentLevel}";
 
         if (currentLevel == 1 && holdingCount == 0)        // Ω∫≈≥ »πµÊ ∏¯«— ªÛ≈¬
+        {
+            State = SlotState.Lock;
+            Debug.Log($"{skillId},3333 : {State}");
             SetLock(true);
-        else        
+        }
+        else
+        {
             SetLock(false);
+        }
 
         // ¿Â¬¯¡ﬂ «•Ω√
         if (Array.IndexOf(equippedSkillData, skillId) >= 0)
