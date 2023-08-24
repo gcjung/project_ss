@@ -860,7 +860,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3825567841155688974
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1157,7 +1157,7 @@ GameObject:
   - component: {fileID: 3763500240229639991}
   - component: {fileID: 4453399312508613728}
   m_Layer: 5
-  m_Name: LevelUp_Image
+  m_Name: LevelUpArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

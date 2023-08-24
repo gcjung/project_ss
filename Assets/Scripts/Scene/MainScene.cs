@@ -542,9 +542,14 @@ public class MainScene : MonoBehaviour
                 });
 
                 skill_Icon.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() =>{
-                    //EquipSkill(slot, id);
-                    // 장비 상태에 따라 장착/해제 (수정예정)
-                    Debug.Log("간편장착버튼 누름@@@");
+                    if (slot.State.HasFlag(SkillSlotState.Equipped))
+                    {
+                        UnequipSkill(slot, id);
+                    }
+                    else
+                    {
+                        EquipSkill(slot, id);
+                    }
                 });
 
             }
@@ -559,7 +564,6 @@ public class MainScene : MonoBehaviour
             equippedSkill_Image[i] = equippedSkillGroup.GetChild(i).GetComponent<Image>();
 
         // 장착중인 스킬
-        
         for (int i = 0; i < equippedSkillData.Length; i++)
         {
             if (string.IsNullOrEmpty(equippedSkillData[i]))
@@ -604,20 +608,17 @@ public class MainScene : MonoBehaviour
         SkillDetail_Popup.Find("DescBG/Desc_Text").GetComponent<TMP_Text>().text = desc;
         SkillDetail_Popup.Find("DescBG/CoolTime_Text").GetComponent<TMP_Text>().text = $"{cooltime}초";
 
-        // 유저 스킬 데이터
-        var skillObtainCountData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
-
-        string[] skillData = skillObtainCountData[int.Parse(skillId) - 1].Split(',');
-        int level = int.Parse(skillData[0]);    // 스킬 레벨
-        int currentValue = int.Parse(skillData[1]);    // 보유 갯수
-
+        int level = slot.CurrentLevel;
+        int currentValue = slot.HoldingCount;
         int requireQuantity = int.Parse(LevelTemplate[level.ToString()][(int)LevelTemplate_.RequiredQuantity]);
-        Debug.Log($"{level}, currentValue : {currentValue}");
+        
+        SkillDetail_Popup.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {level}";
         SkillDetail_Popup.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{currentValue}";
         SkillDetail_Popup.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {requireQuantity}";
         SkillDetail_Popup.Find("Slider").GetComponent<Slider>().value = currentValue / (float)requireQuantity;
 
-        if (slot.IsLocked)
+        //if (slot.IsLocked)
+        if (slot.State == SkillSlotState.Lock)
         {
             SkillDetail_Popup.Find("EquipButton/ButtonImage").GetComponent<Image>().color = Color.gray;// new Color(87f / 255f, 87f / 255f, 87f / 255f, 1);
             SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.gray;
@@ -627,7 +628,8 @@ public class MainScene : MonoBehaviour
         }
         else
         {
-            if (slot.IsUpgradeable)
+            //if (slot.IsUpgradeable)
+            if (slot.State.HasFlag(SkillSlotState.Upgradeable))
             {
                 SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().interactable = true;
                 SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.white;
@@ -642,7 +644,8 @@ public class MainScene : MonoBehaviour
             SkillDetail_Popup.Find("EquipButton/ButtonImage").GetComponent<Image>().color = Color.white;
         }
 
-        if (slot.IsEqiupped)
+        //if (slot.IsEqiupped)
+        if (slot.State.HasFlag(SkillSlotState.Equipped))
             SkillDetail_Popup.Find("EquipButton/Text").GetComponent<TMP_Text>().text = "해제";
         else
             SkillDetail_Popup.Find("EquipButton/Text").GetComponent<TMP_Text>().text = "장착";
@@ -650,7 +653,8 @@ public class MainScene : MonoBehaviour
         SkillDetail_Popup.Find("EquipButton").GetComponent<Button>().onClick.RemoveAllListeners();
         SkillDetail_Popup.Find("EquipButton").GetComponent<Button>().onClick.AddListener(() =>
         {
-            if (slot.IsEqiupped)    // 장착중 -> 해제버튼
+            //if (slot.IsEqiupped)    // 장착중 -> 해제버튼
+            if (slot.State.HasFlag(SkillSlotState.Equipped))    // 장착중 -> 해제버튼
                 UnequipSkill(slot, skillId);
             else                    // 미장착중 -> 장착버튼
                 EquipSkill(slot, skillId);
@@ -659,12 +663,8 @@ public class MainScene : MonoBehaviour
         SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().onClick.RemoveAllListeners();
         SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().onClick.AddListener(() =>
         {
-            Debug.Log("강화버튼입니다!!!!");
-
             UpgradeSkill(slot,skillId);
         });
-
-        
     }
     
     void UpgradeSkill(SkillSlot slot, string skillId)
@@ -677,10 +677,6 @@ public class MainScene : MonoBehaviour
 
         SkillDetail_Popup.gameObject.SetActive(false);
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData,string.Join('@', userSkillData));
-        //string[] skillData = userSkillData[int.Parse(skillId) - 1].Split(',');
-        //currentLevel = int.Parse(skillData[0]);    // 스킬 레벨
-        //holdingCount = int.Parse(skillData[1]);    // 보유 갯수
-
     }
     void EquipSkill(SkillSlot slot, string skillId)
     {
@@ -688,6 +684,7 @@ public class MainScene : MonoBehaviour
         Image[] equippedSkill_Image = new Image[equippedSkillGroup.childCount];
         for (int j = 0; j < equippedSkillGroup.childCount; j++)
             equippedSkill_Image[j] = equippedSkillGroup.GetChild(j).GetComponent<Image>();
+
         Debug.Log("장착");
         var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
         bool isEmpty = false;
@@ -706,12 +703,10 @@ public class MainScene : MonoBehaviour
                 string spriteName = iconDatas[0];
                 string atlasName = iconDatas[1];
 
-                slot.SetEquip(true);
-                //obj.transform.Find("Equip_Text").gameObject.SetActive(true);
-                //obj.transform.Find("Image").GetComponent<Image>().color = new Color(1, 1, 1, 100f / 255f);
+                slot.State |= SkillSlotState.Equipped;
+                slot.SetSlot(slot.State);
 
                 Sprite sp = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
-
                 lobbySkillImage[i].sprite = sp;
                 equippedSkill_Image[i].sprite = sp;
                 
@@ -724,8 +719,10 @@ public class MainScene : MonoBehaviour
         {
 
         }
+        
+        if (SkillDetail_Popup)
+            SkillDetail_Popup.gameObject.SetActive(false);
 
-        SkillDetail_Popup.gameObject.SetActive(false);
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkill));
     }
 
@@ -751,11 +748,12 @@ public class MainScene : MonoBehaviour
                 break;
             }
         }
-        slot.SetEquip(false);
-        //obj.transform.Find("Equip_Text").gameObject.SetActive(false);
-        //obj.transform.Find("Image").GetComponent<Image>().color = Color.white;
+        slot.State &= ~SkillSlotState.Equipped;
+        slot.SetSlot(slot.State);
+;
+        if (SkillDetail_Popup)
+            SkillDetail_Popup.gameObject.SetActive(false);
 
-        SkillDetail_Popup.gameObject.SetActive(false);
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkillData));
     }
     void OpenUI_Category4(GameObject clickButton)

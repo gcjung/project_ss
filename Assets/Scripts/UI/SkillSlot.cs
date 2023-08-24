@@ -1,51 +1,32 @@
 using DG.Tweening;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static GameDataManager;
+public enum SkillSlotState
+{
+    None = 0,
+    Lock = 1 << 0,          // 스킬 미획득 (잠김 상태)
+    Equipped = 1 << 1,      // 장착중
+    //Unequipped = 1 << 2,  // 미장착중
+
+    Upgradeable = 1 << 2,   // 업그레이드 가능
+}
 
 public class SkillSlot : MonoBehaviour
 {
-    public enum SlotState
-    {
-        Lock,           // 스킬 미획득 (잠김 상태)
-        Equipped,       // 장착중
-        Unequipped,     // 미장착중
-
-        IsUpgradeable,
-    }
-    // if (!druidStatus.state.HasFlag(MONSTER_STATE.Walk))
-
-    private SlotState slotState;
-    public SlotState State
+    private SkillSlotState slotState;
+    public SkillSlotState State
     {
         get { return slotState; }
-        private set { slotState = value; }
+        set { slotState = value; }
     }
     string skillID;
-    bool isEquipped = false;
-    bool isLocked = true;
-    bool isUpgradeable = false;
-  
-    public bool IsEqiupped
-    {
-        get { return isEquipped; }
-    }
-    public bool IsLocked
-    {
-        get { return isLocked; }
-    }
-    public bool IsUpgradeable
-    {
-        get { return isUpgradeable; }
-    }
 
     int currentLevel = 0;
     int holdingCount = 0;
-    int tartgetValue = 0;
+    int targetValue = 0;
     public int CurrentLevel
     {
         get { return currentLevel; }
@@ -54,65 +35,41 @@ public class SkillSlot : MonoBehaviour
     {
         get { return holdingCount; }
     }
-    public int TartgetValue
-    {
-        get { return tartgetValue; }
-    }
-
 
     public void Init(string skillId)
     {
-        //SlotState slotTest = SlotState.Lock;
-        //Debug.Log($"{slotTest}, 111 : {slotTest.HasFlag(SlotState.IsUpgradeable)}");
-        //slotTest |= SlotState.IsUpgradeable;
-        //Debug.Log($"{slotTest}, 222 : {slotTest.HasFlag(SlotState.IsUpgradeable)}");
-        //Debug.Log($"{slotTest}, 333 : {slotTest.HasFlag(SlotState.Lock)}");
-        //slotTest = SlotState.Equipped;
-        //Debug.Log($"{slotTest}, 444 : {slotTest.HasFlag(SlotState.IsUpgradeable)}");
-
         skillID = skillId;
+
+        RectTransform upArrowMark = transform.Find("LevelUpArrow").GetComponent<RectTransform>();
+        upArrowMark.DOLocalMoveY(-10, 0.4f).SetLoops(-1, LoopType.Yoyo);
+
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
         var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
-        //Debug.Log($"{GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillObtainCount)}, skillId : {skillId}");
 
         string[] skillData = userSkillData[int.Parse(skillId)-1].Split(',');
         currentLevel = int.Parse(skillData[0]);    // 스킬 레벨
         holdingCount = int.Parse(skillData[1]);    // 보유 갯수
-
-        tartgetValue = int.Parse(LevelTemplate[currentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        
+        targetValue = int.Parse(LevelTemplate[currentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
 
         // 보유갯수
         transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
-        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {tartgetValue}";
-        transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)tartgetValue;
-        Debug.Log($"{skillId}, 111 : {State}");
-        if(holdingCount >= tartgetValue)
-        {
-            State |= SlotState.IsUpgradeable;
-            PossibleUpgrade(true);
-            
-        }
-        Debug.Log($"{skillId}, 2222 : {State}");
+        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+        transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
 
-        // 레벨 텍스트
+        // 스킬 획득 못한 상태 (잠금)
+        if (currentLevel == 1 && holdingCount == 0)
+            State = SkillSlotState.Lock;
+
+        // 업그레이드 가능
+        if (holdingCount >= targetValue)
+            State |= SkillSlotState.Upgradeable;
+
         transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV {currentLevel}";
-
-        if (currentLevel == 1 && holdingCount == 0)        // 스킬 획득 못한 상태
-        {
-            State = SlotState.Lock;
-            Debug.Log($"{skillId},3333 : {State}");
-            SetLock(true);
-        }
-        else
-        {
-            SetLock(false);
-        }
 
         // 장착중 표시
         if (Array.IndexOf(equippedSkillData, skillId) >= 0)
-            SetEquip(true);
-        else if(!isLocked)
-            SetEquip(false);
+            State |= SkillSlotState.Equipped;
 
         string grade = SkillTemplate[skillId][(int)SkillTemplate_.Grade];
         string icon = SkillTemplate[skillId][(int)SkillTemplate_.Icon];
@@ -125,79 +82,70 @@ public class SkillSlot : MonoBehaviour
         string spriteName = iconDatas[0];
         string atlasName = iconDatas[1];
         transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
-         
-        
-        //new Color(87f/255f, 87f/255f, 87f/255f, 1);
-    }
-    void PossibleUpgrade(bool isPossible)
-    {
-        if (isPossible)
-        {
-            isUpgradeable = true;
 
-            transform.Find("Slider/Fill Area/Fill").GetComponent<Image>().color = Color.yellow;
-            RectTransform upArrowMark = transform.Find("LevelUp_Image").GetComponent<RectTransform>();
-            // category2_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
-            //sequence = DOTween.Sequence()
-            //.OnStart(() => { t.DOAnchorPosY(-20, 0.4f).SetLoops(-1, LoopType.Yoyo); });
-            upArrowMark.DOAnchorPosY(-20, 0.4f).SetLoops(-1, LoopType.Yoyo);
-            upArrowMark.gameObject.SetActive(true);
-        }
-        else 
+        SetSlot(State);
+    }
+    public void SetSlot(SkillSlotState State)
+    {
+        //Debug.Log($"@@ : {State}, lock : {State.HasFlag(SkillSlotState.Lock)}, equip : {State.HasFlag(SkillSlotState.Equipped)}");
+        Button equipButton = transform.Find("UpperRightImage").GetComponent<Button>();
+
+        if(State == SkillSlotState.Lock)
         {
-            isUpgradeable = false;
+            equipButton.interactable = false;
+            transform.Find("UpperRightImage/Equip").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas("btn_icon_lock_2", "SkillAtlas");
+            transform.Find("Equip_Text").gameObject.SetActive(false);
+            Debug.Log("락입니다");
+            transform.Find("Image").GetComponent<Image>().color = Util.skillSlot_Lock_Color;
+        }
+        else if(State.HasFlag(SkillSlotState.Equipped))
+        {
+            equipButton.interactable = true;
+            transform.Find("UpperRightImage/Equip").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas("icon_white_close", "SkillAtlas");
+            transform.Find("Equip_Text").gameObject.SetActive(true);
+            Debug.Log("장착입니다");
+            transform.Find("Image").GetComponent<Image>().color = Util.skillSlot_Equip_Color;
+        }
+        else
+        {
+            equipButton.interactable = true;
+            transform.Find("UpperRightImage/Equip").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas("btn_icon_plus", "SkillAtlas");
+            transform.Find("Equip_Text").gameObject.SetActive(false);
+            Debug.Log("해제입니다");
+            transform.Find("Image").GetComponent<Image>().color = Util.skillSlot_Unequip_Color;
+        }
+
+        if(State.HasFlag(SkillSlotState.Upgradeable))
+        {
+            Debug.Log("업글 가능!!!!");
+            transform.Find("Slider/Fill Area/Fill").GetComponent<Image>().color = Color.yellow;
+            transform.Find("LevelUpArrow").gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("업글 불가@@@");
             transform.Find("Slider/Fill Area/Fill").GetComponent<Image>().color = Color.cyan;
-            transform.Find("LevelUp_Image").gameObject.SetActive(false);
+            transform.Find("LevelUpArrow").gameObject.SetActive(false);
         }
     }
+
     public void UpgradeSkill()
     {
-        // 1,2@2,3@1,0 테스트용 
-        PossibleUpgrade(false);
         currentLevel += 1;
-        holdingCount -= tartgetValue;
+        holdingCount -= targetValue;
 
         transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
         transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV {currentLevel}";
 
-        tartgetValue = int.Parse(LevelTemplate[currentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        targetValue = int.Parse(LevelTemplate[currentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
 
-        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {tartgetValue}";
-        transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)tartgetValue;
+        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+        transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+
+        if(holdingCount < targetValue)      // 보유개수가 레벨업 조건개수보다 적으면
+            State &= ~SkillSlotState.Upgradeable;
+
+        SetSlot(State);
     }
-    public void SetLock(bool isLock)
-    {
-        Button equipButton = transform.Find("UpperRightImage").GetComponent<Button>();
-        if (isLock)     // 잠금 (스킬 획득전)
-        {
-            isLocked = true;
-            equipButton.interactable = false;
-            transform.Find("Equip_Text").gameObject.SetActive(false);
-            transform.Find("UpperRightImage/Lock").gameObject.SetActive(true);
-            transform.Find("Image").GetComponent<Image>().color = new Color(100f/255f, 100f/255f, 100f/255f, 100f/255f);
-        }
-        else
-        {
-            isLocked = false;
-            equipButton.interactable = true;
-            transform.Find("Equip_Text").gameObject.SetActive(false);
-            transform.Find("UpperRightImage/Lock").gameObject.SetActive(false);
-            transform.Find("Image").GetComponent<Image>().color = Color.white;
-        }
-    }
-    public void SetEquip(bool isEquip)
-    {
-        if (isEquip)    // 간편 장착/해제버튼 수정예정 스프라이트를 돌려쓸까?
-        {
-            isEquipped = true;
-            transform.Find("Equip_Text").gameObject.SetActive(true);
-            transform.Find("Image").GetComponent<Image>().color = new Color(1, 1, 1, 100f / 255f);
-        }
-        else
-        {
-            isEquipped = false;
-            transform.Find("Equip_Text").gameObject.SetActive(false);
-            transform.Find("Image").GetComponent<Image>().color = Color.white;
-        }
-    }
+
 }

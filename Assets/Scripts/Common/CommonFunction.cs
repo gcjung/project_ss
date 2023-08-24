@@ -27,7 +27,7 @@ public class CommonFunction : MonoBehaviour
     //        dic[prefabName] = newObj;
     //    }
     //}
-    
+
     public static void LoadPrefab(string prefabName)
     {
         if (!prefabsPool.ContainsKey(prefabName))

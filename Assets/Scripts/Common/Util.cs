@@ -8,6 +8,14 @@ using TMPro;
 
 public class Util
 {
+    public static Color skillSlot_Equip_Color = new Color(1, 1, 1, 100f / 255f);
+    public static Color skillSlot_Unequip_Color = Color.white;
+    public static Color skillSlot_Lock_Color = new Color(100f / 255f, 100f / 255f, 100f / 255f, 100f / 255f);
+
+    //colorDic.Add("skillSlot_Equip", new Color(1, 1, 1, 100f / 255f));
+    //    colorDic.Add("skillSlot_Unequip", Color.white);
+    //    colorDic.Add("skillSlot_Lock", new Color(100f / 255f, 100f / 255f, 100f / 255f, 100f / 255f));
+
     public static void ChangeLayer(GameObject obj, int layer)
     {
         obj.layer = layer;

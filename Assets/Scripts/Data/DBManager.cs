@@ -241,8 +241,8 @@ public class DBManager : Manager<DBManager>
             for (int i = 0; i < temp.Length; i++)
             {
                 int skillLevel = 1;
-                int obtainCount = 0;
-                temp[i] = $"{skillLevel},{obtainCount}";
+                int holdingCount = 0;
+                temp[i] = $"{skillLevel},{holdingCount}";
             }
 
             GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', temp));
@@ -254,8 +254,8 @@ public class DBManager : Manager<DBManager>
             for (int i = skillObtainCountData.Length; i < temp.Length; i++)
             {
                 int skillLevel = 1;
-                int obtainCount = 0;
-                temp[i] = $"{skillLevel},{obtainCount}";
+                int holdingCount = 0;
+                temp[i] = $"{skillLevel},{holdingCount}";
             }
 
             skillObtainCountData.CopyTo(temp, 0);
