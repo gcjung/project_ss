@@ -1,8 +1,9 @@
 ﻿skill_ID,grade,name,order,cooltime,damage,icon,desc
-1,일반,애로우 블로우,1,5,150,Arrow_Barrage/SkillAtlas,화살을 여러발 발사합니다. 
-2,고급,피어싱,2,10,200,Beam/SkillAtlas,빔을 발사합니다. 한 번에 강한 데미지를 입힙니다.
-3,희귀,블랙홀,3,12,250,Blackhole/SkillAtlas,강력한 블랙홀 입니다. 지속적인 데미지를 입힙니다.
-4,영웅,,4,,,,
-5,전설,,5,,,,
+1,커먼,애로우 블로우,1,5,150,Arrow_Barrage/SkillAtlas,화살을 여러발 발사합니다. 
+2,언커먼,피어싱,3,10,200,Beam/SkillAtlas,빔을 발사합니다. 한 번에 강한 데미지를 입힙니다.
+3,레어,블랙홀,4,12,250,Blackhole/SkillAtlas,강력한 블랙홀 입니다. 지속적인 데미지를 입힙니다.
+4,에픽,할퀴기,5,12,400,Claw/SkillAtlas,전방으로 할퀴기를 사용합니다. 강력한 데미지를 입힙니다.
+5,커먼,피스트 인레이지,2,7,180,Punches/SkillAtlas,전방으로 주먹을 날립니다. 연속으로 데미지를 입힙니다.
+5,레전더리,,5,,,,
 6,신화,,6,,,,
-7,transcendence,,7,,,,
+7,초월,,7,,,,

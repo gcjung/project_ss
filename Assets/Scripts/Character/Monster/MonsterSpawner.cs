@@ -174,31 +174,31 @@ public class MonsterSpawner : MonoBehaviour
     {
         if (Mathf.Approximately(value, 0.2f) && WaveCount == 0)
         {
-            Debug.Log("웨이브1 실행");
+            //Debug.Log("웨이브1 실행");
             WaveCount++;    // 1
             StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 0.4f) && WaveCount == 1)
         {
-            Debug.Log("웨이브2 실행");
+            //Debug.Log("웨이브2 실행");
             WaveCount++;    // 2
             StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 0.6f) && WaveCount == 2)
         {
-            Debug.Log("웨이브3 실행");
+            //Debug.Log("웨이브3 실행");
             WaveCount++;    // 3
             StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 0.8f) && WaveCount == 3)
         {
-            Debug.Log("웨이브4 실행");
+            //Debug.Log("웨이브4 실행");
             WaveCount++;    // 4
             StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 1.0f) && WaveCount == 4)
         {
-            Debug.Log("웨이브5 실행");
+            //Debug.Log("웨이브5 실행");
             WaveCount++;    // 5
             FinishWave();
         }

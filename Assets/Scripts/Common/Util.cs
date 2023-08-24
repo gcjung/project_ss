@@ -94,22 +94,22 @@ public class Util
 
     public static Color ConvertGradeToColor(string grade)
     {
-        if (grade == "일반")
+        switch(grade)
         {
-            return Color.white;
+            case "커먼":
+                return Color.white;
+            case "언커먼":
+                return Color.green;
+            case "레어":
+                return Color.cyan;
+            case "에픽":
+                return Color.magenta;
+            case "레전더리":
+                return Color.red;
+            default:
+                return Color.black;
         }
-        else if (grade == "고급")
-        {
-            return Color.green;
-        }
-        else if (grade == "희귀")
-        {
-            return Color.cyan;
-        }
-        else
-        {
-            return Color.red;
-        }
+
     }
 
     // Text에 숫자가 자연스럽게 올라가는 함수

@@ -73,7 +73,7 @@ public class DBManager : Manager<DBManager>
     }
     public override void InitializedFininsh()
     {
-        SetDB_SkillObtainedCount();
+        SetDB_SkillAcquireData();
     }
     async void LoadGameData()
     {
@@ -230,38 +230,35 @@ public class DBManager : Manager<DBManager>
         return default;
     }
 
-    void SetDB_SkillObtainedCount() 
+    void SetDB_SkillAcquireData() 
     {
-        var skillObtainCountData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+        var skillAcquireData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
 
-        //Debug.Log($"skillObtainCount.Length : {skillObtainCountData.Length}, SkillTemplate.Count : {SkillTemplate.Count}");
-        if (skillObtainCountData.Length == 1)       // skillObtainCountData가 없을 경우
+        if (skillAcquireData.Length == 1)           // skillAcquireData 없을 경우
         {
-            string[] temp = new string[SkillTemplate.Count];
-            for (int i = 0; i < temp.Length; i++)
+            string[] skillData = new string[SkillTemplate.Count];
+            for (int i = 0; i < skillData.Length; i++)
             {
                 int skillLevel = 1;
                 int holdingCount = 0;
-                temp[i] = $"{skillLevel},{holdingCount}";
+                skillData[i] = $"{skillLevel},{holdingCount}";
             }
 
-            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', temp));
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', skillData));
         }
-        else if (skillObtainCountData.Length < SkillTemplate.Count)   // 템플릿에 새로운 테이블 추가됐을 경우
+        else if (skillAcquireData.Length < SkillTemplate.Count)   // 템플릿에 새로운 테이블 추가됐을 경우
         {
-            //Debug.Log($"@@@");
-            string[] temp = new string[SkillTemplate.Count];
-            for (int i = skillObtainCountData.Length; i < temp.Length; i++)
+            string[] skillData = new string[SkillTemplate.Count];
+            for (int i = 0; i < skillData.Length; i++)
             {
                 int skillLevel = 1;
                 int holdingCount = 0;
-                temp[i] = $"{skillLevel},{holdingCount}";
+                skillData[i] = $"{skillLevel},{holdingCount}";
             }
 
-            skillObtainCountData.CopyTo(temp, 0);
-            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', temp));
+            skillAcquireData.CopyTo(skillData, 0);
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', skillData));
         }
-        //Debug.Log("test : " + GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillObtainCount));
     }
 
     #region 제네릭 버전
