@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using static GameDataManager;
-using static SOGamdData;
 
 [FirestoreData]
 public class UserDatas

@@ -17,8 +17,7 @@ public class SkillSlot : MonoBehaviour
     private SkillSlotState slotState;
     public SkillSlotState State
     {
-        get { return slotState; }
-        set { slotState = value; }
+        get; set;
     }
     string skillID;
 
