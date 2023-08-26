@@ -314,7 +314,7 @@ public class MainScene : MonoBehaviour
             //fadeImage.transform.SetAsFirstSibling();
             _fadeImage.DOFade(1f, fadeInTime).OnComplete(() =>
             {
-                Destroy(_fadeImage);
+                Destroy(_fadeImage.gameObject);
                 StartCoroutine(BossBattle());
             });
         }
@@ -362,7 +362,7 @@ public class MainScene : MonoBehaviour
         _victoryText.DOFade(0f, fadeTime).OnComplete(() =>
         {
             StageClear2();
-            Destroy(_victoryText);
+            Destroy(_victoryText.gameObject);
         }));
     }
     private void StageClear2()
@@ -371,7 +371,7 @@ public class MainScene : MonoBehaviour
         float movingTime = 3.0f;
 
         var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
-        _fadeImage.DOFade(1f, durationTime).OnComplete(() => Destroy(_fadeImage));
+        _fadeImage.DOFade(1f, durationTime).OnComplete(() => Destroy(_fadeImage.gameObject));
 
         playerCharacter.transform.DOMove(movePoint.position, movingTime).OnComplete(() => StageClear3());
     }
