@@ -7,10 +7,7 @@ using DG.Tweening;
 using static GameDataManager;
 using Unity.VisualScripting;
 using UnityEngine.EventSystems;
-using UnityEngine.Events;
-using System;
 using System.Linq;
-using UnityEditor;
 
 public class MainScene : MonoBehaviour
 {
@@ -123,9 +120,11 @@ public class MainScene : MonoBehaviour
     [SerializeField] private GameObject mainUiPanel;
     private TMP_Text goldText;
     private TMP_Text gemText;
-    private Image[] skillSprite = null;
+    private Image[] lobbySkillImage = null;
     private RectTransform category1_UI = null;  // 캐릭터, 장비
     private RectTransform category2_UI = null;  //장비
+    private Transform SkillDetail_Popup = null;
+
     private GameObject popupUI_0 = null;
     private GameObject popupUI_1 = null;
     private IEnumerator Start()
@@ -164,9 +163,9 @@ public class MainScene : MonoBehaviour
 
         var skillPanel = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel");
         
-        skillSprite = new Image[skillPanel.childCount -1];
+        lobbySkillImage = new Image[skillPanel.childCount -1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
-            skillSprite[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
+            lobbySkillImage[i] = skillPanel.GetChild(i+1).GetComponent<Image>();
         
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
@@ -200,7 +199,7 @@ public class MainScene : MonoBehaviour
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
         playerCharacter.AddComponent<PlayerController>();
-        playerCharacter.AddComponent<SkillController>();
+
         playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
         
         IsPlayer = true;
@@ -214,7 +213,7 @@ public class MainScene : MonoBehaviour
     }
     public void SetStage(int stageId)
     {
-        Debug.Log($"현재 스테이지ID : {stageId}");
+        //Debug.Log($"현재 스테이지ID : {stageId}");
 
         if (stageText != null)
             Destroy(stageText.gameObject);
@@ -231,19 +230,19 @@ public class MainScene : MonoBehaviour
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
     }
-    public void SetSkill(string[] equipedSkill)
+    public void SetSkill(string[] equippedSkill)
     {
-        for (int i = 0; i < equipedSkill.Length; i++)
+        for (int i = 0; i < equippedSkill.Length; i++)
         {
-            if (string.IsNullOrEmpty(equipedSkill[i]))
+            if (string.IsNullOrEmpty(equippedSkill[i]))
                 continue;
 
-            string icon = SkillTemplate[equipedSkill[i]][(int)SkillTemplate_.Icon];
+            string icon = SkillTemplate[equippedSkill[i]][(int)SkillTemplate_.Icon];
 
             string[] iconDatas = icon.Split('/');
             string spriteName = iconDatas[0];
             string atlasName = iconDatas[1];
-            skillSprite[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+            lobbySkillImage[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
         }
     }
 
@@ -295,7 +294,8 @@ public class MainScene : MonoBehaviour
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
 
-        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill,"@@@@@").Split('@');
+
         SetSkill(equippedSkill);    // 스킬 세팅
     }
 
@@ -303,7 +303,7 @@ public class MainScene : MonoBehaviour
     {
         if (isWaveClear)
         {
-            Debug.Log("보스방 입장");
+            //Debug.Log("보스방 입장");
             IsWaveClear = false;
 
             SetCurrentStageState(StageState.BossRoom);
@@ -437,6 +437,9 @@ public class MainScene : MonoBehaviour
             case 1:
                 OpenUI_Category2(onClickButton);
                 break;
+            case 4:
+                OpenUI_Category4(onClickButton);
+                break;
 
             default:
                 break;
@@ -518,82 +521,254 @@ public class MainScene : MonoBehaviour
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
     }
+    
 
     void ShowUI_Skill(bool isFirst = false)
     {
+        var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+
         if (isFirst)        // 최초 1회만 실행
         {
-            // 스킬 목록
             Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
             Util.InitGrid(grid);
             foreach (var item in SkillTemplate.OrderBy(x => x.Value[(int)SkillTemplate_.Order]))
             {
-                var skill_Icon = CommonFunction.GetPrefab("Skill_Icon", grid);
-
+                string id = item.Value[(int)SkillTemplate_.SkillId];
                 string grade = item.Value[(int)SkillTemplate_.Grade];
                 string icon = item.Value[(int)SkillTemplate_.Icon];
 
-                skill_Icon.GetComponent<Image>().color = ConvertGradeToColor(grade);
-                string[] iconDatas = icon.Split('/');
-                string spriteName = iconDatas[0];
-                string atlasName = iconDatas[1];
-                skill_Icon.transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+                GameObject skill_Icon = CommonFunction.GetPrefab("SkillSlot", grid);
+                SkillSlot slot = skill_Icon.AddComponent<SkillSlot>();
+                slot.Init(id);
 
-                skill_Icon.GetComponent<Button>().onClick.AddListener(() =>
-                {
-                    var skill_Icon = CommonFunction.GetPrefab("Skill_Detail", popupUI_1.transform);
-
+                // 스킬 아이콘 선택 시 (상세보기)
+                skill_Icon.GetComponent<Button>().onClick.AddListener(() => {
+                    OpenUI_SkillDetail(slot, id);
                 });
 
+                skill_Icon.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() =>{
+                    //EquipSkill(slot, id);
+                    // 장비 상태에 따라 장착/해제 (수정예정)
+                    Debug.Log("간편장착버튼 누름@@@");
+                });
 
             }
         }
+        
+        category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
+        category1_UI.Find("Type1_Character").gameObject.SetActive(false);
+
+        Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
+        Image[] equippedSkill_Image = new Image[equippedSkillGroup.childCount];
+        for (int i = 0; i < equippedSkillGroup.childCount; i++)
+            equippedSkill_Image[i] = equippedSkillGroup.GetChild(i).GetComponent<Image>();
+
+        // 장착중인 스킬
+        
+        for (int i = 0; i < equippedSkillData.Length; i++)
+        {
+            if (string.IsNullOrEmpty(equippedSkillData[i]))
+                continue;
+
+            string icon = SkillTemplate[equippedSkillData[i]][(int)SkillTemplate_.Icon];
+
+            string[] iconDatas = icon.Split('/');
+            string spriteName = iconDatas[0];
+            string atlasName = iconDatas[1];
+            equippedSkill_Image[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+        }
+
+
+    }
+    void OpenUI_SkillDetail(SkillSlot slot, string skillId)
+    {
+        if (SkillDetail_Popup == null)
+            SkillDetail_Popup = CommonFunction.GetPrefab("SkillDetailPopup", popupUI_1.transform).transform;
+        else
+            SkillDetail_Popup.gameObject.SetActive(true);
+        
+        DOTween.Sequence()
+       .OnStart(() =>{ SkillDetail_Popup.transform.localScale = Vector3.zero;})
+       .Append(SkillDetail_Popup.transform.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+
+        //string id = SkillTemplate[skillId][(int)SkillTemplate_.SkillId];
+        string skillName = SkillTemplate[skillId][(int)SkillTemplate_.Name];
+        string grade = SkillTemplate[skillId][(int)SkillTemplate_.Grade];
+        string icon = SkillTemplate[skillId][(int)SkillTemplate_.Icon];
+        string desc = SkillTemplate[skillId][(int)SkillTemplate_.Desc];
+        string cooltime = SkillTemplate[skillId][(int)SkillTemplate_.Cooltime];
+
+        string[] iconDatas = icon.Split('/');
+        string spriteName = iconDatas[0];
+        string atlasName = iconDatas[1];
+
+        SkillDetail_Popup.Find("Icon").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+        SkillDetail_Popup.Find("SkillName_Text").GetComponent<TMP_Text>().text = skillName;
+        SkillDetail_Popup.Find("Grade_Text").GetComponent<TMP_Text>().color = Util.ConvertGradeToColor(grade);
+        SkillDetail_Popup.Find("Grade_Text").GetComponent<TMP_Text>().text = grade;
+        SkillDetail_Popup.Find("DescBG/Desc_Text").GetComponent<TMP_Text>().text = desc;
+        SkillDetail_Popup.Find("DescBG/CoolTime_Text").GetComponent<TMP_Text>().text = $"{cooltime}초";
+
+        // 유저 스킬 데이터
+        var skillObtainCountData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+        string[] skillData = skillObtainCountData[int.Parse(skillId) - 1].Split(',');
+        int level = int.Parse(skillData[0]);    // 스킬 레벨
+        int currentValue = int.Parse(skillData[1]);    // 보유 갯수
+
+        int requireQuantity = int.Parse(LevelTemplate[level.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        Debug.Log($"{level}, currentValue : {currentValue}");
+        SkillDetail_Popup.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{currentValue}";
+        SkillDetail_Popup.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {requireQuantity}";
+        SkillDetail_Popup.Find("Slider").GetComponent<Slider>().value = currentValue / (float)requireQuantity;
+
+        if (slot.IsLocked)
+        {
+            SkillDetail_Popup.Find("EquipButton/ButtonImage").GetComponent<Image>().color = Color.gray;// new Color(87f / 255f, 87f / 255f, 87f / 255f, 1);
+            SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.gray;
+
+            SkillDetail_Popup.Find("EquipButton").GetComponent<Button>().interactable = false;
+            SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().interactable = false;
+        }
         else
         {
-            category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
-            category1_UI.Find("Type1_Character").gameObject.SetActive(false);
-
-            Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
-            Image[] equippedSkill_Image = new Image[equippedSkillGroup.childCount];
-            for (int i = 0; i < equippedSkillGroup.childCount; i++)
-                equippedSkill_Image[i] = equippedSkillGroup.GetChild(i).GetComponent<Image>();
-
-            var userEquippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
-            for (int i = 0; i < userEquippedSkillData.Length; i++)
+            if (slot.IsUpgradeable)
             {
-                if (string.IsNullOrEmpty(userEquippedSkillData[i]))
-                    continue;
+                SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().interactable = true;
+                SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.white;
+            }
+            else
+            {
+                SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().interactable = false;
+                SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.gray;
+            }
 
-                string icon = SkillTemplate[userEquippedSkillData[i]][(int)SkillTemplate_.Icon];
+            SkillDetail_Popup.Find("EquipButton").GetComponent<Button>().interactable = true;
+            SkillDetail_Popup.Find("EquipButton/ButtonImage").GetComponent<Image>().color = Color.white;
+        }
+
+        if (slot.IsEqiupped)
+            SkillDetail_Popup.Find("EquipButton/Text").GetComponent<TMP_Text>().text = "해제";
+        else
+            SkillDetail_Popup.Find("EquipButton/Text").GetComponent<TMP_Text>().text = "장착";
+
+        SkillDetail_Popup.Find("EquipButton").GetComponent<Button>().onClick.RemoveAllListeners();
+        SkillDetail_Popup.Find("EquipButton").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (slot.IsEqiupped)    // 장착중 -> 해제버튼
+                UnequipSkill(slot, skillId);
+            else                    // 미장착중 -> 장착버튼
+                EquipSkill(slot, skillId);
+        });
+
+        SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().onClick.RemoveAllListeners();
+        SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            Debug.Log("강화버튼입니다!!!!");
+
+            UpgradeSkill(slot,skillId);
+        });
+
+        
+    }
+    
+    void UpgradeSkill(SkillSlot slot, string skillId)
+    {
+        slot.UpgradeSkill();
+        var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+        userSkillData[int.Parse(skillId) - 1] = $"{slot.CurrentLevel},{slot.HoldingCount}";
+        Debug.Log("업그레이드 완료 : " + userSkillData);
+
+        SkillDetail_Popup.gameObject.SetActive(false);
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData,string.Join('@', userSkillData));
+        //string[] skillData = userSkillData[int.Parse(skillId) - 1].Split(',');
+        //currentLevel = int.Parse(skillData[0]);    // 스킬 레벨
+        //holdingCount = int.Parse(skillData[1]);    // 보유 갯수
+
+    }
+    void EquipSkill(SkillSlot slot, string skillId)
+    {
+        Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
+        Image[] equippedSkill_Image = new Image[equippedSkillGroup.childCount];
+        for (int j = 0; j < equippedSkillGroup.childCount; j++)
+            equippedSkill_Image[j] = equippedSkillGroup.GetChild(j).GetComponent<Image>();
+        Debug.Log("장착");
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        bool isEmpty = false;
+
+        // 장착할 공간이 있을 때 => 비어있는 칸에 장착
+        for (int i = 0; i < equippedSkill.Length; i++)
+        {
+            if (string.IsNullOrEmpty(equippedSkill[i]))
+            {
+                isEmpty = true;
+                equippedSkill[i] = skillId;     // 비어있는 칸에 스킬 장착
+
+                string icon = SkillTemplate[equippedSkill[i]][(int)SkillTemplate_.Icon];
 
                 string[] iconDatas = icon.Split('/');
                 string spriteName = iconDatas[0];
                 string atlasName = iconDatas[1];
-                equippedSkill_Image[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+
+                slot.SetEquip(true);
+                //obj.transform.Find("Equip_Text").gameObject.SetActive(true);
+                //obj.transform.Find("Image").GetComponent<Image>().color = new Color(1, 1, 1, 100f / 255f);
+
+                Sprite sp = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+
+                lobbySkillImage[i].sprite = sp;
+                equippedSkill_Image[i].sprite = sp;
+                
+                break;
             }
         }
 
+        // 장착할 공간이 없을 때 => 6칸 중에 선택해서 교체하도록 해야됨
+        if (!isEmpty)
+        {
+
+        }
+
+        SkillDetail_Popup.gameObject.SetActive(false);
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkill));
     }
 
-    Color ConvertGradeToColor(string grade)
+    void UnequipSkill(SkillSlot slot, string skillId)
     {
-        if(grade == "common")
+        Debug.Log("해제");
+        Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
+        Image[] equippedSkill_Image = new Image[equippedSkillGroup.childCount];
+        for (int j = 0; j < equippedSkillGroup.childCount; j++)
+            equippedSkill_Image[j] = equippedSkillGroup.GetChild(j).GetComponent<Image>();
+
+        var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+
+        for (int i = 0; i < equippedSkillData.Length; i++)
         {
-            return Color.white;
+            if (equippedSkillData[i] == skillId)    // 장착해제할 스킬 찾기
+            {
+                equippedSkillData[i] = "";
+
+                lobbySkillImage[i].sprite = null;
+                equippedSkill_Image[i].sprite = null;
+                
+                break;
+            }
         }
-        else if(grade == "uncommon")
-        {
-            return Color.green;
-        }
-        else if (grade == "rare")
-        {
-            return Color.cyan;
-        }
-        else
-        {
-            return Color.red;
-        }
+        slot.SetEquip(false);
+        //obj.transform.Find("Equip_Text").gameObject.SetActive(false);
+        //obj.transform.Find("Image").GetComponent<Image>().color = Color.white;
+
+        SkillDetail_Popup.gameObject.SetActive(false);
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkillData));
     }
+    void OpenUI_Category4(GameObject clickButton)
+    {
+
+    }
+
+
 
     public void GetGoods(double getGold = 0, double getGem = 0)
     {

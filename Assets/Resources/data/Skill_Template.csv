@@ -1,8 +1,8 @@
 ﻿skill_ID,grade,name,order,cooltime,damage,icon,desc
-1,common,히드라소환,1,5,150,Arrow_Barrage/SkillAtlas,이건 이러 이러한 효과가 있습니다
-2,uncommon,구체던지기,2,10,200,Beam/SkillAtlas,요런 요런 효과가 있어요
-3,rare,레어스킬,3,12,250,Blackhole/SkillAtlas,블랙홀 스킬입니다
-4,epic,,4,,,,
-5,legendary,,5,,,,
-6,mythic,,6,,,,
+1,일반,애로우 블로우,1,5,150,Arrow_Barrage/SkillAtlas,화살을 여러발 발사합니다. 
+2,고급,피어싱,2,10,200,Beam/SkillAtlas,빔을 발사합니다. 한 번에 강한 데미지를 입힙니다.
+3,희귀,블랙홀,3,12,250,Blackhole/SkillAtlas,강력한 블랙홀 입니다. 지속적인 데미지를 입힙니다.
+4,영웅,,4,,,,
+5,전설,,5,,,,
+6,신화,,6,,,,
 7,transcendence,,7,,,,
