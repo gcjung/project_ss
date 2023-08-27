@@ -13,29 +13,33 @@ public class HpSlider : MonoBehaviour
     private Vector3 offset = new Vector3(0, -0.3f, 0);
     private Slider slider;
     private TextMeshProUGUI hpText;
+    private RectTransform hpRectTransform;
 
+    private void Awake()
+    {
+        slider = GetComponent<Slider>();
+        hpRectTransform = GetComponent<RectTransform>();
+        slider.value = 1.0f;
+
+        if (transform.Find("Hp_Text").TryGetComponent<TextMeshProUGUI>(out var _hpText))
+        {
+            hpText = _hpText;
+        }
+    }
     private void Update()
     {
         if (targetTransform != null)
         {
             Vector3 targetscreenposition = targetTransform.position + offset;   //Screen Space - Camera에선 WorldToScreenPoint 쓸 필요없음
 
-            transform.position = targetscreenposition;
+            hpRectTransform.position = targetscreenposition;
         }
     }
 
     public void SetTarget(GameObject _target)
     {
-        slider = GetComponent<Slider>();
-        slider.value = 1.0f;
-
         target = _target;
         targetTransform = _target.transform;      
-
-        if (transform.Find("Hp_Text").TryGetComponent<TextMeshProUGUI>(out var _hpText))
-        {
-            hpText = _hpText;
-        }
 
         if (_target.TryGetComponent<Player>(out var _player))
         {
@@ -51,6 +55,10 @@ public class HpSlider : MonoBehaviour
             this.hpProvider = _hpProvider;
             this.hpProvider.OnHealthChanged += UpdateHealth;
         }
+
+        Vector3 targetscreenposition = targetTransform.position + offset;
+
+        hpRectTransform.position = targetscreenposition;
     }
 
     private void UpdateHealth(double curHp, double maxHp)
