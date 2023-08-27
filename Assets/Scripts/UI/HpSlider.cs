@@ -6,8 +6,6 @@ using TMPro;
 public class HpSlider : MonoBehaviour
 {
     private IHpProvider hpProvider;
-
-    private GameObject target;
     private Transform targetTransform;
 
     private Vector3 offset = new Vector3(0, -0.3f, 0);
@@ -38,7 +36,6 @@ public class HpSlider : MonoBehaviour
 
     public void SetTarget(GameObject _target)
     {
-        target = _target;
         targetTransform = _target.transform;      
 
         if (_target.TryGetComponent<Player>(out var _player))

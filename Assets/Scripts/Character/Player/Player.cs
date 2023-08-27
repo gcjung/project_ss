@@ -128,6 +128,7 @@ public class Player : MonoBehaviour, IHpProvider
                 break;
             case "HpLevel":                
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
+                OnHealthChanged?.Invoke(CurrentHp, TotalHp);
 
                 Debug.Log($"최대체력 : {TotalHp}");
                 break;

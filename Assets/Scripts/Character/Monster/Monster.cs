@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 using static GameDataManager;
 
 public class Monster : MonoBehaviour, IHpProvider
 {
     public event Action<double, double> OnHealthChanged;
+    public Action BossMonsterDied;
     public string Name { get; private set; }
     public double MaxHp { get; private set; }
     private double currentHp;
@@ -39,8 +41,7 @@ public class Monster : MonoBehaviour, IHpProvider
     private BoxCollider2D boxCollider;
     private SkinnedMeshRenderer skinnedMesh;
     private Color originalColor;
-
-    public Action BossMonsterDied;
+    
     private void OnEnable()
     {
         CurrentHp = MaxHp;

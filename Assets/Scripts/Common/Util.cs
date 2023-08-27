@@ -191,9 +191,9 @@ public class Util
         string numString = string.Empty;
         string unitString = string.Empty;
 
-        if (number < 1)
+        if (number < 1000)
         {
-            numString = number.ToString("F");
+            numString = number.ToString("F2");
             unitString = Units[0];
 
             return string.Format("{0}{1}", numString, unitString);
