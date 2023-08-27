@@ -38,6 +38,7 @@ public class Monster : MonoBehaviour, IHpProvider
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
     private SkinnedMeshRenderer skinnedMesh;
+    private Color originalColor;
 
     public Action BossMonsterDied;
     private void OnEnable()
@@ -58,6 +59,7 @@ public class Monster : MonoBehaviour, IHpProvider
     {
         boxCollider = GetComponent<BoxCollider2D>();
         skinnedMesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
+        originalColor = skinnedMesh.material.color;
 
         if (TryGetComponent<MonsterController>(out var controller))
         {
@@ -77,6 +79,20 @@ public class Monster : MonoBehaviour, IHpProvider
     public void TakeDamage(double damageAmount)
     {
         CurrentHp -= damageAmount;
+
+        StartCoroutine(DamageEffect());
+    }
+
+    private IEnumerator DamageEffect()
+    {
+        float delayTime = 0.1f;
+        Color damageColor = Color.red;
+
+        skinnedMesh.material.color = damageColor;
+
+        yield return new WaitForSeconds(delayTime);
+
+        skinnedMesh.material.color = originalColor;
     }
 
     private void MonsterDie()

@@ -24,7 +24,7 @@ public class Player : MonoBehaviour, IHpProvider
             {
                 currentHp = TotalHp;
             }
-            else if(value <= 0)
+            else if (value <= 0)
             {
                 currentHp = 0;
                 PlayerDie();
@@ -41,13 +41,18 @@ public class Player : MonoBehaviour, IHpProvider
 
 
     private PlayerController playerController;
+    private SkinnedMeshRenderer skinnedMesh;
+    private Color originalColor;
 
     private void Start()
     {
+        skinnedMesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
+        originalColor = skinnedMesh.material.color;
+
         if (TryGetComponent<PlayerController>(out var controller))
         {
             playerController = controller;
-        }
+        }       
     }
 
     public void TakeDamage(double damageAmount)
@@ -56,8 +61,20 @@ public class Player : MonoBehaviour, IHpProvider
         Debug.Log($"남은 체력 : {CurrentHp}");
 
         CurrentHp -= damageAmount;
-    }
 
+        StartCoroutine(DamageEffect());
+    }
+    private IEnumerator DamageEffect()
+    {
+        float delayTime = 0.1f;
+        Color damageColor = Color.red;
+
+        skinnedMesh.material.color = damageColor;
+
+        yield return new WaitForSeconds(delayTime);
+
+        skinnedMesh.material.color = originalColor;
+    }
     private void PlayerDie()
     {
         playerController.SetCurrentPlayerState(PlayerState.Dead);
@@ -96,18 +113,22 @@ public class Player : MonoBehaviour, IHpProvider
         {
             case "AttackLevel":                
                 TotalAttack = Math.Round(Attack * attackLevel * attack_ratio, 2);
+
                 Debug.Log($"공격력 : {TotalAttack}");
                 break;
             case "AttackSpeedLevel":
                 TotalAttackSpeed = Math.Round(AttackSpeed + (attackSpeedLevel * attackSpeed_ratio), 2); //공격속도는 합연산
+
                 Debug.Log($"공격속도 : {TotalAttackSpeed}");
                 break;
             case "CriticalLevel":               
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
+
                 Debug.Log($"크리티컬 : {TotalCritical}");
                 break;
             case "HpLevel":                
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
+
                 Debug.Log($"최대체력 : {TotalHp}");
                 break;
             default:    //캐릭터 첫 세팅 or 교체 시에만 실행
