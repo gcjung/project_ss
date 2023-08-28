@@ -2,15 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UIElements;
+
 public class DamageText : MonoBehaviour
 {
-    Vector3 offset = new Vector3(0, 0.3f, 0);
-    Vector3 scale = new Vector3(40, 40, 1);
+    private float offset = 45.0f;
+    private float durationTime = 0.5f;
+    private RectTransform rectTransform;
+
     private void Start()
     {
-        transform.localScale = scale;
+        rectTransform = GetComponent<RectTransform>();
 
-        transform.DOMove(transform.position + offset, 0.3f).OnComplete(() => Invoke(nameof(OnDestroy), 0.5f));
+        Init();
+    }
+
+    private void Init()
+    {
+        rectTransform.DOAnchorPosY(rectTransform.anchoredPosition.y + offset, durationTime).SetEase(Ease.OutQuad).OnComplete(() => OnDestroy());
     }
 
     private void OnDestroy()

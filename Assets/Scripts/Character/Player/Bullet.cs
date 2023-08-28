@@ -43,7 +43,11 @@ public class Bullet : MonoBehaviour
                 GameObject damageText = CommonFunction.GetPrefab(textName, MainScene.Instance.upSidePanel.transform);
 
                 Vector2 contactPoint = collision.ClosestPoint(transform.position);
-                damageText.transform.position = contactPoint;
+
+                if(damageText.TryGetComponent<RectTransform>(out var rect))
+                {
+                    rect.position = Camera.main.WorldToScreenPoint(contactPoint);
+                }
 
                 if (damageText.TryGetComponent<TextMeshProUGUI>(out var tmp))
                 {

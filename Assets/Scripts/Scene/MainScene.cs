@@ -55,7 +55,7 @@ public class MainScene : MonoBehaviour
     private GameObject stageText;
     private MonsterSpawner spawner; //스테이지 세팅용
 
-    [HideInInspector] public int heroId;    //임시 테스트용
+    [HideInInspector] public int heroId;
     [HideInInspector] public string heroName;
     [HideInInspector] public int stageId;
     [HideInInspector] public string stageName;
@@ -106,7 +106,6 @@ public class MainScene : MonoBehaviour
     public StageState CurrentStageState { get; private set; }
     public bool IsPlayer { get; private set; } = false;
 
-    //스탯 적용 테스트 중
     [HideInInspector] public int attackLevel;
     [HideInInspector] public int attackSpeedLevel;
     [HideInInspector] public int criticalLevel;
@@ -208,8 +207,6 @@ public class MainScene : MonoBehaviour
 
         var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Hero", upSidePanel.transform);   //체력바 세팅
         hpBar.GetComponent<HpSlider>().SetTarget(playerCharacter.gameObject);
-        Vector3 hpBarScale = new Vector3(55f, 55f, 1f);
-        hpBar.transform.localScale = hpBarScale;
     }
     public void SetStage(int stageId)
     {
@@ -303,7 +300,6 @@ public class MainScene : MonoBehaviour
     {
         if (isWaveClear)
         {
-            //Debug.Log("보스방 입장");
             IsWaveClear = false;
 
             SetCurrentStageState(StageState.BossRoom);

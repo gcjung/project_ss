@@ -9,9 +9,9 @@ public class StatusSlot : MonoBehaviour
 {
     private TextMeshProUGUI levelText;
     private TextMeshProUGUI nameText;
-    private TextMeshProUGUI valueText;
-    private Button button;
+    private TextMeshProUGUI valueText;   
     private TextMeshProUGUI costText;
+    private Button button;
 
     private string statusName;
     private int statusLevel;

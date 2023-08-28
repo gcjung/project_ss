@@ -8,6 +8,7 @@ public class HpSlider : MonoBehaviour
     private IHpProvider hpProvider;
     private Transform targetTransform;
 
+    private Vector3 targetScreenPosition;
     private Vector3 offset = new Vector3(0, -0.3f, 0);
     private Slider slider;
     private TextMeshProUGUI hpText;
@@ -28,9 +29,7 @@ public class HpSlider : MonoBehaviour
     {
         if (targetTransform != null)
         {
-            Vector3 targetscreenposition = targetTransform.position + offset;   //Screen Space - Camera에선 WorldToScreenPoint 쓸 필요없음
-
-            hpRectTransform.position = targetscreenposition;
+            SetRectTransform();
         }
     }
 
@@ -53,9 +52,14 @@ public class HpSlider : MonoBehaviour
             this.hpProvider.OnHealthChanged += UpdateHealth;
         }
 
-        Vector3 targetscreenposition = targetTransform.position + offset;
+        SetRectTransform();
+    }
 
-        hpRectTransform.position = targetscreenposition;
+    private void SetRectTransform()
+    {
+        targetScreenPosition = targetTransform.position + offset;
+
+        hpRectTransform.position = Camera.main.WorldToScreenPoint(targetScreenPosition);
     }
 
     private void UpdateHealth(double curHp, double maxHp)

@@ -193,7 +193,7 @@ public class Util
 
         if (number < 1000)
         {
-            numString = number.ToString("F2");
+            numString = number.ToString("F");
             unitString = Units[0];
 
             return string.Format("{0}{1}", numString, unitString);
