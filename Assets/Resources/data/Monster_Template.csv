@@ -1,5 +1,5 @@
 monsterId,name,hp,attack,gold
-1,Skeleton,30,10,30
+1,Skeleton,70,10,30
 2,mong ,1.4,2.141,45
 3,testMonster,,,
 4,SkeletonWarrior,150,45,200

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
+
 public class HpSlider : MonoBehaviour
 {
     private IHpProvider hpProvider;
@@ -10,15 +12,19 @@ public class HpSlider : MonoBehaviour
 
     private Vector3 targetScreenPosition;
     private Vector3 offset = new Vector3(0, -0.3f, 0);
-    private Slider slider;
+    private Slider frontSlider;
+    private Slider backSlider;
     private TextMeshProUGUI hpText;
     private RectTransform hpRectTransform;
 
     private void Awake()
     {
-        slider = GetComponent<Slider>();
         hpRectTransform = GetComponent<RectTransform>();
-        slider.value = 1.0f;
+        frontSlider = GetComponent<Slider>();
+        backSlider = transform.GetChild(0).gameObject.GetComponent<Slider>();
+        
+        frontSlider.value = 1.0f;
+        backSlider.value = 1.0f;
 
         if (transform.Find("Hp_Text").TryGetComponent<TextMeshProUGUI>(out var _hpText))
         {
@@ -64,7 +70,17 @@ public class HpSlider : MonoBehaviour
 
     private void UpdateHealth(double curHp, double maxHp)
     {
-        slider.value = (float)(curHp / maxHp);
+        float targetValue = (float)(curHp / maxHp);
+        float durationTime = 0.5f;
+        float durationTime2 = 0.25f;
+
+        DOTween.To(() => frontSlider.value, value => frontSlider.value = value, targetValue, durationTime)
+        .SetEase(Ease.OutQuad).OnComplete(() =>
+        {
+            DOTween.To(() => backSlider.value, value => backSlider.value = value, targetValue, durationTime2)
+        .SetEase(Ease.OutQuad);
+        });       
+
         hpText.text = Util.BigNumCalculate(curHp);
 
         if (curHp <= 0)

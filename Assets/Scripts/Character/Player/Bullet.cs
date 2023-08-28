@@ -44,7 +44,7 @@ public class Bullet : MonoBehaviour
 
                 Vector2 contactPoint = collision.ClosestPoint(transform.position);
 
-                if(damageText.TryGetComponent<RectTransform>(out var rect))
+                if (damageText.TryGetComponent<RectTransform>(out var rect))
                 {
                     rect.position = Camera.main.WorldToScreenPoint(contactPoint);
                 }
