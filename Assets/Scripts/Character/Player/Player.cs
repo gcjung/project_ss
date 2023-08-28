@@ -3,43 +3,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using static GameDataManager;
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IHpProvider
 {
+    public event Action<double, double> OnHealthChanged;
     public double Attack { get; private set; }
     public double TotalAttack { get; private set; }
     public double AttackSpeed { get; private set; }
     public double TotalAttackSpeed { get; private set; }
     public double Critical { get; private set; }
     public double TotalCritical { get; private set; }
-    public double Hp { get; private set; }
+    public double Hp { get; private set; }  // 캐릭터 기본 체력
 
-    private double currentHp;
+    private double currentHp;   //캐릭터 현재 체력
     public double CurrentHp
     {
         get { return currentHp; }
         private set
         {
-            if (value > TotalHp)
+            if (value >= TotalHp)
             {
                 currentHp = TotalHp;
+            }
+            else if (value <= 0)
+            {
+                currentHp = 0;
+                PlayerDie();
             }
             else
             {
                 currentHp = value;
             }
+
+            OnHealthChanged?.Invoke(currentHp, TotalHp);
         }
     }
-    public double TotalHp { get; private set; }
+    public double TotalHp { get; private set; } //캐릭터 총합 체력
 
 
     private PlayerController playerController;
+    private SkinnedMeshRenderer skinnedMesh;
+    private Color originalColor;
 
     private void Start()
-    {       
-        if(TryGetComponent<PlayerController>(out var controller))
+    {
+        skinnedMesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
+        originalColor = skinnedMesh.material.color;
+
+        if (TryGetComponent<PlayerController>(out var controller))
         {
             playerController = controller;
-        }
+        }       
     }
 
     public void TakeDamage(double damageAmount)
@@ -49,12 +62,19 @@ public class Player : MonoBehaviour
 
         CurrentHp -= damageAmount;
 
-        if (CurrentHp <= 0)
-        {
-            PlayerDie();
-        }
+        StartCoroutine(DamageEffect());
     }
+    private IEnumerator DamageEffect()
+    {
+        float delayTime = 0.1f;
+        Color damageColor = Color.red;
 
+        skinnedMesh.material.color = damageColor;
+
+        yield return new WaitForSeconds(delayTime);
+
+        skinnedMesh.material.color = originalColor;
+    }
     private void PlayerDie()
     {
         playerController.SetCurrentPlayerState(PlayerState.Dead);
@@ -93,18 +113,23 @@ public class Player : MonoBehaviour
         {
             case "AttackLevel":                
                 TotalAttack = Math.Round(Attack * attackLevel * attack_ratio, 2);
+
                 Debug.Log($"공격력 : {TotalAttack}");
                 break;
             case "AttackSpeedLevel":
                 TotalAttackSpeed = Math.Round(AttackSpeed + (attackSpeedLevel * attackSpeed_ratio), 2); //공격속도는 합연산
+
                 Debug.Log($"공격속도 : {TotalAttackSpeed}");
                 break;
             case "CriticalLevel":               
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
+
                 Debug.Log($"크리티컬 : {TotalCritical}");
                 break;
             case "HpLevel":                
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
+                OnHealthChanged?.Invoke(CurrentHp, TotalHp);
+
                 Debug.Log($"최대체력 : {TotalHp}");
                 break;
             default:    //캐릭터 첫 세팅 or 교체 시에만 실행
@@ -113,7 +138,6 @@ public class Player : MonoBehaviour
                 TotalCritical = Math.Round(Critical * ciriticalLevel * critical_ratio, 2);
                 TotalHp = Math.Round(Hp * hpLevel * hp_ratio, 2);
                 CurrentHp = TotalHp;
-                Debug.Log($"All Status Updated2");
                 break;
         }       
     }

@@ -2,20 +2,46 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 using static GameDataManager;
 
-public class Monster : MonoBehaviour
+public class Monster : MonoBehaviour, IHpProvider
 {
+    public event Action<double, double> OnHealthChanged;
+    public Action BossMonsterDied;
     public string Name { get; private set; }
     public double MaxHp { get; private set; }
-    public double CurrentHp { get; private set; }
+    private double currentHp;
+    public double CurrentHp
+    {
+        get { return currentHp; }
+        private set
+        {
+            if (value >= MaxHp)
+            {
+                currentHp = MaxHp;
+            }
+            else if (value <= 0)
+            {
+                currentHp = 0;
+                MonsterDie();
+            }
+            else
+            {
+                currentHp = value;
+            }
+
+            OnHealthChanged?.Invoke(currentHp, MaxHp);
+        }
+    }
     public double Attack { get; private set; }
     public double DropGold { get; private set; }
 
     private MonsterController monsterController;
     private BoxCollider2D boxCollider;
-
-    public Action BossMonsterDied;
+    private SkinnedMeshRenderer skinnedMesh;
+    private Color originalColor;
+    
     private void OnEnable()
     {
         CurrentHp = MaxHp;
@@ -28,16 +54,18 @@ public class Monster : MonoBehaviour
         if (monsterController != null)
         {
             monsterController.SetCurrentMonsterState(MonsterState.Idle);
-        }
+        }       
     }
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider2D>();
+        skinnedMesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
+        originalColor = skinnedMesh.material.color;
 
         if (TryGetComponent<MonsterController>(out var controller))
         {
             monsterController = controller;
-        }
+        }       
     }
     public void SetMonsterStat(int monsterId)
     {
@@ -51,20 +79,25 @@ public class Monster : MonoBehaviour
 
     public void TakeDamage(double damageAmount)
     {
-        //Debug.Log($"{Name}가 {damageAmount}만큼 피해입음");
-
         CurrentHp -= damageAmount;
-        
-        if (CurrentHp <= 0)
-        {
-            MonsterDie();
-        }
+
+        StartCoroutine(DamageEffect());
+    }
+
+    private IEnumerator DamageEffect()
+    {
+        float delayTime = 0.1f;
+        Color damageColor = Color.red;
+
+        skinnedMesh.material.color = damageColor;
+
+        yield return new WaitForSeconds(delayTime);
+
+        skinnedMesh.material.color = originalColor;
     }
 
     private void MonsterDie()
     {
-        //Debug.Log($"{Name} 죽음");
-
         boxCollider.enabled = false;
         
         monsterController.SetCurrentMonsterState(MonsterState.Dead);

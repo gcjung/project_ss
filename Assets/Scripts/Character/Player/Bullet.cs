@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -25,15 +26,7 @@ public class Bullet : MonoBehaviour
     }
     public void SettingInfo(double damage, bool isCritical, Vector3 direction, float speed)
     {
-        if(isCritical)
-        {
-            Damage = damage * 1.5f;
-        }
-        else
-        {
-            Damage = damage;
-        }
-        
+        Damage = isCritical ? damage * 1.5f : damage;
         IsCritical = isCritical;
         Direction = direction;
         Speed = speed;
@@ -45,6 +38,25 @@ public class Bullet : MonoBehaviour
         {
             //Debug.Log($"{monster.Name}에게 {Damage}만큼 피해");
 
+            {   //데미지 텍스트 생성
+                string textName = IsCritical ? "Damage_Text(Critical)" : "Damage_Text";
+                GameObject damageText = CommonFunction.GetPrefab(textName, MainScene.Instance.upSidePanel.transform);
+
+                Vector2 contactPoint = collision.ClosestPoint(transform.position);
+
+                if (damageText.TryGetComponent<RectTransform>(out var rect))
+                {
+                    rect.position = Camera.main.WorldToScreenPoint(contactPoint);
+                }
+
+                if (damageText.TryGetComponent<TextMeshProUGUI>(out var tmp))
+                {
+                    tmp.text = Util.BigNumCalculate(Damage);
+                }
+
+                damageText.AddComponent<DamageText>();
+            }
+            
             monster.TakeDamage(Damage);
             gameObject.SetActive(false);
         }

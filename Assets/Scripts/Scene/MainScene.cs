@@ -24,7 +24,7 @@ public class MainScene : MonoBehaviour
         }
     }
     [Header("UI Canvas")]
-    [SerializeField] private UpSidePanel upSidePanel;
+    public UpSidePanel upSidePanel;
     //[SerializeField] private DownSidePanel downSidePanel;
 
     [Header("Create Player")]
@@ -56,7 +56,7 @@ public class MainScene : MonoBehaviour
     private GameObject stageText;
     private MonsterSpawner spawner; //스테이지 세팅용
 
-    [HideInInspector] public int heroId;    //임시 테스트용
+    [HideInInspector] public int heroId;
     [HideInInspector] public string heroName;
     [HideInInspector] public int stageId;
     [HideInInspector] public string stageName;
@@ -107,7 +107,6 @@ public class MainScene : MonoBehaviour
     public StageState CurrentStageState { get; private set; }
     public bool IsPlayer { get; private set; } = false;
 
-    //스탯 적용 테스트 중
     [HideInInspector] public int attackLevel;
     [HideInInspector] public int attackSpeedLevel;
     [HideInInspector] public int criticalLevel;
@@ -216,10 +215,13 @@ public class MainScene : MonoBehaviour
         playerCharacter.AddComponent<PlayerController>();
 
         playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
-
+        
         IsPlayer = true;
 
         UpdateStatusLevel();    //최초 1회 스탯 레벨 업데이트
+
+        var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Hero", upSidePanel.transform);   //체력바 세팅
+        hpBar.GetComponent<HpSlider>().SetTarget(playerCharacter.gameObject);
     }
     public void SetStage(int stageId)
     {
@@ -313,7 +315,6 @@ public class MainScene : MonoBehaviour
     {
         if (isWaveClear)
         {
-            //Debug.Log("보스방 입장");
             IsWaveClear = false;
 
             SetCurrentStageState(StageState.BossRoom);
@@ -324,7 +325,7 @@ public class MainScene : MonoBehaviour
             //fadeImage.transform.SetAsFirstSibling();
             _fadeImage.DOFade(1f, fadeInTime).OnComplete(() =>
             {
-                Destroy(_fadeImage);
+                Destroy(_fadeImage.gameObject);
                 StartCoroutine(BossBattle());
             });
         }
@@ -372,7 +373,7 @@ public class MainScene : MonoBehaviour
         _victoryText.DOFade(0f, fadeTime).OnComplete(() =>
         {
             StageClear2();
-            Destroy(_victoryText);
+            Destroy(_victoryText.gameObject);
         }));
     }
     private void StageClear2()
@@ -381,7 +382,7 @@ public class MainScene : MonoBehaviour
         float movingTime = 3.0f;
 
         var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
-        _fadeImage.DOFade(1f, durationTime).OnComplete(() => Destroy(_fadeImage));
+        _fadeImage.DOFade(1f, durationTime).OnComplete(() => Destroy(_fadeImage.gameObject));
 
         playerCharacter.transform.DOMove(movePoint.position, movingTime).OnComplete(() => StageClear3());
     }
