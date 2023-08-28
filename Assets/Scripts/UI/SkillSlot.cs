@@ -14,24 +14,23 @@ public enum SkillSlotState
 
 public class SkillSlot : MonoBehaviour
 {
-    private SkillSlotState slotState;
-    public SkillSlotState State
-    {
-        get; set;
-    }
+    public SkillSlotState State { get; set; } = SkillSlotState.None;
     string skillID;
 
-    int currentLevel = 0;
-    int holdingCount = 0;
-    int targetValue = 0;
-    public int CurrentLevel
-    {
-        get { return currentLevel; }
-    }
-    public int HoldingCount
-    {
-        get { return holdingCount; }
-    }
+    //int currentLevel = 0;
+    //int holdingCount = 0;
+    //int targetValue = 0;
+    //public int CurrentLevel
+    //{
+    //    get { return currentLevel; }
+    //}
+    //public int HoldingCount
+    //{
+    //    get { return holdingCount; }
+    //}
+    public int CurrentLevel { get; private set; } = 1;
+    public int HoldingCount { get; private set; } = 0;
+    public int TargetValue { get; private set; } = 0;
 
     public void Init(string skillId)
     {
@@ -44,16 +43,16 @@ public class SkillSlot : MonoBehaviour
         var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
 
         string[] skillData = userSkillData[int.Parse(skillId)-1].Split(',');
-        currentLevel = int.Parse(skillData[0]);    // 스킬 레벨
-        holdingCount = int.Parse(skillData[1]);    // 보유 갯수
+        CurrentLevel = int.Parse(skillData[0]);    // 스킬 레벨
+        HoldingCount = int.Parse(skillData[1]);    // 보유 갯수
 
-        transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{currentLevel}";
+        transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";
 
-        targetValue = int.Parse(LevelTemplate[currentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
 
-        transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
-        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
-        transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+        transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
+        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
+        transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;
 
         string grade = SkillTemplate[skillId][(int)SkillTemplate_.Grade];
         string[] icon = SkillTemplate[skillId][(int)SkillTemplate_.Icon].Split('/');
@@ -67,11 +66,11 @@ public class SkillSlot : MonoBehaviour
         transform.Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
 
         // 스킬 획득 못한 상태 (잠금)
-        if (currentLevel == 1 && holdingCount == 0)
+        if (CurrentLevel == 1 && HoldingCount == 0)
             State = SkillSlotState.Lock;
 
         // 업그레이드 가능 확인
-        if (holdingCount >= targetValue)
+        if (HoldingCount >= TargetValue)
             State |= SkillSlotState.Upgradeable;
 
         // 장착중 확인
@@ -121,19 +120,19 @@ public class SkillSlot : MonoBehaviour
 
     public void UpgradeSkill()
     {
-        currentLevel += 1;
-        holdingCount -= targetValue;
+        CurrentLevel += 1;
+        HoldingCount -= TargetValue;
 
-        transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
-        transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{currentLevel}";
+        transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
+        transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";
 
         // 레벨업 목표 개수
-        targetValue = int.Parse(LevelTemplate[currentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
 
-        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
-        transform.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
+        transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;
 
-        if(holdingCount < targetValue)      // 보유개수가 레벨업 조건개수보다 적으면
+        if(HoldingCount < TargetValue)      // 보유개수가 레벨업 조건개수보다 적으면
             State &= ~SkillSlotState.Upgradeable;
 
         SetSlot(State);
