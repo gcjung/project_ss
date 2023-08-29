@@ -138,8 +138,8 @@ public class MonsterSpawner : MonoBehaviour
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
-            var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
-            hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
+            //var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+            //hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
 
             MonsterCount--;
 

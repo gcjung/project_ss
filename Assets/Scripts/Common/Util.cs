@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.TextCore.Text;
 using TMPro;
-
+using UnityEditor;
 
 public class Util
 {
@@ -48,14 +48,93 @@ public class Util
 
         return foundComponent;
     }
-    public static void SetFontInChildrenText(Transform parent, TMP_FontAsset font)
+    public static void SetFontInChildrenText(Transform parent)
     {
         var textArr = parent.GetComponentsInChildren<TMP_Text>();
 
         foreach (var text in textArr)
         {
+            if (text.font == null)
+            {
+                Debug.Log(text.name + ", 폰트없음@@@@@@@@@@@@@@@");
+                continue;
+            }
+
+            var font = CommonFunction.GetFont("Font/" + text.font.name);
+
+            if (font == null)
+                font = CommonFunction.GetFont("Font/KimjungchulGothic-Regular SDF");
+
             text.font = font;
         }
+    }
+
+    public static void ReLinkShader(GameObject obj, bool _isActive = false)
+    {
+        MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>(_isActive);
+        foreach (MeshRenderer mr in meshRenderers)
+        {
+            foreach (var sm in mr.sharedMaterials)
+            {
+                if (sm == null || sm.shader == null)
+                    continue;
+                
+                if (!string.IsNullOrEmpty(sm.shader.name))
+                {
+                    sm.shader = Shader.Find(sm.shader.name);
+                }
+            }
+        }
+
+        ParticleSystem[] particleSystem = obj.GetComponentsInChildren<ParticleSystem>(_isActive);
+        foreach (ParticleSystem ps in particleSystem)
+        {
+            if (ps.GetComponent<Renderer>().sharedMaterials != null)
+            {
+                foreach (var sm in ps.GetComponent<Renderer>().sharedMaterials)
+                {
+                    if (sm == null || sm.shader == null)
+                        continue;
+                    
+                    if (!string.IsNullOrEmpty(sm.shader.name))
+                    {
+                        sm.shader = Shader.Find(sm.shader.name);
+                    }
+                }
+            }
+        }
+
+        TrailRenderer[] trailRenderers = obj.GetComponentsInChildren<TrailRenderer>();
+        foreach (var tr in trailRenderers)
+        {
+            foreach (var sm in tr.sharedMaterials)
+            {
+                if (sm == null || sm.shader == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(sm.shader.name))
+                {
+                    sm.shader = Shader.Find(sm.shader.name);
+                }
+            }
+        }
+
+        //TMP_Text[] TMP_Texts = obj.GetComponentsInChildren<TMP_Text>();
+        //foreach (TMP_Text text in TMP_Texts)
+        //{
+        //    foreach (var sm in text.fontSharedMaterials)
+        //    {
+        //        if (sm == null || sm.shader == null)
+        //            continue;
+
+        //        if (!string.IsNullOrEmpty(sm.shader.name))
+        //        {
+        //            int originRenderQ = sm.renderQueue;
+        //            sm.shader = Shader.Find(sm.shader.name);
+        //            sm.renderQueue = originRenderQ;
+        //        }
+        //    }
+        //}
     }
 
     // 데이터 용량으로 변환 해주는 함수

@@ -41,8 +41,7 @@ public class ResourceLoader : MonoBehaviour
     public enum BundleType
     {
         atlas = 0,
-        uiPrefab,
-        font,
+        prefab,
     }
 
 
@@ -52,12 +51,18 @@ public class ResourceLoader : MonoBehaviour
 
         return obj;
     }
-    public static GameObject LoadUiPrefab(string prefabName)
+    public static GameObject LoadPrefab(string prefabName)
     {
-        GameObject obj = assetBundleArr[(int)BundleType.uiPrefab].LoadAsset(prefabName) as GameObject;
+        GameObject obj = assetBundleArr[(int)BundleType.prefab].LoadAsset(prefabName) as GameObject;
         //Debug.Log($"UI 에셋불러오기 : {obj.name}");
         return obj;
     }
+    //public static GameObject LoadCharPrefab(string prefabName)
+    //{
+    //    GameObject obj = assetBundleArr[(int)BundleType.charprefab].LoadAsset(prefabName) as GameObject;
+    //    //Debug.Log($"UI 에셋불러오기 : {obj.name}");
+    //    return obj;
+    //}
 
 
     public void LoadAllAssetBundle(bool loadFromServer)

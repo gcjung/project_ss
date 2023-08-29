@@ -8,7 +8,7 @@ using TMPro;
 
 public class CommonFunction : MonoBehaviour
 {
-    static Dictionary<string, Object> prefabsPool = new Dictionary<string, Object>();
+    static Dictionary<string, Object> prefabPool = new Dictionary<string, Object>();
     static Dictionary<string, Object> atlasPool = new Dictionary<string, Object>();
     static Dictionary<string, Object> fontPool = new Dictionary<string, Object>();
 
@@ -30,19 +30,18 @@ public class CommonFunction : MonoBehaviour
 
     public static void LoadPrefab(string prefabName)
     {
-        if (!prefabsPool.ContainsKey(prefabName))
+        if (!prefabPool.ContainsKey(prefabName))
         {
             //GameObject newObj = Resources.Load<GameObject>(prefabName);
-            GameObject newObj = ResourceLoader.LoadUiPrefab(prefabName);
-            prefabsPool.Add(prefabName, newObj);
+            GameObject newObj = ResourceLoader.LoadPrefab(prefabName);
+            prefabPool.Add(prefabName, newObj);
         }
-        else if (prefabsPool[prefabName] == null)
+        else if (prefabPool[prefabName] == null)
         {
             //GameObject newObj = Resources.Load<GameObject>(prefabName);
-            GameObject newObj = ResourceLoader.LoadUiPrefab(prefabName);
-            prefabsPool[prefabName] = newObj;
+            GameObject newObj = ResourceLoader.LoadPrefab(prefabName);
+            prefabPool[prefabName] = newObj;
         }
-
     }
 
     public static GameObject GetPrefab(Object prefab, Transform parentTransform, string fontName ="")
@@ -50,11 +49,14 @@ public class CommonFunction : MonoBehaviour
         GameObject obj = Instantiate(prefab) as GameObject;
         obj.transform.SetParent(parentTransform, false);
 
-        if (string.IsNullOrEmpty(fontName))
-            fontName = "Font/KimjungchulGothic-Regular SDF";
-        
-        var font = GetFont(fontName);
-        Util.SetFontInChildrenText(obj.transform, font);
+        if (obj.GetComponent<RectTransform>())
+        {
+            Util.SetFontInChildrenText(obj.transform);
+        }
+        else
+        {
+            Util.ReLinkShader(obj);
+        }
 
         return obj;
     }
@@ -63,7 +65,7 @@ public class CommonFunction : MonoBehaviour
         LoadPrefab(prefabName);
         //LoadObj(prefabsPool, prefabName);
 
-        return GetPrefab(prefabsPool[prefabName], parentTransform);
+        return GetPrefab(prefabPool[prefabName], parentTransform);
     }
 
     public static void LoadFont(string prefabName)

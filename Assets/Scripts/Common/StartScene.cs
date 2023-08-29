@@ -68,8 +68,6 @@ public class StartScene : MonoBehaviour
                 seq.Play();
             });
     }
-
-
     private void Init()
     {
         Debug.Log("스타트씬 시작");
