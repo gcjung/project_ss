@@ -215,18 +215,15 @@ public class MainScene : MonoBehaviour
         playerCharacter.AddComponent<PlayerController>();
 
         playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
-
         IsPlayer = true;
 
         UpdateStatusLevel();    //최초 1회 스탯 레벨 업데이트
 
         var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Hero", upSidePanel.transform);   //체력바 세팅
-        hpBar.GetComponent<HpSlider>().SetTarget(playerCharacter.gameObject);
+        hpBar.GetComponent<HpSlider>().SetTarget(playerCharacter.gameObject);        
     }
     public void SetStage(int stageId)
     {
-        //Debug.Log($"현재 스테이지ID : {stageId}");
-
         if (stageText != null)
             Destroy(stageText.gameObject);
 
@@ -258,7 +255,7 @@ public class MainScene : MonoBehaviour
         }
     }
 
-    public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
+    public void UpdateStatusLevel(string statusName = "", int level = 1)
     {
         switch (statusName)
         {
@@ -322,7 +319,6 @@ public class MainScene : MonoBehaviour
             float fadeInTime = 1.0f;
 
             var _fadeImage = Instantiate(fadeImage, upSidePanel.transform);
-            //fadeImage.transform.SetAsFirstSibling();
             _fadeImage.DOFade(1f, fadeInTime).OnComplete(() =>
             {
                 Destroy(_fadeImage.gameObject);
@@ -335,7 +331,12 @@ public class MainScene : MonoBehaviour
     {
         float delayTime = 2.0f;
         int targetLayer = LayerMask.NameToLayer("Over UI");
-        var _vsImage = Instantiate(vsImage, upSidePanel.transform);
+
+        var rawImage = CommonFunction.GetPrefab("VS_RawImage", upSidePanel.transform);
+        rawImage.transform.SetAsFirstSibling();
+
+        var _vsImage = CommonFunction.GetPrefab("VS_Image", upSidePanel.transform);
+        _vsImage.transform.SetAsFirstSibling();       
 
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
@@ -350,6 +351,7 @@ public class MainScene : MonoBehaviour
 
         yield return new WaitForSeconds(delayTime);
 
+        Destroy(rawImage.gameObject);
         Destroy(_bossPref);
         Destroy(_playerPref);
         Destroy(_vsImage.gameObject);

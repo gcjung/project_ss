@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using static UnityEngine.GraphicsBuffer;
 
 public class HpSlider : MonoBehaviour
 {
     private IHpProvider hpProvider;
+    private GameObject target;
     private Transform targetTransform;
 
     private Vector3 targetScreenPosition;
@@ -37,10 +39,16 @@ public class HpSlider : MonoBehaviour
         {
             SetRectTransform();
         }
+
+        if (target == null)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     public void SetTarget(GameObject _target)
     {
+        target = _target;
         targetTransform = _target.transform;      
 
         if (_target.TryGetComponent<Player>(out var _player))

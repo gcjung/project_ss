@@ -106,7 +106,6 @@ public class MonsterSpawner : MonoBehaviour
                     StopAllCoroutines();    // Stop InfinitySpawnMonster, SpawnMonster
                     infinitySpawnCoroutine = null;
 
-                    //monsterPool.ClearPool();
                     Destroy(monsterPool.TrPool.gameObject);
                     Destroy(bossRoomButton.gameObject);
                 });
@@ -114,7 +113,6 @@ public class MonsterSpawner : MonoBehaviour
                 if (infinitySpawnCoroutine != null)
                 {
                     StopCoroutine(infinitySpawnCoroutine);
-                    infinitySpawnCoroutine = null;
                 }
 
                 infinitySpawnCoroutine = StartCoroutine(InfinitySpawnMonster());
@@ -131,15 +129,15 @@ public class MonsterSpawner : MonoBehaviour
         while (MonsterCount != 0)
         {
             int randomIndex = Random.Range(1, 4);
-            Transform spawnPoint = GetSpawnPoint(randomIndex);
+            Transform spawnPoint = GetSpawnPoint(randomIndex);  //스폰 위치 설정
 
-            var _monster = monsterPool.GetObjectPool();
+            var _monster = monsterPool.GetObjectPool(); //몬스터 생성
             _monster.SetMonsterStat(mainScene.monsterId);
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
-            //var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
-            //hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
+            var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+            hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
 
             MonsterCount--;
 
