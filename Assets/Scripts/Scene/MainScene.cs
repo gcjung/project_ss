@@ -143,6 +143,7 @@ public class MainScene : MonoBehaviour
         spawner = Util.FindChildComponent<MonsterSpawner>(transform);
     }
 
+    SkillController skillController = null;
     private Image[] lobbyEquipSkill_Image = null;
     private void Init()
     {
@@ -167,12 +168,16 @@ public class MainScene : MonoBehaviour
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
 
+        skillController = FindObjectOfType<SkillController>();
+        skillController.Init(playerCharacter);
+
         // 로비 스킬UI 버튼
         lobbyEquipSkill_Image = new Image[skillPanel.childCount - 1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
         {
             int index = i;
             lobbyEquipSkill_Image[i] = skillPanel.GetChild(i + 1).GetComponent<Image>();
+            skillController.equippedSkillInfo[i].lobbySkillSlot = skillPanel.GetChild(i + 1).GetComponent<Image>();
 
             EventTrigger.Entry entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerUp;
@@ -181,7 +186,6 @@ public class MainScene : MonoBehaviour
             });
 
             lobbyEquipSkill_Image[i].GetComponent<EventTrigger>().triggers.Add(entry);
-
         }
 
         // 바텀 카테고리 버튼
@@ -220,7 +224,7 @@ public class MainScene : MonoBehaviour
 
         UpdateStatusLevel();    //최초 1회 스탯 레벨 업데이트
 
-        var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Hero", upSidePanel.transform);   //체력바 세팅
+        var hpBar = CommonFunction.GetPrefabInstance("Slider_HealthBar_Hero", upSidePanel.transform);   //체력바 세팅
         hpBar.GetComponent<HpSlider>().SetTarget(playerCharacter.gameObject);
     }
     public void SetStage(int stageId)
@@ -231,7 +235,7 @@ public class MainScene : MonoBehaviour
             Destroy(stageText.gameObject);
 
         stageName = StageTemplate[stageId.ToString()][(int)StageTemplate_.Stage];
-        stageText = CommonFunction.GetPrefab("StageName_Text", upSidePanel.transform);
+        stageText = CommonFunction.GetPrefabInstance("StageName_Text", upSidePanel.transform);
         stageText.GetComponent<TextMeshProUGUI>().text = stageName;
 
         mapName = StageTemplate[stageId.ToString()][(int)StageTemplate_.MapImage];  //맵이미지 세팅
@@ -461,7 +465,7 @@ public class MainScene : MonoBehaviour
     {
         if (category1_UI == null)
         {
-            category1_UI = CommonFunction.GetPrefab("Category1", popupUI_0.transform).GetComponent<RectTransform>();
+            category1_UI = CommonFunction.GetPrefabInstance("Category1", popupUI_0.transform).GetComponent<RectTransform>();
             category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
 
             ShowUI_Character(true);
@@ -506,7 +510,7 @@ public class MainScene : MonoBehaviour
         //장비 UI
         if (category2_UI == null)
         {
-            category2_UI = CommonFunction.GetPrefab("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
+            category2_UI = CommonFunction.GetPrefabInstance("UI/Item_Panel", popupUI_0.transform).GetComponent<RectTransform>();
             category2_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
         }
         else
@@ -533,8 +537,9 @@ public class MainScene : MonoBehaviour
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
     }
 
+    
     const int maxEquipSkillCount = 6;
-    Image[] equippedSkillIcon = null;
+    Transform[] equippedSkillSlot = null;
     void ShowUI_Skill(bool isFirst = false)
     {
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
@@ -554,7 +559,7 @@ public class MainScene : MonoBehaviour
                 string grade = item.Value[(int)SkillTemplate_.Grade];
                 string icon = item.Value[(int)SkillTemplate_.Icon];
 
-                GameObject skillslot = CommonFunction.GetPrefab("SkillSlot", grid);
+                GameObject skillslot = CommonFunction.GetPrefabInstance("SkillSlot", grid);
                 SkillSlot slot = skillslot.AddComponent<SkillSlot>();
                 slot.Init(id);
 
@@ -578,14 +583,15 @@ public class MainScene : MonoBehaviour
                 }
             }
 
+            
             Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
-            equippedSkillIcon = new Image[maxEquipSkillCount];
+            equippedSkillSlot = new Transform[maxEquipSkillCount];
             for (int i = 0; i < maxEquipSkillCount; i++)
-                equippedSkillIcon[i] = equippedSkillGroup.GetChild(i).GetComponent<Image>();
+                equippedSkillSlot[i] = equippedSkillGroup.GetChild(i);
 
             var skillAcquireData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
 
-            // 장착중인 스킬 UI
+            // 장착중 스킬슬롯
             for (int i = 0; i < equippedSkillData.Length; i++)
             {
                 int index = i;
@@ -596,23 +602,27 @@ public class MainScene : MonoBehaviour
                     string[] icon = SkillTemplate[skillID][(int)SkillTemplate_.Icon].Split('/');
                     string spriteName = icon[0];
                     string atlasName = icon[1];
-                    equippedSkillIcon[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+                    
+                    equippedSkillSlot[i].Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+                    equippedSkillSlot[i].Find("Image").GetComponent<Image>().gameObject.SetActive(true);
 
-                    string skillLevel = skillAcquireData[int.Parse(skillID) - 1].Split(",")[0];    // syntax : 스킬레벨,보유개수
-                    equippedSkillIcon[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{skillLevel}";
+                    string skillLevel = skillAcquireData[int.Parse(skillID) - 1].Split(",")[0];    // syntax : 스킬레벨,보유개수@
+                    equippedSkillSlot[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{skillLevel}";
 
-                    Button skillDetailBtn = equippedSkillIcon[i].GetComponent<Button>();
+                    Button skillDetailBtn = equippedSkillSlot[i].GetComponent<Button>();
                     skillDetailBtn.onClick.RemoveAllListeners();
                     skillDetailBtn.onClick.AddListener(() =>
                     {
+                        Debug.Log($"i : {i}, index : {index}");
                         OpenUI_SkillDetail(equipSkillSlot[index], skillID);
                     });
 
-                    Button simpleUnequipBtn = equippedSkillIcon[i].transform.Find("Unequip_Button").GetComponent<Button>();
+                    Button simpleUnequipBtn = equippedSkillSlot[i].transform.Find("Unequip_Button").GetComponent<Button>();
                     simpleUnequipBtn.gameObject.SetActive(true);
                     simpleUnequipBtn.onClick.RemoveAllListeners();
                     simpleUnequipBtn.onClick.AddListener(() =>
                     {
+                        Debug.Log($"i : {i}, index : {index}");
                         OnClick_UnequipSkill(equipSkillSlot[index], skillID);
                     });
 
@@ -625,7 +635,7 @@ public class MainScene : MonoBehaviour
     void OpenUI_SkillDetail(SkillSlot slot, string skillId)
     {
         if (SkillDetail_Popup == null)
-            SkillDetail_Popup = CommonFunction.GetPrefab("SkillDetailPopup", popupUI_1.transform).transform;
+            SkillDetail_Popup = CommonFunction.GetPrefabInstance("SkillDetailPopup", popupUI_1.transform).transform;
         else
             SkillDetail_Popup.gameObject.SetActive(true);
 
@@ -718,7 +728,7 @@ public class MainScene : MonoBehaviour
         {
             if (equippedSkillData[i] == skillId)
             {
-                equippedSkillIcon[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{slot.CurrentLevel}";
+                equippedSkillSlot[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{slot.CurrentLevel}";
                 break;
             }
         }
@@ -743,29 +753,33 @@ public class MainScene : MonoBehaviour
                 string atlasName = icon[1];
                 Sprite sp = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
                 lobbyEquipSkill_Image[i].sprite = sp;
-                equippedSkillIcon[i].sprite = sp;
 
-                equippedSkillIcon[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{slot.CurrentLevel}";
+                equippedSkillSlot[i].Find("Image").GetComponent<Image>().sprite = sp;
+                equippedSkillSlot[i].Find("Image").GetComponent<Image>().gameObject.SetActive(true);
+
+                equippedSkillSlot[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{slot.CurrentLevel}";
 
                 slot.State |= SkillSlotState.Equipped;
                 slot.SetSlot(slot.State);
 
-                Button simpleUnequipBtn = equippedSkillIcon[i].transform.Find("Unequip_Button").GetComponent<Button>();
+                Button simpleUnequipBtn = equippedSkillSlot[i].transform.Find("Unequip_Button").GetComponent<Button>();
                 simpleUnequipBtn.gameObject.SetActive(true);
                 simpleUnequipBtn.onClick.RemoveAllListeners();
                 simpleUnequipBtn.onClick.AddListener(() => OnClick_UnequipSkill(slot, skillID));
 
-                Button skillDetailBtn = equippedSkillIcon[i].GetComponent<Button>();
+                Button skillDetailBtn = equippedSkillSlot[i].GetComponent<Button>();
                 skillDetailBtn.onClick.RemoveAllListeners();
                 skillDetailBtn.onClick.AddListener(() => OpenUI_SkillDetail(slot, skillID));
 
                 equippedSkillData[i] = skillID;     // 비어있는 칸에 스킬 장착
                 GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkillData));
 
-                //OnClickUseSkill(index, true);
 
-                StartSkillCooltime(i, skillID, true);
-
+                //StartSkillCooltime(i, skillID, true);
+                //skillController.equippedSkillInfo[i].SetSkillInfo(skillID);
+                skillController.SetEquipSkill(i, skillID);
+                skillController.StartSkillCooltime(i);
+                
                 break;
             }
         }
@@ -791,13 +805,16 @@ public class MainScene : MonoBehaviour
                 equippedSkillData[i] = "";          // 장착 해제
 
                 lobbyEquipSkill_Image[i].sprite = null;
-                equippedSkillIcon[i].sprite = null;
+                equippedSkillSlot[i].Find("Image").GetComponent<Image>().sprite = null;
+                equippedSkillSlot[i].Find("Image").GetComponent<Image>().gameObject.SetActive(false);
 
-                equippedSkillIcon[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"";
-                equippedSkillIcon[i].transform.Find("Unequip_Button").gameObject.SetActive(false);
-                equippedSkillIcon[i].GetComponent<Button>().onClick.RemoveAllListeners();
+                equippedSkillSlot[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"";
+                equippedSkillSlot[i].transform.Find("Unequip_Button").gameObject.SetActive(false);
+                equippedSkillSlot[i].GetComponent<Button>().onClick.RemoveAllListeners();
 
-                StopSkillCooltime(i);
+                
+                skillController.StopSkillCooltime(i);
+                //skillController.equippedSkillInfo[i].SetSkillInfo();
                 break;
             }
         }
@@ -810,88 +827,96 @@ public class MainScene : MonoBehaviour
 
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkillData));
     }
-    bool isAutoON = false;
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            Debug.Log("1누름");
-            StopCoroutine(Co_SkillCooltime[0]);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Debug.Log("2누름");
-            StopCoroutine(Co_SkillCooltime[1]);
-        }
+        //if (Input.GetKeyDown(KeyCode.Alpha1))
+        //{
+        //    Debug.Log("1누름");
+        //    StopCoroutine(Co_SkillCooltime[0]);
+        //}
+        //if (Input.GetKeyDown(KeyCode.Alpha2))
+        //{
+        //    Debug.Log("2누름");
+        //    StopCoroutine(Co_SkillCooltime[1]);
+        //}
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             Debug.Log("3누름");
-            GameObject obj = CommonFunction.GetPrefab("Lazer_blue",transform);
-            obj.transform.position = Vector3.zero;
+            GameObject obj = CommonFunction.GetPrefabInstance("Lazer_blue",transform);
+            
+            obj.transform.position = playerCharacter.transform.position + new Vector3();
         }
     }
-    IEnumerator[] Co_SkillCooltime = new IEnumerator[maxEquipSkillCount];
-    bool[] isSkillCooltime = new bool[maxEquipSkillCount];
+
     private void OnClickUseSkill(int index)
     {
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
 
-        if (string.IsNullOrEmpty(equippedSkillData[index])) return; // 스킬 장착중인 칸이 아닌 경우
+        if (string.IsNullOrEmpty(equippedSkillData[index])) return; // 스킬 장착중이 아닌 경우
 
-        Debug.Log($"스킬쿨 : {isSkillCooltime[index]}");
-
-        if (!isSkillCooltime[index]) // 사용가능하면 
-        {
-            StartSkillCooltime(index, equippedSkillData[index]);
-            UseSkill(equippedSkillData[index]);
-        }
+        skillController.UseSkill(index, equippedSkillData[index]);
     }
-    SkillController skillController = new SkillController();
-    void UseSkill(string skillId)
-    {
-        skillController.test(skillId);
-    }
-    void StartSkillCooltime(int index, string skillID, bool resetCooltime = false)
-    {
-        if (!isSkillCooltime[index] || resetCooltime) // resetCooltime: 스킬 장착시, 무조건 쿨타임 돌도록 만듬
-        {
-            if (resetCooltime && Co_SkillCooltime[index] != null)
-                StopCoroutine(Co_SkillCooltime[index]);
 
-            isSkillCooltime[index] = true;
-            int cooltime = int.Parse(SkillTemplate[skillID][(int)SkillTemplate_.Cooltime]);
 
-            Co_SkillCooltime[index] = Co_SkillCoolTime(cooltime, index);
-            StartCoroutine(Co_SkillCooltime[index]);
-        }
-    }
-    void StopSkillCooltime(int index)
-    {
-        if (Co_SkillCooltime[index] != null)
-            StopCoroutine(Co_SkillCooltime[index]);
+    #region 테스트용
+    //private void OnClickUseSkill(int index)
+    //{
+    //    var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
 
-        lobbyEquipSkill_Image[index].color = Color.white;
-        lobbyEquipSkill_Image[index].transform.Find("CoolTime").GetComponent<Image>().fillAmount = 0;
-    }
-    public IEnumerator Co_SkillCoolTime(float cool, int index)
-    {
-        Image coolTimeIcon = lobbyEquipSkill_Image[index].transform.Find("CoolTime").GetComponent<Image>();
-        coolTimeIcon.fillAmount = 1f;
+    //    if (string.IsNullOrEmpty(equippedSkillData[index])) return; // 스킬 장착중인 칸이 아닌 경우
 
-        lobbyEquipSkill_Image[index].color = Color.gray;
+    //    Debug.Log($"스킬쿨 : {isSkillCooltime[index]}");
 
-        float time = cool;
-        while (time > 0)
-        {
-            time -= Time.deltaTime;
-            coolTimeIcon.fillAmount = time / cool;
+    //    if (!isSkillCooltime[index]) // 사용가능하면 
+    //    {
+    //        SkillController.instance.StartCoroutine(Co_SkillCooltime[index]);
+    //        //StartSkillCooltime(index, equippedSkillData[index]);
+    //        UseSkill(equippedSkillData[index]);
+    //    }
+    //}
 
-            yield return CommonIEnumerator.WaitForEndOfFrame;
-        }
+    //void StartSkillCooltime(int index, string skillID, bool resetCooltime = false)
+    //{
+    //    if (!isSkillCooltime[index] || resetCooltime) // resetCooltime: 스킬 장착시, 무조건 쿨타임 돌도록 만듬
+    //    {
+    //        if (resetCooltime && Co_SkillCooltime[index] != null)
+    //            StopCoroutine(Co_SkillCooltime[index]);
 
-        lobbyEquipSkill_Image[index].color = Color.white;
-        isSkillCooltime[index] = false;
-    }
+    //        isSkillCooltime[index] = true;
+    //        int cooltime = int.Parse(SkillTemplate[skillID][(int)SkillTemplate_.Cooltime]);
+
+    //        Co_SkillCooltime[index] = Co_SkillCoolTime(cooltime, index);
+    //        StartCoroutine(Co_SkillCooltime[index]);
+    //    }
+    //}
+    //void StopSkillCooltime(int index)
+    //{
+    //    if (Co_SkillCooltime[index] != null)
+    //        StopCoroutine(Co_SkillCooltime[index]);
+
+    //    lobbyEquipSkill_Image[index].color = Color.white;
+    //    lobbyEquipSkill_Image[index].transform.Find("CoolTime").GetComponent<Image>().fillAmount = 0;
+    //}
+    //public IEnumerator Co_SkillCoolTime(float cool, int index)
+    //{
+    //    Image coolTimeIcon = lobbyEquipSkill_Image[index].transform.Find("CoolTime").GetComponent<Image>();
+    //    coolTimeIcon.fillAmount = 1f;
+
+    //    lobbyEquipSkill_Image[index].color = Color.gray;
+
+    //    float time = cool;
+    //    while (time > 0)
+    //    {
+    //        time -= Time.deltaTime;
+    //        coolTimeIcon.fillAmount = time / cool;
+
+    //        yield return CommonIEnumerator.WaitForEndOfFrame;
+    //    }
+
+    //    lobbyEquipSkill_Image[index].color = Color.white;
+    //    isSkillCooltime[index] = false;
+    //}
+    #endregion 테스트용
     void OpenUI_Category4(GameObject clickButton)
     {
 

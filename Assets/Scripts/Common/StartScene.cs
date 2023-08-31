@@ -70,8 +70,6 @@ public class StartScene : MonoBehaviour
     }
     private void Init()
     {
-        Debug.Log("스타트씬 시작");
-
         FadeIn();
     }
 

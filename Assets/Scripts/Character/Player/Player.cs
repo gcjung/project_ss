@@ -57,8 +57,8 @@ public class Player : MonoBehaviour, IHpProvider
 
     public void TakeDamage(double damageAmount)
     {
-        Debug.Log($"플레이어가 {damageAmount}만큼 피해를 입음.");
-        Debug.Log($"남은 체력 : {CurrentHp}");
+        //Debug.Log($"플레이어가 {damageAmount}만큼 피해를 입음.");
+        //Debug.Log($"남은 체력 : {CurrentHp}");
 
         CurrentHp -= damageAmount;
 

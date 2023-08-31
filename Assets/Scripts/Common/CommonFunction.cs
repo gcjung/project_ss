@@ -44,7 +44,7 @@ public class CommonFunction : MonoBehaviour
         }
     }
 
-    public static GameObject GetPrefab(Object prefab, Transform parentTransform, string fontName ="")
+    public static GameObject CreatePrefab(Object prefab, Transform parentTransform)
     {
         GameObject obj = Instantiate(prefab) as GameObject;
         obj.transform.SetParent(parentTransform, false);
@@ -60,13 +60,24 @@ public class CommonFunction : MonoBehaviour
 
         return obj;
     }
-    public static GameObject GetPrefab(string prefabName, Transform parentTransform)
+    public static GameObject GetPrefabInstance(string prefabName, Transform parentTransform)    // ¿⁄√º Instantiate «ÿ¡‹
     {
         LoadPrefab(prefabName);
         //LoadObj(prefabsPool, prefabName);
 
-        return GetPrefab(prefabPool[prefabName], parentTransform);
+        return CreatePrefab(prefabPool[prefabName], parentTransform);
     }
+
+    public static GameObject GetPrefab(string prefabName)
+    {
+        LoadPrefab(prefabName);
+        
+        GameObject obj = prefabPool[prefabName] as GameObject;
+        Util.ReLinkShader(obj);
+
+        return obj;
+    }
+
 
     public static void LoadFont(string prefabName)
     {

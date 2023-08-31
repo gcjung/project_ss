@@ -27,6 +27,7 @@ public class Bullet : MonoBehaviour
     public void SettingInfo(double damage, bool isCritical, Vector3 direction, float speed)
     {
         Damage = isCritical ? damage * 1.5f : damage;
+        Damage = 1;
         IsCritical = isCritical;
         Direction = direction;
         Speed = speed;
@@ -40,7 +41,7 @@ public class Bullet : MonoBehaviour
 
             {   //데미지 텍스트 생성
                 string textName = IsCritical ? "Damage_Text(Critical)" : "Damage_Text";
-                GameObject damageText = CommonFunction.GetPrefab(textName, MainScene.Instance.upSidePanel.transform);
+                GameObject damageText = CommonFunction.GetPrefabInstance(textName, MainScene.Instance.upSidePanel.transform);
 
                 Vector2 contactPoint = collision.ClosestPoint(transform.position);
 

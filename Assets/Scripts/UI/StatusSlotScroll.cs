@@ -41,7 +41,7 @@ public class StatusSlotScroll : MonoBehaviour
             double statusValue = statLevel * val_calc;
             double costValue = statLevel * cost_calc;
 
-            var slot = CommonFunction.GetPrefab("StatusSlot", content);
+            var slot = CommonFunction.GetPrefabInstance("StatusSlot", content);
             slot.AddComponent<StatusSlot>().SetSlot(statLevelStr, statLevel, typeName, statusValue, costValue, val_calc, cost_calc);
 
             slots.Add(slot);
