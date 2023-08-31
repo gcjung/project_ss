@@ -195,7 +195,6 @@ public class SkillController : MonoBehaviour
             FireBall fireBall = TmpObjectPool.Instance.GetPoolObject("FireBall").GetComponent<FireBall>();
             fireBall.transform.position = tempPostion + new Vector3(0.3f,0,0);
             fireBall.SettingInfo(player.TotalAttack * damage, player.TotalCritical, FindTarget());
-            //obj.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
 
             yield return CommonIEnumerator.WaitForSecond(0.3f);
         }

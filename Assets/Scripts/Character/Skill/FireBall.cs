@@ -33,11 +33,9 @@ public class FireBall : SkillEffect
             TmpObjectPool.Instance.ReturnToPool(gameObject);
             Debug.Log(gameObject.name + " 시간지나사라짐");
         }
-
         
     }
-
-    void LookAtTarget(Vector3 dir)                // 화살이 적의 방향을 향하도록 해줌
+    void LookAtTarget(Vector3 dir)             
     {
         transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
     }
@@ -59,6 +57,7 @@ public class FireBall : SkillEffect
         {
             if (target == collision.transform || target == null)
             {
+                Debug.Log($"파이어볼 target : {target}");
                 string textName = CalcCritical(critical) ? "Damage_Text(Critical)" : "Damage_Text";
                 GameObject damageText = CommonFunction.GetPrefabInstance(textName, MainScene.Instance.upSidePanel.transform);
 
@@ -76,13 +75,8 @@ public class FireBall : SkillEffect
 
                 damageText.AddComponent<DamageText>();
                 monster.TakeDamage(damage);
-                Debug.Log($"{monster.Name}에 파이어볼 부딪힘, 데미지 : {damage}");
                 TmpObjectPool.Instance.ReturnToPool(gameObject);
             }
-           
-
-
-
         }
     }
 
