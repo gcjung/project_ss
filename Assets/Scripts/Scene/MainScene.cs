@@ -163,25 +163,30 @@ public class MainScene : MonoBehaviour
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
         gemText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gem_Image/Gem_Text").GetComponent<TMP_Text>();
 
-        var skillPanel = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel");
-
         popupUI_0 = UIManager.instance.transform.Find("PopupUI_0").gameObject;
         popupUI_1 = UIManager.instance.transform.Find("PopupUI_1").gameObject;
 
         skillController = FindObjectOfType<SkillController>();
         skillController.Init(playerCharacter);
 
+        var skillPanel = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel");
         // 로비 스킬UI 버튼
         lobbyEquipSkill_Image = new Image[skillPanel.childCount - 1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
         {
+            if(i == 0)
+            {
+                skillPanel.GetChild(0).GetComponent<Button>().onClick.AddListener(() => { OnClick_AutoSkillBtn(); });
+            }
+
             int index = i;
             lobbyEquipSkill_Image[i] = skillPanel.GetChild(i + 1).GetComponent<Image>();
             skillController.equippedSkillInfo[i].lobbySkillSlot = skillPanel.GetChild(i + 1).GetComponent<Image>();
 
             EventTrigger.Entry entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerUp;
-            entry.callback.AddListener((eventData) => {
+            entry.callback.AddListener((eventData) =>
+            {
                 OnClickUseSkill(index);
             });
 
@@ -246,7 +251,7 @@ public class MainScene : MonoBehaviour
         map1.sprite = mapSprite;
         map2.sprite = mapSprite;
     }
-    public void SetSkill(string[] equippedSkill)
+    public void SetLobbySkill(string[] equippedSkill)
     {
         for (int i = 0; i < equippedSkill.Length; i++)
         {
@@ -261,8 +266,31 @@ public class MainScene : MonoBehaviour
             lobbyEquipSkill_Image[i].sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
         }
     }
+    void OnClick_AutoSkillBtn()
+    {
+        var isOn = GlobalManager.Instance.DBManager.GetUserBoolData(UserBoolDataType.isOnAutoSkill);
+        SetLobbyAutoSkil(!isOn);    // 버튼 눌렀으니깐 반대로
+        skillController.StartAutoSkill(!isOn);
 
-    public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
+        GlobalManager.Instance.DBManager.UpdateUserData(UserBoolDataType.isOnAutoSkill, !isOn);
+    }
+    public void SetLobbyAutoSkil(bool isOn)
+    {
+        var autoSkillBtn = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel/Auto_Image");
+        
+        if (isOn)
+        {
+            autoSkillBtn.Find("Text").GetComponent<TMP_Text>().text = "Auto\nON";
+            autoSkillBtn.Find("loop").gameObject.SetActive(true);  
+        }
+        else
+        {
+            autoSkillBtn.Find("Text").GetComponent<TMP_Text>().text = "Auto\nOFF";
+            autoSkillBtn.Find("loop").gameObject.SetActive(false);
+        }
+    }
+
+        public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
     {
         switch (statusName)
         {
@@ -310,9 +338,12 @@ public class MainScene : MonoBehaviour
         goldText.text = $"{Util.BigNumCalculate(gold)} G";
         gemText.text = Util.BigNumCalculate(gem);
 
-        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill, "@@@@@").Split('@');
+        var isOn = GlobalManager.Instance.DBManager.GetUserBoolData(UserBoolDataType.isOnAutoSkill);
+        SetLobbyAutoSkil(isOn);
+        skillController.StartAutoSkill(isOn);
 
-        SetSkill(equippedSkill);    // 스킬 세팅
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill, "@@@@@").Split('@');
+        SetLobbySkill(equippedSkill);    // 스킬 세팅
     }
 
     private void EnterBossRoom()

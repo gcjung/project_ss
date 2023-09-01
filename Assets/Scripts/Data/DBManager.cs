@@ -30,7 +30,14 @@ public enum UserStringDataType
 {
     EquippedSkill,
     SkillData,
+    isOnAutoSkill,
 }
+public enum UserBoolDataType
+{
+    isOnAutoSkill,
+
+}
+
 
 public enum GameDataType
 {
@@ -41,6 +48,7 @@ public class DBManager : Manager<DBManager>
 {
     Dictionary<string, double> userDoubleDataDic = new Dictionary<string, double>();
     Dictionary<string, string> userStringDataDic = new Dictionary<string, string>();
+    Dictionary<string, bool> userBoolDataDic = new Dictionary<string, bool>();
 
     Dictionary<string, object> gameData = new Dictionary<string, object>();
 
@@ -113,6 +121,10 @@ public class DBManager : Manager<DBManager>
                 {
                     userStringDataDic.Add(pair.Key, (string)pair.Value);
                 }
+                else if (pair.Value is bool)
+                {
+                    userBoolDataDic.Add(pair.Key, (bool)pair.Value);
+                }
                 else
                 {
                     Debug.Log($"else : {pair.Key}, {pair.Value}");
@@ -168,6 +180,25 @@ public class DBManager : Manager<DBManager>
 
         return defaultValue;
     }
+    public bool GetUserBoolData(UserBoolDataType key_, bool defaultValue = false)
+    {
+        string key = key_.ToString();
+        if (userBoolDataDic.ContainsKey(key))
+            return userBoolDataDic[key];
+        else
+            UpdateUserData(key, defaultValue);
+
+        return defaultValue;
+    }
+    public bool GetUserBoolData(string key, bool defaultValue = false)
+    {
+        if (userBoolDataDic.ContainsKey(key))
+            return userBoolDataDic[key];
+        else
+            UpdateUserData(key, defaultValue);
+
+        return defaultValue;
+    }
 
 
     public void UpdateUserData(UserDoubleDataType key_, double value)
@@ -208,6 +239,27 @@ public class DBManager : Manager<DBManager>
 
         UpdateFirebaseUserData(key, value);
     }
+    public void UpdateUserData(UserBoolDataType key_, bool value)
+    {
+        string key = key_.ToString();
+        if (userBoolDataDic.ContainsKey(key))
+            userBoolDataDic[key] = value;
+        else
+            userBoolDataDic.Add(key, value);
+
+        UpdateFirebaseUserData(key, value);
+    }
+    public void UpdateUserData(string key, bool value)
+    {
+        if (userBoolDataDic.ContainsKey(key))
+            userBoolDataDic[key] = value;
+        else
+            userBoolDataDic.Add(key, value);
+
+        UpdateFirebaseUserData(key, value);
+    }
+
+
 
     public string GetGameData(GameDataType key_)
     {

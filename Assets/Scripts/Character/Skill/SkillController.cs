@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static GameDataManager;
+using static SkillController;
 
 public class SkillController : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class SkillController : MonoBehaviour
         public bool isSkillCooltime { get; set; } = false;
 
         public Image lobbySkillSlot { get; set; }
-        public IEnumerator Co_SkillCooltime;
+        public IEnumerator co_SkillCooltime;
         public EquippedSkillInfo(string skillId) => SetSkillInfo(skillId);
         public void SetSkillInfo(string skillId = "")   
         {
@@ -58,21 +59,20 @@ public class SkillController : MonoBehaviour
     {
         var skillInfo = equippedSkillInfo[index];
 
-        if (skillInfo.Co_SkillCooltime != null)
-            StopCoroutine(skillInfo.Co_SkillCooltime);
+        if (skillInfo.co_SkillCooltime != null)
+            StopCoroutine(skillInfo.co_SkillCooltime);
 
         skillInfo.isSkillCooltime = true;
 
-        skillInfo.Co_SkillCooltime = Co_SkillCoolTime(skillInfo.cooltime, index);
-        StartCoroutine(skillInfo.Co_SkillCooltime);
-
+        skillInfo.co_SkillCooltime = Co_SkillCoolTime(skillInfo.cooltime, index);
+        StartCoroutine(skillInfo.co_SkillCooltime);
     }
     public void StopSkillCooltime(int index)
     {
         var skillInfo = equippedSkillInfo[index];
 
-        if (skillInfo.Co_SkillCooltime != null)
-            StopCoroutine(skillInfo.Co_SkillCooltime);
+        if (skillInfo.co_SkillCooltime != null)
+            StopCoroutine(skillInfo.co_SkillCooltime);
 
         skillInfo.lobbySkillSlot.color = Color.white;
         skillInfo.lobbySkillSlot.transform.Find("CoolTime").GetComponent<Image>().fillAmount = 0;
@@ -99,16 +99,28 @@ public class SkillController : MonoBehaviour
 
         skillInfo.lobbySkillSlot.color = Color.white;
         skillInfo.isSkillCooltime = false;
+
+        var isOn = GlobalManager.Instance.DBManager.GetUserBoolData(UserBoolDataType.isOnAutoSkill);
+        if (isOn)
+            UseSkill(index, skillInfo.id);
+    }
+    public void StartAutoSkill(bool isOn)
+    {
+        if (!isOn) return;
+
+        var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        for (int i = 0; i < equippedSkill.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(equippedSkill[i]))
+            {
+                UseSkill(i, equippedSkillInfo[i].id);
+            }
+        }
+        
     }
 
-    //ObjectPool<Thunderbolt> thunderBoltPool;
-    
     void Start()
     {
-        //Thunderbolt thunderbolt = CommonFunction.GetPrefab("ThunderBolt").GetComponent<Thunderbolt>();
-        //thunderBoltPool = new ObjectPool<Thunderbolt>(thunderbolt, 5, transform);
-        //GameObject creationFireBallEffect = CommonFunction.GetPrefab("CreationFireBallEffect");
-        //creationFireBallEffectPool = new ObjectPool<GameObject>(creationFireBallEffect, 5, transform);
         enemyList = new LinkedList<Monster>();
 
         TmpObjectPool.Instance.CreatePool("ThunderBolt", 3);
@@ -141,6 +153,7 @@ public class SkillController : MonoBehaviour
         if (skillInfo.isSkillCooltime) return;
         
         StartSkillCooltime(index);
+        Debug.Log($"{skillId} 스킬사용");
         int damage = int.Parse(SkillTemplate[skillId][(int)SkillTemplate_.Damage]);
         switch (skillId)
         {
@@ -168,7 +181,7 @@ public class SkillController : MonoBehaviour
         }
     }
 
-    Transform FindTarget()
+    Transform FindTarget()  // 단일 타겟용, 캐릭터와 가장가까운 적을 반환
     {
         Debug.Log("현재 타겟수 : " + enemyList.Count);
         if (enemyList.Count <= 0) return null;
