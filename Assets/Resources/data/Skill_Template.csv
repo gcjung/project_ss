@@ -1,9 +1,9 @@
 ﻿skill_ID,grade,name,order,cooltime,damage,icon,desc
-1,커먼,회복,1,1,150,38-Healing-Light/SkillAtlas,체력을 회복합니다.
-2,언커먼,파이어볼,3,2,200,31-Fire/SkillAtlas,한 번에 강한 데미지를 입히는 파이어볼을 발사
-3,레어,썬더 볼트,4,2,250,47-Lightning/SkillAtlas,번개가 4번 떨어져 범위 피해를 입힙니다.
+1,커먼,회복,1,5,150,38-Healing-Light/SkillAtlas,체력을 회복합니다.
+2,언커먼,파이어볼,3,7,200,31-Fire/SkillAtlas,한 번에 강한 데미지를 입히는 파이어볼을 발사
+3,레어,썬더 볼트,4,10,250,47-Lightning/SkillAtlas,번개가 4번 떨어져 범위 피해를 입힙니다.
 4,에픽,익스플로전,5,1,400,22-Delaminate/SkillAtlas,폭발이 6번 일어납니다. 범위 피해와 강력한 데미지를 입힙니다.
-5,커먼,분노,2,1,30,113-Rage/SkillAtlas,5초 동안 공격력이 증가합니다.
+5,커먼,분노,2,10,30,113-Rage/SkillAtlas,5초 동안 공격력이 증가합니다.
 5,레전더리,,5,,,,
 6,신화,,6,,,,
 7,초월,,7,,,,

@@ -79,13 +79,9 @@ public class SkillController : MonoBehaviour
     }
     public IEnumerator Co_SkillCoolTime(float cool, int index)
     {
-        //Image coolTimeIcon = lobbySkillSlot.transform.Find("CoolTime").GetComponent<Image>();
-        //coolTimeIcon.fillAmount = 1f;
         var skillInfo = equippedSkillInfo[index];
-
         Image coolTimeIcon = skillInfo.lobbySkillSlot.transform.Find("CoolTime").GetComponent<Image>();
         coolTimeIcon.fillAmount = 1f;
-
         skillInfo.lobbySkillSlot.color = Color.gray;
 
         float time = cool;
@@ -104,7 +100,7 @@ public class SkillController : MonoBehaviour
         if (isOn)
             UseSkill(index, skillInfo.id);
     }
-    public void StartAutoSkill(bool isOn)
+    public void OnStartAutoSkill(bool isOn)
     {
         if (!isOn) return;
 
@@ -116,7 +112,6 @@ public class SkillController : MonoBehaviour
                 UseSkill(i, equippedSkillInfo[i].id);
             }
         }
-        
     }
 
     void Start()
@@ -126,6 +121,8 @@ public class SkillController : MonoBehaviour
         TmpObjectPool.Instance.CreatePool("ThunderBolt", 3);
         TmpObjectPool.Instance.CreatePool("CreationFireBallEffect", 3);
         TmpObjectPool.Instance.CreatePool("FireBall", 3);
+        TmpObjectPool.Instance.CreatePool("HealEffect", 3);
+        TmpObjectPool.Instance.CreatePool("RageEffect", 3);
     }
     LinkedList<Monster> enemyList;
     private void OnTriggerEnter2D(Collider2D collision)
@@ -153,13 +150,15 @@ public class SkillController : MonoBehaviour
         if (skillInfo.isSkillCooltime) return;
         
         StartSkillCooltime(index);
-        Debug.Log($"{skillId} 스킬사용");
+        
         int damage = int.Parse(SkillTemplate[skillId][(int)SkillTemplate_.Damage]);
         switch (skillId)
         {
             case "1":
-
+                //StartCoroutine(UseSkill_Heal(damage));
+                UseSkill_Heal(damage);
                 break;
+
             case "2":
                 StartCoroutine(UseSkill_FireBall(damage));
                 break;
@@ -169,8 +168,11 @@ public class SkillController : MonoBehaviour
                 break;
 
             case "4":
+                StartCoroutine(UseSkill_Explosion(damage));
                 break;
+
             case "5":
+                UseSkill_Rage(damage);
                 break;
 
             case "6":
@@ -183,7 +185,6 @@ public class SkillController : MonoBehaviour
 
     Transform FindTarget()  // 단일 타겟용, 캐릭터와 가장가까운 적을 반환
     {
-        Debug.Log("현재 타겟수 : " + enemyList.Count);
         if (enemyList.Count <= 0) return null;
 
         Transform target = enemyList.First.Value.transform;
@@ -194,6 +195,20 @@ public class SkillController : MonoBehaviour
         }
 
         return target;
+    }
+    void UseSkill_Heal(int damage)
+    {
+        GameObject obj = TmpObjectPool.Instance.GetPoolObject("HealEffect");
+        obj.transform.position = player.transform.position + new Vector3(0,0.5f,0);
+
+        player.TakeDamage(-damage);
+    }
+    void UseSkill_Rage(int damage)
+    {
+        GameObject obj = TmpObjectPool.Instance.GetPoolObject("RageEffect");
+        obj.transform.position = player.transform.position + new Vector3(0, 0.5f, 0);
+
+        //player.TakeDamage(-damage) 공격력 증가 코드를 짜야함.
     }
 
     IEnumerator UseSkill_FireBall(int damage)
@@ -212,6 +227,20 @@ public class SkillController : MonoBehaviour
             yield return CommonIEnumerator.WaitForSecond(0.3f);
         }
     }
+
+    IEnumerator UseSkill_Explosion(int damage)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            //Thunderbolt obj = TmpObjectPool.Instance.GetPoolObject("ThunderBolt").GetComponent<Thunderbolt>();
+            //obj.transform.position = player.transform.position + new Vector3(Random.Range(1f, 4f), 3f, 0f) + Random.insideUnitSphere * 1;
+            ////obj.transform.localScale = new Vector3(0.5f, 1f, 1f);
+            //obj.SettingInfo(player.TotalAttack * damage, player.TotalCritical, /*임시*/transform);
+            Debug.Log("익스플로전 " + i);
+            yield return CommonIEnumerator.WaitForSecond(0.3f);
+        }
+    }
+
 
     IEnumerator UseSkill_ThunderBolt(int damage)
     {

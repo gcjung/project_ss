@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static GameDataManager;
@@ -64,15 +66,17 @@ public class MonsterSpawner : MonoBehaviour
         string bossName = MonsterTemplate[mainScene.bossId.ToString()][(int)MonsterTemplate_.Name];
 
         {//일반몬스터 세팅   
-            monster = Resources.Load<Monster>($"Monster/{monsterName}");      
-            
+            monster = Resources.Load<Monster>($"Monster/{monsterName}");
+
             var _monster = Instantiate(monster, transform);
             _monster.gameObject.AddComponent<MonsterController>();
 
             if (monsterPool != null && monsterPool.TrPool != null && monsterPool.TrPool.gameObject != null)
+            {
                 Destroy(monsterPool.TrPool.gameObject);
+            }
 
-            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);           
+            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
             Destroy(_monster.gameObject);
         }
 

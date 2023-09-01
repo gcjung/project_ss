@@ -269,12 +269,12 @@ public class MainScene : MonoBehaviour
     void OnClick_AutoSkillBtn()
     {
         var isOn = GlobalManager.Instance.DBManager.GetUserBoolData(UserBoolDataType.isOnAutoSkill);
-        SetLobbyAutoSkil(!isOn);    // 버튼 눌렀으니깐 반대로
-        skillController.StartAutoSkill(!isOn);
+        SetLobbyAutoSkill(!isOn);    // 버튼 눌렀으니깐 반대로
+        skillController.OnStartAutoSkill(!isOn);
 
         GlobalManager.Instance.DBManager.UpdateUserData(UserBoolDataType.isOnAutoSkill, !isOn);
     }
-    public void SetLobbyAutoSkil(bool isOn)
+    public void SetLobbyAutoSkill(bool isOn)
     {
         var autoSkillBtn = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel/Auto_Image");
         
@@ -290,7 +290,7 @@ public class MainScene : MonoBehaviour
         }
     }
 
-        public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
+    public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
     {
         switch (statusName)
         {
@@ -339,8 +339,8 @@ public class MainScene : MonoBehaviour
         gemText.text = Util.BigNumCalculate(gem);
 
         var isOn = GlobalManager.Instance.DBManager.GetUserBoolData(UserBoolDataType.isOnAutoSkill);
-        SetLobbyAutoSkil(isOn);
-        skillController.StartAutoSkill(isOn);
+        SetLobbyAutoSkill(isOn);
+        skillController.OnStartAutoSkill(isOn);
 
         var equippedSkill = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill, "@@@@@").Split('@');
         SetLobbySkill(equippedSkill);    // 스킬 세팅

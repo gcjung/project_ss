@@ -63,6 +63,23 @@ public class TmpObjectPool : MonoBehaviour
         }
     }
 
+    public void CreatePool(GameObject prefab, int poolSize)
+    {
+        if (!objectPool.ContainsKey(prefab.name))
+        {
+            objectPool[prefab.name] = new Queue<GameObject>();
+        }
+
+        for (int i = 0; i < poolSize; i++)
+        {
+            GameObject obj = Instantiate(prefab, transform);
+            obj.name = prefab.name;
+            obj.SetActive(false);
+            objectPool[prefab.name].Enqueue(obj);
+        }
+    }
+
+
     public GameObject GetPoolObject(string prefabName, Transform tf = null)
     {
         if (tf == null) tf = transform;

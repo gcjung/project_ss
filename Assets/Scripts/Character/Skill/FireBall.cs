@@ -31,7 +31,6 @@ public class FireBall : SkillEffect
         if (gameObject.activeSelf)
         {
             TmpObjectPool.Instance.ReturnToPool(gameObject);
-            Debug.Log(gameObject.name + " 시간지나사라짐");
         }
         
     }
@@ -57,7 +56,6 @@ public class FireBall : SkillEffect
         {
             if (target == collision.transform || target == null)
             {
-                Debug.Log($"파이어볼 target : {target}");
                 string textName = CalcCritical(critical) ? "Damage_Text(Critical)" : "Damage_Text";
                 GameObject damageText = CommonFunction.GetPrefabInstance(textName, MainScene.Instance.upSidePanel.transform);
 
