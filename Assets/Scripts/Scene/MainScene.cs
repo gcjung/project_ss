@@ -370,7 +370,11 @@ public class MainScene : MonoBehaviour
     {
         float delayTime = 2.0f;
         int targetLayer = LayerMask.NameToLayer("Over UI");
-        var _vsImage = Instantiate(vsImage, upSidePanel.transform);
+
+        //rawImage.transform.SetAsFirstSibling();
+        var rawImage = CommonFunction.GetPrefabInstance("VS_RawImage", upSidePanel.transform);
+
+        var _vsSprite = CommonFunction.GetPrefabInstance("VS_Sprite", transform);
 
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
@@ -385,13 +389,13 @@ public class MainScene : MonoBehaviour
 
         yield return new WaitForSeconds(delayTime);
 
+        Destroy(rawImage.gameObject);
         Destroy(_bossPref);
         Destroy(_playerPref);
-        Destroy(_vsImage.gameObject);
+        Destroy(_vsSprite.gameObject);
 
         spawner.SpawnBossMonster();
     }
-
 
     private void StageClear()
     {

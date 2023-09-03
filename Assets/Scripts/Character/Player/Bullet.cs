@@ -27,7 +27,6 @@ public class Bullet : MonoBehaviour
     public void SettingInfo(double damage, bool isCritical, Vector3 direction, float speed)
     {
         Damage = isCritical ? damage * 1.5f : damage;
-        Damage = 1;
         IsCritical = isCritical;
         Direction = direction;
         Speed = speed;

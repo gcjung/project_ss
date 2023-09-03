@@ -5,6 +5,7 @@ using System;
 using UnityEngine.TextCore.Text;
 using TMPro;
 using UnityEditor;
+using UnityEngine.UI;
 
 public class Util
 {
@@ -69,6 +70,23 @@ public class Util
         }
     }
 
+
+    public static void SetRawImageTexture(Transform parent)
+    {
+        RawImage[] rawImages = parent.GetComponentsInChildren<RawImage>();
+        foreach (var ri in rawImages)
+        {
+            if (ri.texture == null)
+                continue;
+
+            if (!string.IsNullOrEmpty(ri.texture.name))
+            {
+                ri.texture = Resources.Load<Texture>("Texture/" + ri.texture.name);
+            }
+        }
+    }
+
+
     public static void ReLinkShader(GameObject obj, bool _isActive = false)
     {
         MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>(_isActive);
@@ -118,6 +136,7 @@ public class Util
                 }
             }
         }
+
 
         //TMP_Text[] TMP_Texts = obj.GetComponentsInChildren<TMP_Text>();
         //foreach (TMP_Text text in TMP_Texts)

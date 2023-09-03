@@ -25,25 +25,9 @@ public class TmpObjectPool : MonoBehaviour
         if (instance == null)
             instance = this;
 
-        //prefabDic = new Dictionary<string, GameObject>();
         objectPool = new Dictionary<string, Queue<GameObject>>();
     }
-    //public void AddPrefabDic(GameObject prefab)
-    //{
-    //    if (!prefabDic.ContainsKey(prefab.name))
-    //    {
-    //        prefabDic.Add(prefab.name, prefab);
-    //    }
-    //}
 
-    //public GameObject GetGameObject(string prefabName)
-    //{
-    //    if (prefabDic.ContainsKey(prefabName))
-    //    {
-    //        return prefabDic[prefabName];
-    //    }
-    //    return null;
-    //}
 
     public void CreatePool(string prefabName, int poolSize)
     {

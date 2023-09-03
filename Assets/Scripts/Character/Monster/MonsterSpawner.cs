@@ -98,7 +98,7 @@ public class MonsterSpawner : MonoBehaviour
             case StageState.InfinityWave:
                 slider.gameObject.SetActive(false);
 
-                bossRoomButton = CommonFunction.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
+                bossRoomButton = CommonFunction.GetPrefabInstance("BossRoom_Button", slider.gameObject.transform.parent);              
                 bossRoomButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     FinishWave();
@@ -136,7 +136,7 @@ public class MonsterSpawner : MonoBehaviour
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
-            var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+            var hpBar = CommonFunction.GetPrefabInstance("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
             hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
 
             MonsterCount--;
@@ -157,7 +157,7 @@ public class MonsterSpawner : MonoBehaviour
         _bossMonster.transform.position = spawnPoint2.position;
         _bossMonster.GetComponent<Monster>().BossMonsterDied += FinishStage;
 
-        var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Boss", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+        var hpBar = CommonFunction.GetPrefabInstance("Slider_HealthBar_Boss", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
         hpBar.GetComponent<HpSlider>().SetTarget(_bossMonster.gameObject);
     }
 

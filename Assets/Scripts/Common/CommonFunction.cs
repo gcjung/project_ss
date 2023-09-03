@@ -52,6 +52,7 @@ public class CommonFunction : MonoBehaviour
         if (obj.GetComponent<RectTransform>())
         {
             Util.SetFontInChildrenText(obj.transform);
+            Util.SetRawImageTexture(obj.transform);
         }
         else
         {

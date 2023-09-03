@@ -177,6 +177,7 @@ public class SkillController : MonoBehaviour
 
             case "6":
                 break;
+
             default:
                 Debug.Log(skillId + "는 없는 스킬 ID 입니다");
                 break;
