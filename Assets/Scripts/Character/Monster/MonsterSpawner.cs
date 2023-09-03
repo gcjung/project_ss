@@ -106,7 +106,7 @@ public class MonsterSpawner : MonoBehaviour
                     StopAllCoroutines();    // Stop InfinitySpawnMonster, SpawnMonster
                     infinitySpawnCoroutine = null;
 
-                    Destroy(monsterPool.TrPool.gameObject);
+                    Destroy(monsterPool.TrPool.gameObject); //오브젝트풀 파괴
                     Destroy(bossRoomButton.gameObject);
                 });
 

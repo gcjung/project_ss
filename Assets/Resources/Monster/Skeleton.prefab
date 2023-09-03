@@ -1217,10 +1217,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bf89143c04fe17419b9749b74653d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 0
-  currentHp: 0
-  attack: 0
-  gold: 0
 --- !u!1 &4634661722846009945
 GameObject:
   m_ObjectHideFlags: 0

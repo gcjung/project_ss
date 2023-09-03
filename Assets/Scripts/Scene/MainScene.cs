@@ -151,7 +151,7 @@ public class MainScene : MonoBehaviour
 
         Debug.Log("메인씬 시작");
 
-        SetCurrentStageState(StageState.NormalWave);
+        SetCurrentStageState(StageState.InfinityWave);
 
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
         SetStage(stageId);  //스테이지 세팅
@@ -333,10 +333,9 @@ public class MainScene : MonoBehaviour
         int targetLayer = LayerMask.NameToLayer("Over UI");
 
         var rawImage = CommonFunction.GetPrefab("VS_RawImage", upSidePanel.transform);
-        rawImage.transform.SetAsFirstSibling();
+        //rawImage.transform.SetAsFirstSibling();
 
-        var _vsImage = CommonFunction.GetPrefab("VS_Image", upSidePanel.transform);
-        _vsImage.transform.SetAsFirstSibling();       
+        var _vsSprite = CommonFunction.GetPrefab("VS_Sprite", transform);
 
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
@@ -354,7 +353,7 @@ public class MainScene : MonoBehaviour
         Destroy(rawImage.gameObject);
         Destroy(_bossPref);
         Destroy(_playerPref);
-        Destroy(_vsImage.gameObject);
+        Destroy(_vsSprite.gameObject);
 
         spawner.SpawnBossMonster();
     }
