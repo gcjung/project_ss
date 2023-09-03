@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 1508222186440645649}
   - component: {fileID: -1250306742949942494}
   m_Layer: 5
-  m_Name: BossEntrance_Image
+  m_Name: VS_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

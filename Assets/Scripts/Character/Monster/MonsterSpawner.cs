@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static GameDataManager;
@@ -66,17 +64,15 @@ public class MonsterSpawner : MonoBehaviour
         string bossName = MonsterTemplate[mainScene.bossId.ToString()][(int)MonsterTemplate_.Name];
 
         {//일반몬스터 세팅   
-            monster = Resources.Load<Monster>($"Monster/{monsterName}");
-
+            monster = Resources.Load<Monster>($"Monster/{monsterName}");      
+            
             var _monster = Instantiate(monster, transform);
             _monster.gameObject.AddComponent<MonsterController>();
 
             if (monsterPool != null && monsterPool.TrPool != null && monsterPool.TrPool.gameObject != null)
-            {
                 Destroy(monsterPool.TrPool.gameObject);
-            }
 
-            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);
+            monsterPool = new ObjectPool<Monster>(_monster, 9, this.transform);           
             Destroy(_monster.gameObject);
         }
 
@@ -102,7 +98,7 @@ public class MonsterSpawner : MonoBehaviour
             case StageState.InfinityWave:
                 slider.gameObject.SetActive(false);
 
-                bossRoomButton = CommonFunction.GetPrefabInstance("BossRoom_Button", slider.gameObject.transform.parent);              
+                bossRoomButton = CommonFunction.GetPrefab("BossRoom_Button", slider.gameObject.transform.parent);              
                 bossRoomButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     FinishWave();
@@ -110,15 +106,13 @@ public class MonsterSpawner : MonoBehaviour
                     StopAllCoroutines();    // Stop InfinitySpawnMonster, SpawnMonster
                     infinitySpawnCoroutine = null;
 
-                    //monsterPool.ClearPool();
-                    Destroy(monsterPool.TrPool.gameObject);
+                    Destroy(monsterPool.TrPool.gameObject); //오브젝트풀 파괴
                     Destroy(bossRoomButton.gameObject);
                 });
 
                 if (infinitySpawnCoroutine != null)
                 {
                     StopCoroutine(infinitySpawnCoroutine);
-                    infinitySpawnCoroutine = null;
                 }
 
                 infinitySpawnCoroutine = StartCoroutine(InfinitySpawnMonster());
@@ -135,14 +129,14 @@ public class MonsterSpawner : MonoBehaviour
         while (MonsterCount != 0)
         {
             int randomIndex = Random.Range(1, 4);
-            Transform spawnPoint = GetSpawnPoint(randomIndex);
+            Transform spawnPoint = GetSpawnPoint(randomIndex);  //스폰 위치 설정
 
-            var _monster = monsterPool.GetObjectPool();
+            var _monster = monsterPool.GetObjectPool(); //몬스터 생성
             _monster.SetMonsterStat(mainScene.monsterId);
             _monster.transform.localScale = monster.transform.localScale;
             _monster.transform.position = spawnPoint.position;
 
-            var hpBar = CommonFunction.GetPrefabInstance("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+            var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Monster", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
             hpBar.GetComponent<HpSlider>().SetTarget(_monster.gameObject);
 
             MonsterCount--;
@@ -163,7 +157,7 @@ public class MonsterSpawner : MonoBehaviour
         _bossMonster.transform.position = spawnPoint2.position;
         _bossMonster.GetComponent<Monster>().BossMonsterDied += FinishStage;
 
-        var hpBar = CommonFunction.GetPrefabInstance("Slider_HealthBar_Boss", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
+        var hpBar = CommonFunction.GetPrefab("Slider_HealthBar_Boss", MainScene.Instance.upSidePanel.transform);   //체력바 세팅
         hpBar.GetComponent<HpSlider>().SetTarget(_bossMonster.gameObject);
     }
 
