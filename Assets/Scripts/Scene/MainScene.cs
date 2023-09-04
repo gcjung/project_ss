@@ -152,7 +152,7 @@ public class MainScene : MonoBehaviour
 
         Debug.Log("메인씬 시작");
 
-        SetCurrentStageState(StageState.NormalWave);
+        SetCurrentStageState(StageState.InfinityWave);
 
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
         SetStage(stageId);  //스테이지 세팅
@@ -370,21 +370,25 @@ public class MainScene : MonoBehaviour
     {
         float delayTime = 2.0f;
         int targetLayer = LayerMask.NameToLayer("Over UI");
+        string bossName = MonsterTemplate[bossId.ToString()][(int)MonsterTemplate_.Name];
 
-        //rawImage.transform.SetAsFirstSibling();
+        //var _vsImage = CommonFunction.GetPrefabInstance("VS_Image", upSidePanel.transform);
+
         var rawImage = CommonFunction.GetPrefabInstance("VS_RawImage", upSidePanel.transform);
 
         var _vsSprite = CommonFunction.GetPrefabInstance("VS_Sprite", transform);
 
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
+        //playerPref = CommonFunction.GetPrefabInstance(heroName, upSidePanel.transform);
         _playerPref.transform.position = playerPosition.position;
+        _playerPref.transform.localScale = new Vector3(3, 3, 1);
         Util.ChangeLayer(_playerPref, targetLayer);
-
-        string bossName = MonsterTemplate[bossId.ToString()][(int)MonsterTemplate_.Name];
+       
         bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
         var _bossPref = Instantiate(bossPref, bossPosition);
         _bossPref.transform.position = bossPosition.position;
+        _bossPref.transform.localScale = new Vector3(3, 3, -1);
         Util.ChangeLayer(_bossPref, targetLayer);
 
         yield return new WaitForSeconds(delayTime);
@@ -393,6 +397,7 @@ public class MainScene : MonoBehaviour
         Destroy(_bossPref);
         Destroy(_playerPref);
         Destroy(_vsSprite.gameObject);
+        //Destroy(_vsImage.gameObject);
 
         spawner.SpawnBossMonster();
     }

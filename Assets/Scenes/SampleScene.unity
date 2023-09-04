@@ -478,7 +478,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &849948545
 RectTransform:
   m_ObjectHideFlags: 0
@@ -488,7 +488,7 @@ RectTransform:
   m_GameObject: {fileID: 849948544}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 23.17462, y: 23.17462, z: 23.17462}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 149336698}
@@ -667,6 +667,7 @@ MonoBehaviour:
   canvas: {fileID: 149336697}
   rawImage: {fileID: 4209805315466985488, guid: 19da57aa4f4269a43b683484e535c423, type: 3}
   spriteRenderer: {fileID: 818536095436016163, guid: df24c27266102584e8d62f6b4c41331a, type: 3}
+  image: {fileID: 849948546}
 --- !u!4 &1614460660
 Transform:
   m_ObjectHideFlags: 0

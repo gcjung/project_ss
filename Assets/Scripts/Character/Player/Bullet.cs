@@ -14,7 +14,8 @@ public class Bullet : MonoBehaviour
 
     private void OnEnable()
     {
-        Invoke(nameof(Off), 4.0f);
+        //Invoke(nameof(Off), 4.0f);
+        StartCoroutine(Off());
     }
     private void Awake()
     {
@@ -62,9 +63,18 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void Off()
+    private IEnumerator Off()
     {
+        float delayTime = 4.0f;
+
+        yield return new WaitForSeconds(delayTime);
+
         if (this.gameObject.activeSelf)
             this.gameObject.SetActive(false);
     }
+    //private void Off()
+    //{
+    //    if (this.gameObject.activeSelf)
+    //        this.gameObject.SetActive(false);
+    //}
 }
