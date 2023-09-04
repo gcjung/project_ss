@@ -18,8 +18,6 @@ public class PlayerController : MonoBehaviour
     private float projectileSpeed = 5.0f;
     private Transform target;
 
-    public bool IsWaveFinish { get; private set; }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.TryGetComponent<MonsterController>(out var monster))
@@ -80,7 +78,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    if (IsWaveFinish)
+                    if (MonsterSpawner.IsWaveFinish)
                     {
                         SetCurrentPlayerState(PlayerState.Idle);
                         playerAnimator.SetTrigger("Idle");
@@ -183,14 +181,14 @@ public class PlayerController : MonoBehaviour
     private IEnumerator DelayChangeState(MonsterController enemy)
     {
         float delayTime = 2.0f;
-        IsWaveFinish = true;
+        MonsterSpawner.IsWaveFinish = true;
 
         yield return CommonIEnumerator.IETimeout(
             onStart: () => { SetCurrentPlayerState(PlayerState.Idle); },
             onFinish: () =>
             {
                 enemyList.Remove(enemy);
-                IsWaveFinish = false;
+                MonsterSpawner.IsWaveFinish = false;
             }, delayTime);
     }
 

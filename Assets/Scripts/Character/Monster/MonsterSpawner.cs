@@ -27,6 +27,7 @@ public class MonsterSpawner : MonoBehaviour
     private GameObject bossRoomButton;
 
     public static bool IsSpawning { get; set; } = false;
+    public static bool IsWaveFinish { get; set; } = false;
     public static int MonsterCount { get; private set; } = 0;
     public static int WaveCount { get; private set; } = 0;
 
@@ -163,15 +164,18 @@ public class MonsterSpawner : MonoBehaviour
 
     public IEnumerator InfinitySpawnMonster()
     {
-        float delayTime = 4.0f;
+        float delayTime = 3.0f;
+        float extraDelayTime = 2.0f;    //PlayerController의 delayTime과 같아야함
 
-        while(mainScene.CurrentStageState == StageState.InfinityWave)
+        while (mainScene.CurrentStageState == StageState.InfinityWave)
         {
             yield return new WaitForSeconds(delayTime);
 
             StartCoroutine(SpawnMonster());
 
-            yield return new WaitUntil(() => !IsSpawning);            
+            yield return new WaitUntil(() => IsWaveFinish);
+
+            yield return new WaitForSeconds(extraDelayTime);
         }
     }
     public void OnSliderValueChanged(float value)
