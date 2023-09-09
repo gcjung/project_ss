@@ -137,7 +137,6 @@ public class Util
             }
         }
 
-
         //TMP_Text[] TMP_Texts = obj.GetComponentsInChildren<TMP_Text>();
         //foreach (TMP_Text text in TMP_Texts)
         //{
