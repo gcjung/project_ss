@@ -2140,11 +2140,9 @@ MonoBehaviour:
   map1: {fileID: 1820378810}
   map2: {fileID: 587764934}
   fadeImage: {fileID: 1187355897327120250, guid: 6914bad92f8ea064aabceb985d55e6e3, type: 3}
-  vsImage: {fileID: -1250306742949942494, guid: c5bf3d997ef6bb24abf6b1d087045766, type: 3}
   playerPosition: {fileID: 1071568692}
   bossPosition: {fileID: 1424292077}
   movePoint: {fileID: 1242721248}
-  victoryText: {fileID: 6669254609789748411, guid: 3b3ca7fda0fcc514698ec2e21119fee7, type: 3}
   totalDamageText: {fileID: 2067080698}
   heroId: 0
   heroName: 
@@ -3171,7 +3169,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1071568691}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3, y: -1, z: 0}
+  m_LocalPosition: {x: -6, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4249,7 +4247,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1424292076}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3, y: -1, z: 0}
+  m_LocalPosition: {x: 6, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -38,16 +38,13 @@ public class MainScene : MonoBehaviour
 
     [Header("Enter Boss Room")]
     [SerializeField] private Image fadeImage;
-    [SerializeField] private Image vsImage;
     [SerializeField] private Transform playerPosition;
     [SerializeField] private Transform bossPosition;
     private GameObject playerPref;
     private GameObject bossPref;
 
-
     [Header("Stage Clear")]
     [SerializeField] private Transform movePoint;
-    [SerializeField] private TextMeshProUGUI victoryText;
 
     [Header("Total Damage Text")]
     [SerializeField] private TextMeshProUGUI totalDamageText;
@@ -290,7 +287,7 @@ public class MainScene : MonoBehaviour
         }
     }
 
-    public void UpdateStatusLevel(string statusName = "", int level = 1)    //임시 메서드(존나게 맘에 안듬)
+    public void UpdateStatusLevel(string statusName = "", int level = 1)
     {
         switch (statusName)
         {
@@ -368,37 +365,49 @@ public class MainScene : MonoBehaviour
 
     private IEnumerator BossBattle()
     {
-        float delayTime = 2.0f;
+        float delayTime = 3.0f;
+        Vector3 playerScale = new Vector3(3, 3, 1);
+        Vector3 bossScale = new Vector3(3, 3, -1);
+        Vector3 playerPos = new Vector3(-3, -1, 1);
+        Vector3 bossPos = new Vector3(3, -1, 1);
         int targetLayer = LayerMask.NameToLayer("Over UI");
         string bossName = MonsterTemplate[bossId.ToString()][(int)MonsterTemplate_.Name];
 
-        //var _vsImage = CommonFunction.GetPrefabInstance("VS_Image", upSidePanel.transform);
-
         var rawImage = CommonFunction.GetPrefabInstance("VS_RawImage", upSidePanel.transform);
-
         var _vsSprite = CommonFunction.GetPrefabInstance("VS_Sprite", transform);
+        GameObject vsText = null;
 
         playerPref = Resources.Load<GameObject>($"Player/{heroName}");
         var _playerPref = Instantiate(playerPref, playerPosition);
-        //playerPref = CommonFunction.GetPrefabInstance(heroName, upSidePanel.transform);
         _playerPref.transform.position = playerPosition.position;
-        _playerPref.transform.localScale = new Vector3(3, 3, 1);
+        _playerPref.transform.localScale = playerScale;
         Util.ChangeLayer(_playerPref, targetLayer);
-       
+
         bossPref = Resources.Load<GameObject>($"Monster/{bossName}");
         var _bossPref = Instantiate(bossPref, bossPosition);
         _bossPref.transform.position = bossPosition.position;
-        _bossPref.transform.localScale = new Vector3(3, 3, -1);
+        _bossPref.transform.localScale = bossScale;
         Util.ChangeLayer(_bossPref, targetLayer);
+
+        _playerPref.transform.DOMove(playerPos, 1.0f).SetEase(Ease.OutQuad);    //플레이어 캐릭터 이동
+        _bossPref.transform.DOMove(bossPos, 1.0f).SetEase(Ease.OutQuad).OnComplete(() =>    //보스 캐릭터 이동
+        {
+            vsText = CommonFunction.GetPrefabInstance("VS_Text", upSidePanel.transform);
+            DOTween.Sequence()
+            .OnStart(() => { vsText.transform.localScale = Vector3.zero; })
+            .Append(vsText.transform.DOScale(3, 0.5f).SetEase(Ease.OutBack));
+        });
 
         yield return new WaitForSeconds(delayTime);
 
-        Destroy(rawImage.gameObject);
-        Destroy(_bossPref);
-        Destroy(_playerPref);
-        Destroy(_vsSprite.gameObject);
-        //Destroy(_vsImage.gameObject);
-
+        {//연출요소들 파괴
+            Destroy(rawImage.gameObject);
+            Destroy(_bossPref);
+            Destroy(_playerPref);
+            Destroy(_vsSprite.gameObject);
+            Destroy(vsText);
+        }
+        
         spawner.SpawnBossMonster();
     }
 
@@ -406,18 +415,19 @@ public class MainScene : MonoBehaviour
     {
         float fadeTime = 1.0f;
 
-        var _victoryText = Instantiate(victoryText, upSidePanel.transform);
-        _victoryText.text = "Victory";
+        var _victoryText = CommonFunction.GetPrefabInstance("Victory_Text", upSidePanel.transform);
+        TextMeshProUGUI tmp = _victoryText.GetComponent<TextMeshProUGUI>();
+        tmp.text = "Victory";
 
-        Color color = _victoryText.color;    //알파값 0으로 초기화
+        Color color = tmp.color;    //알파값 0으로 초기화
         color.a = 0f;
-        _victoryText.color = color;
+        tmp.color = color;
 
-        _victoryText.DOFade(1f, fadeTime).OnComplete(() =>
-        _victoryText.DOFade(0f, fadeTime).OnComplete(() =>
+        tmp.DOFade(1f, fadeTime).OnComplete(() =>
+        tmp.DOFade(0f, fadeTime).OnComplete(() =>
         {
             StageClear2();
-            Destroy(_victoryText.gameObject);
+            Destroy(_victoryText);
         }));
     }
     private void StageClear2()
