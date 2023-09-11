@@ -122,7 +122,8 @@ public class MainScene : MonoBehaviour
     private TMP_Text gemText;
 
     private RectTransform category1_UI = null;  // 캐릭터, 장비
-    private RectTransform category2_UI = null;  //장비
+    private RectTransform category2_UI = null;  // 장비
+    private RectTransform category5_UI = null;  // 뽑기
     private Transform SkillDetail_Popup = null;
 
     private GameObject popupUI_0 = null;    // UI를 띄워줄 캔버스 레이어
@@ -488,14 +489,14 @@ public class MainScene : MonoBehaviour
                 OpenUI_Category2(button);
                 break;
             case 4:
-                OpenUI_Category4(button);
+                OpenUI_Category5(button);
                 break;
 
             default:
                 break;
         }
     }
-    const int invisiblePosY = -1700;
+    const int invisiblePosY = -1900;
     void OpenUI_Category1(GameObject clickButton)
     {
         if (category1_UI == null)
@@ -952,9 +953,25 @@ public class MainScene : MonoBehaviour
     //    isSkillCooltime[index] = false;
     //}
     #endregion 테스트용
-    void OpenUI_Category4(GameObject clickButton)
+    void OpenUI_Category5(GameObject clickButton)
     {
+        if (category5_UI == null)
+        {
+            category5_UI = CommonFunction.GetPrefabInstance("Category5", popupUI_0.transform).GetComponent<RectTransform>();
+            category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
 
+        }
+        else
+        {
+            bool active = category5_UI.gameObject.activeSelf;
+
+            if (active)
+                category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+            else
+                category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
+
+            category5_UI.gameObject.SetActive(!active);
+        }
     }
 
 
