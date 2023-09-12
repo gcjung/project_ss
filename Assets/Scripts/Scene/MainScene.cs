@@ -583,8 +583,17 @@ public class MainScene : MonoBehaviour
     void ShowUI_Character(bool isFirst = false)
     {
         Debug.Log("ShowUI_Character");
+
+        var equippedHeroData = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId);
+
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
+
+        if (isFirst)        // 최초 1회만 실행
+        {
+            Transform grid = category1_UI.Find("Type1_Character/CharacterEffect/Scroll View/Viewport/Grid");
+            Util.InitGrid(grid);
+        }
     }
 
     
