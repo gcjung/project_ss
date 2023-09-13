@@ -137,23 +137,17 @@ public class Util
             }
         }
 
+        Animator[] animators = obj.GetComponentsInChildren<Animator>();
+        foreach (var animator in animators)
+        {
+            if (animator == null)
+                continue;
 
-        //TMP_Text[] TMP_Texts = obj.GetComponentsInChildren<TMP_Text>();
-        //foreach (TMP_Text text in TMP_Texts)
-        //{
-        //    foreach (var sm in text.fontSharedMaterials)
-        //    {
-        //        if (sm == null || sm.shader == null)
-        //            continue;
-
-        //        if (!string.IsNullOrEmpty(sm.shader.name))
-        //        {
-        //            int originRenderQ = sm.renderQueue;
-        //            sm.shader = Shader.Find(sm.shader.name);
-        //            sm.renderQueue = originRenderQ;
-        //        }
-        //    }
-        //}
+            if (!string.IsNullOrEmpty(animator.name))
+            {
+                animator.runtimeAnimatorController = CommonFunction.GetAnimator(animator.name);
+            }
+        }
     }
 
     // 데이터 용량으로 변환 해주는 함수

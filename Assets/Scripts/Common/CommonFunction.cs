@@ -11,6 +11,7 @@ public class CommonFunction : MonoBehaviour
     static Dictionary<string, Object> prefabPool = new Dictionary<string, Object>();
     static Dictionary<string, Object> atlasPool = new Dictionary<string, Object>();
     static Dictionary<string, Object> fontPool = new Dictionary<string, Object>();
+    static Dictionary<string, Object> animatorPool = new Dictionary<string, Object>();
 
     //public static void LoadObj(Dictionary<string, Object> dic, string prefabName)
     //{
@@ -80,19 +81,19 @@ public class CommonFunction : MonoBehaviour
     }
 
 
-    public static void LoadFont(string prefabName)
+    public static void LoadFont(string fontName)
     {
-        if (!fontPool.ContainsKey(prefabName))
+        if (!fontPool.ContainsKey(fontName))
         {
             //GameObject newObj = Resources.Load<GameObject>(prefabName);
-            TMP_FontAsset newObj = Resources.Load<TMP_FontAsset>(prefabName);
-            fontPool.Add(prefabName, newObj);
+            TMP_FontAsset newObj = Resources.Load<TMP_FontAsset>(fontName);
+            fontPool.Add(fontName, newObj);
         }
-        else if (fontPool[prefabName] == null)
+        else if (fontPool[fontName] == null)
         {
             //GameObject newObj = Resources.Load<GameObject>(prefabName);
-            TMP_FontAsset newObj = Resources.Load<TMP_FontAsset>(prefabName);
-            fontPool[prefabName] = newObj;
+            TMP_FontAsset newObj = Resources.Load<TMP_FontAsset>(fontName);
+            fontPool[fontName] = newObj;
         }
     }
 
@@ -102,6 +103,30 @@ public class CommonFunction : MonoBehaviour
         LoadFont(prefabName);
 
         return fontPool[prefabName] as TMP_FontAsset;
+    }
+
+    public static void LoadAnimator(string animator)
+    {
+        if (!animatorPool.ContainsKey(animator))
+        {
+            //GameObject newObj = Resources.Load<GameObject>(prefabName);
+            RuntimeAnimatorController newObj = ResourceLoader.LoadAnimator(animator);
+            animatorPool.Add(animator, newObj);
+        }
+        else if (animatorPool[animator] == null)
+        {
+            //GameObject newObj = Resources.Load<GameObject>(prefabName);
+            RuntimeAnimatorController newObj = ResourceLoader.LoadAnimator(animator);
+            animatorPool[animator] = newObj;
+        }
+    }
+
+    public static RuntimeAnimatorController GetAnimator(string animator)
+    {
+        //LoadPrefab(prefabName);
+        LoadAnimator(animator);
+
+        return animatorPool[animator] as RuntimeAnimatorController;
     }
 
 

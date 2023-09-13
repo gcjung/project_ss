@@ -958,8 +958,8 @@ public class MainScene : MonoBehaviour
         if (category5_UI == null)
         {
             category5_UI = CommonFunction.GetPrefabInstance("Category5", popupUI_0.transform).GetComponent<RectTransform>();
+            category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
             category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
-
         }
         else
         {
