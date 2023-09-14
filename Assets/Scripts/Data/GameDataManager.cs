@@ -71,7 +71,8 @@ public class GameDataManager : Manager<GameDataManager>
     {
         None = -1,
         Level,
-        RequiredQuantity,
+        Skill_Item_RequiredQuantity,
+        Gacha_RequiredQuantity,
 
         Max,
     }

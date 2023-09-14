@@ -48,7 +48,7 @@ public class SkillSlot : MonoBehaviour
 
         transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";
 
-        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
 
         transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
         transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
@@ -127,7 +127,7 @@ public class SkillSlot : MonoBehaviour
         transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";
 
         // 레벨업 목표 개수
-        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.RequiredQuantity]);
+        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
 
         transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
         transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;

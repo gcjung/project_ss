@@ -960,6 +960,14 @@ public class MainScene : MonoBehaviour
             category5_UI = CommonFunction.GetPrefabInstance("Category5", popupUI_0.transform).GetComponent<RectTransform>();
             category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
             category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
+
+            //Transform bottomMenu = category5_UI.Find("BottomBar/BottomMenu");
+            //for (int i = 1; i < bottomMenu.childCount; i++)
+            //{
+            //    bottomMenu.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
+            //}
+
+            ShowUI_Gacha(0);
         }
         else
         {
@@ -972,8 +980,95 @@ public class MainScene : MonoBehaviour
 
             category5_UI.gameObject.SetActive(!active);
         }
-    }
 
+        clickButton.transform.Find("Text").gameObject.SetActive(!category5_UI.gameObject.activeSelf);
+        clickButton.transform.Find("CloseImage").gameObject.SetActive(category5_UI.gameObject.activeSelf);
+
+        Transform parent = category5_UI.Find("BottomBar/BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            int index = i;
+            Button button = parent.GetChild(i).GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
+
+            switch (index)
+            {
+                case 0:
+                    button.onClick.AddListener(() => ShowUI_Gacha(index));
+                    break;
+                case 1:
+                    button.onClick.AddListener(() => ShowUI_Test(index));
+                    break;
+                case 2:
+                    button.onClick.AddListener(() => ShowUI_Test(index));
+                    break;
+                case 3:
+                    button.onClick.AddListener(() => ShowUI_Test(index));
+                    break;
+            }
+        }
+        
+    }
+    void ShowUI_Gacha(int index)
+    {
+        Transform gachaUI = category5_UI.Find("Type1_Gacha");
+        string[] itemData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_ItemData, "1@0").Split('@');
+        {
+            int currentLevel = int.Parse(itemData[0]);
+            int holdingCount = int.Parse(itemData[1]);
+      
+            //var t = LevelTemplate[itemData[0]][(int)LevelTemplate_.Skill_Item_RequiredQuantity];
+            var targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+            //int targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+
+            Transform itemGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(0);
+            itemGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
+            itemGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
+            itemGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+            if (holdingCount != 0)
+                itemGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+        }
+
+        string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData, "1@0").Split('@');
+        {
+            int currentLevel = int.Parse(skillData[0]);
+            int holdingCount = int.Parse(skillData[1]);
+
+            var targetValue = int.Parse(LevelTemplate[skillData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+
+            Transform skillGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(1);
+            skillGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
+            skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
+            skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+            if (holdingCount != 0)
+                skillGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+        }
+        //TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
+
+        //transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
+        //transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
+        //transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;
+
+        Debug.Log("ShowUI_Gacha, index : " + index);
+        Transform parent = category5_UI.Find("BottomBar/BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            parent.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
+        }
+        parent.GetChild(index).Find("BtnOn").gameObject.SetActive(true);
+    }
+    void ShowUI_Test(int index)
+    {
+        Debug.Log("index : " + index);
+        Transform parent = category5_UI.Find("BottomBar/BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            parent.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
+        }
+        parent.GetChild(index).Find("BtnOn").gameObject.SetActive(true);
+    }
 
 
     public void GetGoods(double getGold = 0, double getGem = 0)

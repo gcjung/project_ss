@@ -30,15 +30,14 @@ public enum UserStringDataType
 {
     EquippedSkill,
     SkillData,
-    isOnAutoSkill,
+    Gacha_ItemData,
+    Gacha_SkillData,
 }
 public enum UserBoolDataType
 {
     isOnAutoSkill,
 
 }
-
-
 public enum GameDataType
 {
     AssetBundleVersion,
