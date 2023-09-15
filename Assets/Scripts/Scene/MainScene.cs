@@ -9,6 +9,8 @@ using Unity.VisualScripting;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
+using System;
+using Unity.Burst.Intrinsics;
 
 public class MainScene : MonoBehaviour
 {
@@ -967,7 +969,7 @@ public class MainScene : MonoBehaviour
             //    bottomMenu.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
             //}
 
-            ShowUI_Gacha(0);
+            ShowUI_Gacha(0,true);
         }
         else
         {
@@ -1009,41 +1011,59 @@ public class MainScene : MonoBehaviour
         }
         
     }
-    void ShowUI_Gacha(int index)
+    void ShowUI_Gacha(int index, bool isFirst = false)
     {
-        Transform gachaUI = category5_UI.Find("Type1_Gacha");
-        string[] itemData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_ItemData, "1@0").Split('@');
+        if (isFirst)
         {
-            int currentLevel = int.Parse(itemData[0]);
-            int holdingCount = int.Parse(itemData[1]);
-      
-            //var t = LevelTemplate[itemData[0]][(int)LevelTemplate_.Skill_Item_RequiredQuantity];
-            var targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
-            //int targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+            Transform gachaUI = category5_UI.Find("Type1_Gacha");
+            string[] itemData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_ItemData, "1@0").Split('@');
+            {
+                int currentLevel = int.Parse(itemData[0]);
+                int holdingCount = int.Parse(itemData[1]);
 
-            Transform itemGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(0);
-            itemGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
-            itemGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
-            itemGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+                //var t = LevelTemplate[itemData[0]][(int)LevelTemplate_.Skill_Item_RequiredQuantity];
+                var targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+                //int targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
 
-            if (holdingCount != 0)
-                itemGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
-        }
+                Transform itemGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(0);
+                itemGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
+                itemGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
+                itemGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
 
-        string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData, "1@0").Split('@');
-        {
-            int currentLevel = int.Parse(skillData[0]);
-            int holdingCount = int.Parse(skillData[1]);
+                if (holdingCount != 0)
+                    itemGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+            }
 
-            var targetValue = int.Parse(LevelTemplate[skillData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+            string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData, "1@0").Split('@');
+            {
+                int currentLevel = int.Parse(skillData[0]);
+                int holdingCount = int.Parse(skillData[1]);
 
-            Transform skillGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(1);
-            skillGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
-            skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
-            skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+                var targetValue = int.Parse(LevelTemplate[skillData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
 
-            if (holdingCount != 0)
-                skillGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+                Transform skillGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(1);
+                skillGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
+                skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
+                skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+                if (holdingCount != 0)
+                    skillGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+
+                skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+                skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() => 
+                {
+                    Debug.Log("11가차 버튼 누름");
+                    Gacha(11);
+                });
+
+                skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+                skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    Debug.Log("35가차 버튼 누름");
+                    Gacha(35);
+                });
+
+            }
         }
         //TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
 
@@ -1058,6 +1078,57 @@ public class MainScene : MonoBehaviour
             parent.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
         }
         parent.GetChild(index).Find("BtnOn").gameObject.SetActive(true);
+    }
+    void Gacha(int count)
+    {
+        Debug.Log("GachaGacha");
+
+        Transform gachaPanel = CommonFunction.GetPrefabInstance("GachaUI",popupUI_1.transform).transform;
+        Transform grid = gachaPanel.Find("Grid");
+
+        string[] probability = new string[GachaTemplate["skill1"].Length - 1];
+        Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
+        int[] ints = Array.ConvertAll(probability, int.Parse);
+        for (int i = 0; i < count; i++)
+        {
+            grid.GetChild(i).gameObject.SetActive(true);
+
+            Debug.Log("확률 계산시작 " + (i+1) +"회");
+            GachaGrade grade = CalcPercent(ints);
+        }
+
+    }
+
+    GachaGrade CalcPercent(int[] arr)
+    {
+        //for (int i = 0; i < arr.Length; i++)
+        //{
+        //    Debug.Log("확률 : " + arr[i]);
+        //}
+
+        int[] acquisitionProbability = new int[Enum.GetValues(typeof(GachaGrade)).Length];
+        int threshold = 0;
+        for (int i = 0; i < arr.Length; i++)
+        {
+            threshold += arr[i];
+            acquisitionProbability[i] = threshold;
+        }
+
+        GachaGrade result = GachaGrade.None;
+        int randomValue =  UnityEngine.Random.Range(1, 10001);
+        for (int i = 0; i < acquisitionProbability.Length; i++)
+        {
+            if (randomValue <= acquisitionProbability[i])
+            {
+                result = (GachaGrade)i;
+                Debug.Log($"randomValue : {randomValue}, 확률 : {acquisitionProbability[i]}, result {result}");
+                Debug.Log("확률 계산끝########");
+                
+                return result;
+            }
+        }
+        Debug.Log("확률 계산끝^^^^^^^^^^^^^");
+        return result;
     }
     void ShowUI_Test(int index)
     {

@@ -28,7 +28,6 @@ public enum ItemType
     Ring,
     Rune
 }
-
 public enum ItemGrade
 {
     D,
@@ -36,4 +35,20 @@ public enum ItemGrade
     B,
     A,
     S
+}
+public enum GachaType
+{
+    None = -1,
+    Item,
+    Skill
+}
+public enum GachaGrade
+{
+    None = -1,
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Regendary,
+    Mythic,
 }

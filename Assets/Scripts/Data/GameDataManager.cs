@@ -99,6 +99,7 @@ public class GameDataManager : Manager<GameDataManager>
     public static Dictionary<string, string[]> SkillTemplate;
     public static Dictionary<string, string[]> LevelTemplate;
     public static Dictionary<string, string[]> ItemTemplate;
+    public static Dictionary<string, string[]> GachaTemplate;
 
     public override void Init()
     {       
@@ -114,6 +115,7 @@ public class GameDataManager : Manager<GameDataManager>
         SkillTemplate = CSVRead("data/Skill_Template");
         LevelTemplate = CSVRead("data/Level_Template");
         ItemTemplate = CSVRead("data/Item_Template");
+        GachaTemplate = CSVRead("data/Gacha_Template");
 
         Ininialized = true;
     }
