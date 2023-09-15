@@ -17,8 +17,10 @@ public class CaptureScript : MonoBehaviour
 
     private void Capture()
     {
-        string path = "C:\\Users\\Asset" + "/capture"+i.ToString()+".png";
+        //string path = "C:\\Users\\Asset" + "/capture"+i.ToString()+".png";
+        string path = "C:\\Asset" + "/capture" + i.ToString() + ".png";
         i++;
+        Debug.Log(path);
         StartCoroutine(CoCapture(path));
     }
 

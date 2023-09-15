@@ -9,6 +9,8 @@ using Unity.VisualScripting;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
+using static UnityEditor.Progress;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class MainScene : MonoBehaviour
 {
@@ -584,19 +586,48 @@ public class MainScene : MonoBehaviour
     {
         Debug.Log("ShowUI_Character");
 
-        var equippedHeroData = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId);
+        var equippedHeroId = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId);
 
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
 
         if (isFirst)        // 최초 1회만 실행
         {
+            string heroName = HeroTemplate[equippedHeroId.ToString()][(int)HeroTemplate_.Name];
+            string spriteName = $"{heroName}_Image";
+            string atlasName = "HeroImageAtlas";
+
+            Image heroImage = category1_UI.Find("Type1_Character/Character/Character_Image").GetComponent<Image>();
+            heroImage.sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+
+            TextMeshProUGUI heroNameText = category1_UI.Find("Type1_Character/Character/CharacterName_Text").GetComponent<TextMeshProUGUI>();
+            heroNameText.text = heroName;
+
             Transform grid = category1_UI.Find("Type1_Character/CharacterEffect/Scroll View/Viewport/Grid");
             Util.InitGrid(grid);
+
+            foreach (var hero in HeroTemplate.OrderBy(x => x.Value[(int)HeroTemplate_.HeroId]))
+            {
+                string id = hero.Value[(int)HeroTemplate_.HeroId];
+
+                GameObject heroSlot = CommonFunction.GetPrefabInstance("HeroSlot", grid);
+                HeroSlot slot = heroSlot.AddComponent<HeroSlot>();
+                slot.Init(id);
+
+                // 영웅 아이콘 선택 시 (상세보기)
+                heroSlot.GetComponent<Button>().onClick.AddListener(() => {
+                    OpenUI_HeroDetail(slot, id);
+                });
+            }
         }
     }
 
-    
+    void OpenUI_HeroDetail(HeroSlot slot, string heroId)
+    {
+
+    }
+
+
     const int maxEquipSkillCount = 6;
     Transform[] equippedSkillSlot = null;
     void ShowUI_Skill(bool isFirst = false)

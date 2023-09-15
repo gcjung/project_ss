@@ -17,6 +17,8 @@ public class GameDataManager : Manager<GameDataManager>
         AttackSpeed,
         Critical,
         Hp,
+        Grade,
+        Icon,
 
         Max,
     }

@@ -7,17 +7,12 @@ using UnityEngine.UI;
 public class Test : MonoBehaviour
 {
     public Canvas canvas;
-    public RawImage rawImage;
-    public SpriteRenderer spriteRenderer;
-    public Image image;
+
     private void Start()
     {
-        //var _image = Instantiate(image, canvas.transform);
-        var _rawImage = Instantiate(rawImage, canvas.transform);
-        var _sprite = Instantiate(spriteRenderer, transform);
-
         var playerPref = Resources.Load<GameObject>($"Player/Farmer");
         var _playerPref = Instantiate(playerPref, transform);
-        Util.ChangeLayer(_playerPref, 6);
+        //Util.ChangeLayer(_playerPref, 6);
+        _playerPref.transform.localScale = new Vector3(5, 5, 1);
     }
 }
