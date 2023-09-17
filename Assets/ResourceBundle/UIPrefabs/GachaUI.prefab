@@ -5904,9 +5904,9 @@ GameObject:
   - component: {fileID: 3668653087329359213}
   - component: {fileID: 8863207374728846107}
   - component: {fileID: 1920713559957705610}
-  - component: {fileID: 610172767789206512}
+  - component: {fileID: 8596232904336684622}
   m_Layer: 5
-  m_Name: Button
+  m_Name: CloseButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5971,7 +5971,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &610172767789206512
+--- !u!114 &8596232904336684622
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5980,7 +5980,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7851931169149085489}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c8d44b519e025f4f98858746468ddc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -6015,6 +6015,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+  isDontDestroy: 1
+  destroyTarget: {fileID: 0}
 --- !u!1 &7919145863758537696
 GameObject:
   m_ObjectHideFlags: 0

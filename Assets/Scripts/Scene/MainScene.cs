@@ -865,26 +865,6 @@ public class MainScene : MonoBehaviour
 
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkillData));
     }
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.Alpha1))
-        //{
-        //    Debug.Log("1누름");
-        //    StopCoroutine(Co_SkillCooltime[0]);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha2))
-        //{
-        //    Debug.Log("2누름");
-        //    StopCoroutine(Co_SkillCooltime[1]);
-        //}
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            Debug.Log("3누름");
-            GameObject obj = CommonFunction.GetPrefabInstance("Lazer_blue",transform);
-            
-            obj.transform.position = playerCharacter.transform.position + new Vector3();
-        }
-    }
 
     private void OnClickUseSkill(int index)
     {
