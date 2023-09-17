@@ -9,8 +9,8 @@ using Unity.VisualScripting;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
-using static UnityEditor.Progress;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+//using static UnityEditor.Progress;
+//using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class MainScene : MonoBehaviour
 {
@@ -615,7 +615,8 @@ public class MainScene : MonoBehaviour
                 slot.Init(id);
 
                 // 영웅 아이콘 선택 시 (상세보기)
-                heroSlot.GetComponent<Button>().onClick.AddListener(() => {
+                heroSlot.GetComponent<Button>().onClick.AddListener(() =>
+                {
                     OpenUI_HeroDetail(slot, id);
                 });
             }
