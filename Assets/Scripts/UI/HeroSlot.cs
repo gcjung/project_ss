@@ -17,13 +17,26 @@ public class HeroSlot : MonoBehaviour
 {
     public HeroSlotState State { get; set; } = HeroSlotState.None;
 
-    private string heroId;
+    public string heroId;
     private string heroName;
     private string grade;
     private string atlasName = "HeroIconAtlas";
 
     private Image frameImage;
-    private Image iconImage;   
+    private Image iconImage;
+    private GameObject selectedImage;
+    private GameObject equipText;
+
+    private bool isSelect = false;
+    public bool IsSelect
+    {
+        get { return isSelect; }
+        set
+        {
+            isSelect = value;
+            selectedImage.SetActive(value);
+        }
+    }
 
     private void Awake()
     {
@@ -32,6 +45,16 @@ public class HeroSlot : MonoBehaviour
         if (transform.Find("Icon_Image").TryGetComponent<Image>(out var _iconImage))
         {
             iconImage = _iconImage;
+        }
+
+        if (transform.Find("Selected_Image").TryGetComponent<Image>(out var _selectedImage))
+        {
+            selectedImage = _selectedImage.gameObject;
+        }
+
+        if (transform.Find("Equip_Text").TryGetComponent<Image>(out var _equipText))
+        {
+            equipText = _equipText.gameObject;
         }
     }
     public void Init(string _heroId)
@@ -42,5 +65,10 @@ public class HeroSlot : MonoBehaviour
 
         frameImage.color = Util.ConvertGradeToColor(grade);
         iconImage.sprite = CommonFunction.GetSprite_Atlas($"{heroName}_Icon", atlasName);
+    }
+
+    public void SetSelected(bool selected)
+    {
+        IsSelect = selected;
     }
 }

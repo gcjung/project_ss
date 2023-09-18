@@ -55,7 +55,7 @@ public class MainScene : MonoBehaviour
     private GameObject stageText;
     private MonsterSpawner spawner; //스테이지 세팅용
 
-    [HideInInspector] public int heroId;
+    [HideInInspector] public double heroId;
     [HideInInspector] public string heroName;
     [HideInInspector] public int stageId;
     [HideInInspector] public string stageName;
@@ -156,7 +156,7 @@ public class MainScene : MonoBehaviour
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
         SetStage(stageId);  //스테이지 세팅
 
-        heroId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
+        heroId = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId, 1);
         SetPlayer(heroId);  //영웅 세팅      
 
         goldText = mainUiPanel.transform.Find("UpSide_Panel/Goods_Panel/Gold_Image/Gold_Text").GetComponent<TMP_Text>();
@@ -208,7 +208,7 @@ public class MainScene : MonoBehaviour
         }
 
     }
-    public void SetPlayer(int heroId)
+    public void SetPlayer(double heroId)
     {
         Debug.Log($"현재 영웅ID : {heroId}");
 
@@ -581,19 +581,16 @@ public class MainScene : MonoBehaviour
             category2_UI.gameObject.SetActive(!active);
         }
     }
-
+    private HeroSlot selectedHeroSlot;
     void ShowUI_Character(bool isFirst = false)
     {
         Debug.Log("ShowUI_Character");
-
-        var equippedHeroId = GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentHeroId);
 
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
 
         if (isFirst)        // 최초 1회만 실행
         {
-            string heroName = HeroTemplate[equippedHeroId.ToString()][(int)HeroTemplate_.Name];
             string spriteName = $"{heroName}_Image";
             string atlasName = "HeroImageAtlas";
 
@@ -602,6 +599,16 @@ public class MainScene : MonoBehaviour
 
             TextMeshProUGUI heroNameText = category1_UI.Find("Type1_Character/Character/CharacterName_Text").GetComponent<TextMeshProUGUI>();
             heroNameText.text = heroName;
+
+            Button equipButton = category1_UI.Find("Type1_Character/Equip_Button").GetComponent<Button>();
+            equipButton.onClick.AddListener(() =>
+            {
+                ChangeCurrentHero();
+
+                spriteName = $"{heroName}_Image";
+                heroImage.sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+                heroNameText.text = heroName;
+            });
 
             Transform grid = category1_UI.Find("Type1_Character/CharacterEffect/Scroll View/Viewport/Grid");
             Util.InitGrid(grid);
@@ -614,18 +621,43 @@ public class MainScene : MonoBehaviour
                 HeroSlot slot = heroSlot.AddComponent<HeroSlot>();
                 slot.Init(id);
 
-                // 영웅 아이콘 선택 시 (상세보기)
+                // 영웅 아이콘 선택 시 선택된 슬릇 표시
                 heroSlot.GetComponent<Button>().onClick.AddListener(() =>
                 {
-                    OpenUI_HeroDetail(slot, id);
+                    ChangeSelectedSlot(slot);
                 });
             }
         }
     }
 
-    void OpenUI_HeroDetail(HeroSlot slot, string heroId)
+    private void ChangeCurrentHero()
     {
+        if (CurrentStageState != StageState.BossRoom && selectedHeroSlot != null) //스테이지가 NormalWave 상태일 때만 변경 가능
+        {
+            GlobalManager.Instance.DBManager.UpdateUserData("CurrentHeroId", selectedHeroSlot.heroId);
+            heroId = double.Parse(selectedHeroSlot.heroId);
+            heroName = HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Name];
 
+            StartCoroutine(RestartStage());           
+        }
+        else
+        {
+            Debug.LogError("현재 영웅을 교체할 수 없음");
+        }
+    }
+
+    private void ChangeSelectedSlot(HeroSlot slot)
+    {
+        if (selectedHeroSlot != null)
+        {
+            selectedHeroSlot.SetSelected(false);
+        }
+
+        // 현재 클릭한 슬롯을 선택된 슬롯으로 설정
+        selectedHeroSlot = slot;
+
+        // 선택된 슬롯의 상태를 변경하여 테두리를 빛나게 함
+        selectedHeroSlot.SetSelected(true);
     }
 
 

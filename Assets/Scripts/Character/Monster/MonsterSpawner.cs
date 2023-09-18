@@ -55,6 +55,8 @@ public class MonsterSpawner : MonoBehaviour
 
     public void SetMonster()
     {
+        IsWaveFinish = false;
+
         if (!slider.IsActive())
             slider.gameObject.SetActive(true);
 

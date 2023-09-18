@@ -1,6 +1,6 @@
 heroId,name,attack,attackspeed,critical,hp,grade
-1,Farmer,30,1,0.01,300,Ä¿¸Õ
-2,Samurai,50,1,0.02,500,¾ðÄ¿¸Õ
-3,,,,,,
+1,Farmer,30,1,0.01,300,ì»¤ë¨¼
+2,Samurai,50,1,0.02,500,ì–¸ì»¤ë¨¼
+3,Prince,55,1,0.01,400,ì–¸ì»¤ë¨¼
 4,,,,,,
 5,,,,,,

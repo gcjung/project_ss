@@ -87,7 +87,7 @@ public class Player : MonoBehaviour, IHpProvider
         MainScene.Instance.IsPlayerDead = true;
     }
 
-    public void SetHeroStatus(int heroId)
+    public void SetHeroStatus(double heroId)
     {
         Attack = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Attack]);       
         AttackSpeed = double.Parse(HeroTemplate[heroId.ToString()][(int)HeroTemplate_.AttackSpeed]);
