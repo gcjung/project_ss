@@ -45,10 +45,17 @@ public enum GachaType
 public enum GachaGrade
 {
     None = -1,
-    Common,
-    Uncommon,
-    Rare,
-    Epic,
-    Regendary,
-    Mythic,
+    //Common,
+    //Uncommon,
+    //Rare,
+    //Epic,
+    //Regendary,
+    //Mythic,
+    커먼,
+    언커먼,
+    레어,
+    에픽,
+    레전더리,
+    신화,
+    // 초월
 }

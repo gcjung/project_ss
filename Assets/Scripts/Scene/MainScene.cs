@@ -1068,13 +1068,32 @@ public class MainScene : MonoBehaviour
 
         string[] probability = new string[GachaTemplate["skill1"].Length - 1];
         Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
-        int[] ints = Array.ConvertAll(probability, int.Parse);
+        Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
+        
+        foreach (var item in SkillTemplate)
+        {
+            string grade = item.Value[(int)SkillTemplate_.Grade];
+            string id = item.Value[(int)SkillTemplate_.SkillId];
+            if (skillIDByGrade.ContainsKey(grade))
+            {
+                if (skillIDByGrade[grade] == null)
+                {
+                    skillIDByGrade[grade] = new List<string>();
+                }
+
+                skillIDByGrade[grade].Add(id);
+            }
+        }
+
         for (int i = 0; i < count; i++)
         {
             grid.GetChild(i).gameObject.SetActive(true);
 
             Debug.Log("È®·ü °è»ê½ÃÀÛ " + (i+1) +"È¸");
-            GachaGrade grade = CalcPercent(ints);
+            GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
+
+            int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
+            string gachaID = skillIDByGrade[grade.ToString()][randomValue];
         }
 
     }
@@ -1086,7 +1105,7 @@ public class MainScene : MonoBehaviour
         //    Debug.Log("È®·ü : " + arr[i]);
         //}
 
-        int[] acquisitionProbability = new int[Enum.GetValues(typeof(GachaGrade)).Length];
+        int[] acquisitionProbability = new int[Enum.GetValues(typeof(GachaGrade)).Length - 1];
         int threshold = 0;
         for (int i = 0; i < arr.Length; i++)
         {
