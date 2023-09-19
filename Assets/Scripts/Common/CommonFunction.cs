@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.U2D;
 using TMPro;
-
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class CommonFunction : MonoBehaviour
 {
@@ -74,7 +75,16 @@ public class CommonFunction : MonoBehaviour
         LoadPrefab(prefabName);
         
         GameObject obj = prefabPool[prefabName] as GameObject;
-        Util.ReLinkShader(obj);
+
+        if (obj.GetComponent<RectTransform>())
+        {
+            Util.SetFontInChildrenText(obj.transform);
+            Util.SetRawImageTexture(obj.transform);
+        }
+        else
+        {
+            Util.ReLinkShader(obj);
+        }
 
         return obj;
     }
@@ -133,7 +143,20 @@ public class CommonFunction : MonoBehaviour
             return null;
     }
 
+    public static void CreateNotification(string contents,Transform transform)
+    {
+        float endValue = 1500.0f;
+        float duration = 1.0f;
 
+        GameObject obj = TmpObjectPool.Instance.GetPoolObject("Notification_Text", transform);  //오브젝트풀에서 가져오기
 
+        RectTransform rect = obj.GetComponent<RectTransform>();
+        rect.localPosition = Vector3.zero;  //위치 초기화
+
+        TextMeshProUGUI tmp = obj.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        tmp.text = contents;
+
+        rect.DOAnchorPosY(endValue, duration).SetEase(Ease.OutExpo).OnComplete(() => TmpObjectPool.Instance.ReturnToPool(obj)); //목표 위치까지 이동 후 오브젝트 풀에 반환
+    }
 }
 

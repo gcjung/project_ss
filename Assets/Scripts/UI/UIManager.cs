@@ -17,4 +17,10 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private void Start()
+    {
+        TmpObjectPool.Instance.CreatePool("Notification_Text", 10);
+        TmpObjectPool.Instance.CreatePool("Damage_Text", 10);
+        TmpObjectPool.Instance.CreatePool("Damage_Text(Critical)", 10);
+    }
 }

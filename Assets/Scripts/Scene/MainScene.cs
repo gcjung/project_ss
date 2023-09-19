@@ -366,12 +366,13 @@ public class MainScene : MonoBehaviour
     }
 
     private IEnumerator BossBattle()
-    {
-        float delayTime = 3.0f;
+    {       
         Vector3 playerScale = new Vector3(3, 3, 1);
         Vector3 bossScale = new Vector3(3, 3, -1);
         Vector3 playerPos = new Vector3(-3, -1, 1);
         Vector3 bossPos = new Vector3(3, -1, 1);
+
+        float delayTime = 3.0f;
         int targetLayer = LayerMask.NameToLayer("Over UI");
         string bossName = MonsterTemplate[bossId.ToString()][(int)MonsterTemplate_.Name];
 
@@ -528,14 +529,7 @@ public class MainScene : MonoBehaviour
             bool active = category1_UI.gameObject.activeSelf;
 
             if (active)
-            {
-                category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
-
-                //선택된 슬릇 초기화
-                selectedHeroSlot.SetSelected(false);
-                selectedHeroSlot = null;
-                disabledImage.gameObject.SetActive(true);
-            }               
+                category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);         
             else
                 category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
 
@@ -640,10 +634,13 @@ public class MainScene : MonoBehaviour
             }
         }
 
-        if (selectedHeroSlot == null)
+        //선택된 슬릇 초기화 <<<<<<<<< 수정해야됨
+        if (selectedHeroSlot != null)
         {
+            selectedHeroSlot.SetSelected(false);
+            selectedHeroSlot = null;
             disabledImage.gameObject.SetActive(true);
-        }
+        }        
     }
 
     private void ChangeCurrentHero()
@@ -660,12 +657,12 @@ public class MainScene : MonoBehaviour
             }
             else
             {
-                Debug.LogError("이미 장착 중인 영웅임");
+                CommonFunction.CreateNotification("이미 장착 중인 영웅임", popupUI_1.transform);
             }            
         }
         else
         {
-            Debug.LogError("현재 영웅을 교체할 수 없음");
+            CommonFunction.CreateNotification("현재 영웅을 교체할 수 없음", popupUI_1.transform);
         }
     }
 
