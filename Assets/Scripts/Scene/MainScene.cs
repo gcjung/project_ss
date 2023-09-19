@@ -528,7 +528,14 @@ public class MainScene : MonoBehaviour
             bool active = category1_UI.gameObject.activeSelf;
 
             if (active)
+            {
                 category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+
+                //선택된 슬릇 초기화
+                selectedHeroSlot.SetSelected(false);
+                selectedHeroSlot = null;
+                disabledImage.gameObject.SetActive(true);
+            }               
             else
                 category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
 
@@ -582,6 +589,7 @@ public class MainScene : MonoBehaviour
         }
     }
     private HeroSlot selectedHeroSlot;
+    private Image disabledImage;
     void ShowUI_Character(bool isFirst = false)
     {
         Debug.Log("ShowUI_Character");
@@ -594,6 +602,8 @@ public class MainScene : MonoBehaviour
             string spriteName = $"{heroName}_Image";
             string atlasName = "HeroImageAtlas";
 
+            disabledImage = category1_UI.Find("Type1_Character/Equip_Button/Disabled_Image").GetComponent<Image>();
+
             Image heroImage = category1_UI.Find("Type1_Character/Character/Character_Image").GetComponent<Image>();
             heroImage.sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
 
@@ -605,10 +615,11 @@ public class MainScene : MonoBehaviour
             {
                 ChangeCurrentHero();
 
+                //현재 설정된 영웅의 이미지,이름 업데이트
                 spriteName = $"{heroName}_Image";
                 heroImage.sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
                 heroNameText.text = heroName;
-            });
+            });           
 
             Transform grid = category1_UI.Find("Type1_Character/CharacterEffect/Scroll View/Viewport/Grid");
             Util.InitGrid(grid);
@@ -628,17 +639,29 @@ public class MainScene : MonoBehaviour
                 });
             }
         }
+
+        if (selectedHeroSlot == null)
+        {
+            disabledImage.gameObject.SetActive(true);
+        }
     }
 
     private void ChangeCurrentHero()
     {
         if (CurrentStageState != StageState.BossRoom && selectedHeroSlot != null) //스테이지가 NormalWave 상태일 때만 변경 가능
         {
-            GlobalManager.Instance.DBManager.UpdateUserData("CurrentHeroId", selectedHeroSlot.heroId);
-            heroId = double.Parse(selectedHeroSlot.heroId);
-            heroName = HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Name];
+            if (double.Parse(selectedHeroSlot.heroId) != heroId)    //이미 장착중인 영웅이 아닐 때
+            {
+                GlobalManager.Instance.DBManager.UpdateUserData("CurrentHeroId", selectedHeroSlot.heroId);
+                heroId = double.Parse(selectedHeroSlot.heroId);
+                heroName = HeroTemplate[heroId.ToString()][(int)HeroTemplate_.Name];
 
-            StartCoroutine(RestartStage());           
+                StartCoroutine(RestartStage());
+            }
+            else
+            {
+                Debug.LogError("이미 장착 중인 영웅임");
+            }            
         }
         else
         {
@@ -656,8 +679,9 @@ public class MainScene : MonoBehaviour
         // 현재 클릭한 슬롯을 선택된 슬롯으로 설정
         selectedHeroSlot = slot;
 
-        // 선택된 슬롯의 상태를 변경하여 테두리를 빛나게 함
+        // 선택된 슬롯의 상태를 변경하여 체크표시를 활성화
         selectedHeroSlot.SetSelected(true);
+        disabledImage.gameObject.SetActive(false);
     }
 
 
