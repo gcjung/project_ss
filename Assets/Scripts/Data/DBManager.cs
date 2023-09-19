@@ -64,14 +64,14 @@ public class DBManager : Manager<DBManager>
 
         if (FirebaseAuthManager.Instance.isCurrentLogin())
         {
-            InitUserDBSetting();
+            LoadUserDBSetting();
         }
         else
         {
             Ininialized = true;
         }
     }
-    public void InitUserDBSetting()
+    public void LoadUserDBSetting()
     {
         CollectionReference firebaseUserDB = FirebaseFirestore.DefaultInstance.Collection("UserDB");
         uidRef = firebaseUserDB.Document(FirebaseAuthManager.Instance.UserId);
@@ -79,8 +79,15 @@ public class DBManager : Manager<DBManager>
     }
     public override void InitializedFininsh()
     {
+        InitUserDB();
+    }
+    void InitUserDB()
+    {
+        GetUserStringData(UserStringDataType.Gacha_SkillData, "1@0");
+        GetUserStringData(UserStringDataType.Gacha_ItemData, "1@0");
         SetDB_SkillAcquireData();
     }
+
     async void LoadGameData()
     {
         DocumentReference dataRef = FirebaseFirestore.DefaultInstance.Collection("GameData").Document("Data");

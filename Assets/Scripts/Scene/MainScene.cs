@@ -10,7 +10,6 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
 using System;
-using Unity.Burst.Intrinsics;
 
 public class MainScene : MonoBehaviour
 {
@@ -1014,7 +1013,7 @@ public class MainScene : MonoBehaviour
                     itemGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
             }
 
-            string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData, "1@0").Split('@');
+            string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
             {
                 int currentLevel = int.Parse(skillData[0]);
                 int holdingCount = int.Parse(skillData[1]);
@@ -1026,21 +1025,25 @@ public class MainScene : MonoBehaviour
                 skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
                 skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
 
-                if (holdingCount != 0)
+                if (holdingCount == 0)
+                    skillGacha.Find("Slider").GetComponent<Slider>().value = 0;
+                else
                     skillGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
 
                 skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
                 skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() => 
                 {
                     Debug.Log("11가차 버튼 누름");
-                    Gacha(11);
+                    //Gacha(11);
+                    StartCoroutine(Gacha(GachaType.Skill, 11));
                 });
 
                 skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
                 skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
                 {
                     Debug.Log("35가차 버튼 누름");
-                    Gacha(35);
+                    //Gacha(35);
+                    StartCoroutine(Gacha(GachaType.Skill, 35));
                 });
 
             }
@@ -1059,45 +1062,203 @@ public class MainScene : MonoBehaviour
         }
         parent.GetChild(index).Find("BtnOn").gameObject.SetActive(true);
     }
-    void Gacha(int count)
-    {
-        Debug.Log("GachaGacha");
 
-        Transform gachaPanel = CommonFunction.GetPrefabInstance("GachaUI",popupUI_1.transform).transform;
-        Transform grid = gachaPanel.Find("Grid");
+    Transform gachaPanel = null;
+    //void Gacha(int count)
+    //{
+    //    Debug.Log("GachaGacha");
+    //    if (gachaPanel == null)
+    //        gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
+    //    else
+    //        gachaPanel.gameObject.SetActive(true);
 
-        string[] probability = new string[GachaTemplate["skill1"].Length - 1];
-        Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
-        Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
+    //    Transform grid = gachaPanel.Find("Grid");
+
+    //    string[] probability = new string[GachaTemplate["skill1"].Length - 1];
+    //    Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
+    //    Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
         
+    //    foreach (var item in SkillTemplate)
+    //    {
+    //        string grade = item.Value[(int)SkillTemplate_.Grade];
+    //        string id = item.Value[(int)SkillTemplate_.SkillId];
+    //        if (!skillIDByGrade.ContainsKey(grade))
+    //        {
+    //            skillIDByGrade.Add(grade, new List<string>());
+    //            skillIDByGrade[grade].Add(id);
+    //        }
+    //        else
+    //        {
+    //            skillIDByGrade[grade].Add(id);
+    //        }
+    //    }
+
+    //    for (int i = 0; i < 35; i++)
+    //    {
+    //        //grid.GetChild(i).gameObject.SetActive(true);
+    //        Transform slot = grid.GetChild(i);
+    //        slot.gameObject.SetActive(false);
+
+    //        if (i < count)
+    //        {
+    //            Debug.Log("확률 계산시작 " + (i + 1) + "회");
+    //            GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
+
+    //            int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
+    //            string gachaID = skillIDByGrade[grade.ToString()][randomValue];
+    //            Debug.Log($"@@@@@@@@@@ grade : {grade}, randomValue : {randomValue}, result {gachaID} @@@@@");
+
+    //            string[] icon = SkillTemplate[gachaID][(int)SkillTemplate_.Icon].Split('/');
+    //            string spriteName = icon[0];
+    //            string atlasName = icon[1];
+    //            slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+    //            slot.Find("BgGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+    //            slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+    //            //slot.gameObject.SetActive(true);
+    //        }
+    //        //else
+    //        //{
+    //        //    Transform slot = grid.GetChild(i);
+
+    //        //    slot.gameObject.SetActive(false);
+    //        //}
+
+    //    }
+    //    StartCoroutine(GachaEffect(count));
+    //}
+
+    IEnumerator Gacha(GachaType gachaType, int count)
+    {
+        if (gachaPanel == null)
+            gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
+        else
+            gachaPanel.gameObject.SetActive(true);
+
+        GetGachaExp(gachaType, count);
+
+        // key - 스킬등급, value - 스킬ID
+        Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
         foreach (var item in SkillTemplate)
         {
             string grade = item.Value[(int)SkillTemplate_.Grade];
             string id = item.Value[(int)SkillTemplate_.SkillId];
-            if (skillIDByGrade.ContainsKey(grade))
+            if (!skillIDByGrade.ContainsKey(grade))
             {
-                if (skillIDByGrade[grade] == null)
-                {
-                    skillIDByGrade[grade] = new List<string>();
-                }
-
+                skillIDByGrade.Add(grade, new List<string>());
+                skillIDByGrade[grade].Add(id);
+            }
+            else
+            {
                 skillIDByGrade[grade].Add(id);
             }
         }
 
+        Transform grid = gachaPanel.Find("Grid");
+        for (int i = 0; i < 35; i++)
+        {
+            Transform slot = grid.GetChild(i);
+            slot.gameObject.SetActive(false);
+        }
+
+        string[] probability = new string[GachaTemplate["skill1"].Length - 1];
+        Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
         for (int i = 0; i < count; i++)
         {
-            grid.GetChild(i).gameObject.SetActive(true);
+            Transform slot = grid.GetChild(i);
 
-            Debug.Log("확률 계산시작 " + (i+1) +"회");
+            Debug.Log("확률 계산시작 " + (i + 1) + "회");
             GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
 
             int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
-            string gachaID = skillIDByGrade[grade.ToString()][randomValue];
+            string getSkillID = skillIDByGrade[grade.ToString()][randomValue];
+            Debug.Log($"grade : {grade}, randomValue : {randomValue}, result {getSkillID} @@@@@");
+
+            string[] icon = SkillTemplate[getSkillID][(int)SkillTemplate_.Icon].Split('/');
+            string spriteName = icon[0];
+            string atlasName = icon[1];
+            slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+            slot.Find("BgGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+            slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+            Transform glowEffect = slot.Find("GlowEffect");
+            int childCount = glowEffect.childCount;
+            for (int j = 0; j < childCount; j++)
+                glowEffect.GetChild(j).GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+            if ((int)GachaGrade.언커먼 <= (int)grade)
+            {
+                DOTween.Sequence()
+                    .OnStart(() =>
+                    {
+                        slot.localScale = Vector3.zero;
+                        glowEffect.localScale = Vector3.one;
+                    })
+                    .Join(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack))
+                    .Join(glowEffect.DORotate(new Vector3(0, 0, 1800), 1.5f, RotateMode.FastBeyond360))
+                    .Join(glowEffect.DOScale(new Vector3(1.7f, 1.7f, 1.7f), 2))
+                    .Append(glowEffect.DOScale(Vector3.zero, 1.5f));
+
+                glowEffect.gameObject.SetActive(true);
+            }
+            else
+            {
+                DOTween.Sequence()
+                 .OnStart(() => { slot.localScale = Vector3.zero; })
+                 .Append(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+            }
+            slot.gameObject.SetActive(true);
+
+            yield return CommonIEnumerator.WaitForEndOfFrame;
         }
 
+        
     }
 
+    void GetGachaExp(GachaType gachaType, int count)
+    {
+        string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
+        int level = int.Parse(skillData[0]);
+        int currentValue = int.Parse(skillData[1]) + count;
+
+        int targetValue = int.Parse(LevelTemplate[level.ToString()][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+        if (currentValue >= targetValue)
+        {
+            currentValue -= targetValue;
+            level += 1;
+        }
+
+        Transform skillGacha = category5_UI.Find("Type1_Gacha/Scroll View/Viewport/Content").GetChild((int)gachaType);
+        skillGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {level}";
+        skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{currentValue}";
+        skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+        if (currentValue == 0)
+            skillGacha.Find("Slider").GetComponent<Slider>().value = 0;
+        else
+            skillGacha.Find("Slider").GetComponent<Slider>().value = currentValue / (float)targetValue;
+
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.Gacha_SkillData, $"{level}@{currentValue}");
+    }
+    IEnumerator GachaEffect(int count)
+    {
+
+        Transform grid = gachaPanel.Find("Grid");
+        for (int i = 0; i < count; i++)
+        {
+            Transform slot = grid.GetChild(i);
+            slot.gameObject.SetActive(false);
+
+            DOTween.Sequence()
+            .OnStart(() => { slot.transform.localScale = Vector3.zero; })
+            .Append(slot.transform.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+
+            slot.gameObject.SetActive(true);
+            yield return CommonIEnumerator.WaitForEndOfFrame;
+        }
+
+
+    }
     GachaGrade CalcPercent(int[] arr)
     {
         //for (int i = 0; i < arr.Length; i++)
@@ -1120,8 +1281,8 @@ public class MainScene : MonoBehaviour
             if (randomValue <= acquisitionProbability[i])
             {
                 result = (GachaGrade)i;
-                Debug.Log($"randomValue : {randomValue}, 확률 : {acquisitionProbability[i]}, result {result}");
-                Debug.Log("확률 계산끝########");
+                //Debug.Log($"randomValue : {randomValue}, 확률 : {acquisitionProbability[i]}, result {result}");
+                //Debug.Log("확률 계산끝########");
                 
                 return result;
             }
