@@ -1161,8 +1161,13 @@ public class MainScene : MonoBehaviour
             slot.gameObject.SetActive(false);
         }
 
+        // 이 부분도 가챠레벨에 따라 다른 값을 받도록 변경해야됨.
         string[] probability = new string[GachaTemplate["skill1"].Length - 1];
         Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
+
+        // 자료구조를 통해서 뭐 뽑은지 저장해놓고? => 마지막에 DB에 업데이트?
+        // 근데 뽑는순간에 1. 스킬을 얻고(DB업데이트) 2. 연출과 분리하기,,,  왜냐 --> 뽑기하자마자 꺼버리면 문제있음
+
         for (int i = 0; i < count; i++)
         {
             Transform slot = grid.GetChild(i);
