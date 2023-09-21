@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -44,21 +45,23 @@ public class Bullet : MonoBehaviour
 
             {   //데미지 텍스트 생성
                 string textName = IsCritical ? "Damage_Text(Critical)" : "Damage_Text";
-                GameObject damageText = CommonFunction.GetPrefabInstance(textName, MainScene.Instance.upSidePanel.transform);
+                GameObject damageText = TmpObjectPool.Instance.GetPoolObject(textName, MainScene.Instance.upSidePanel.transform);
 
                 Vector2 contactPoint = collision.ClosestPoint(transform.position);
 
                 if (damageText.TryGetComponent<RectTransform>(out var rect))
                 {
+                    float offset = 45.0f;
+                    float durationTime = 0.5f;
+
                     rect.position = Camera.main.WorldToScreenPoint(contactPoint);
+                    rect.DOAnchorPosY(rect.anchoredPosition.y + offset, durationTime).SetEase(Ease.OutQuad).OnComplete(() => TmpObjectPool.Instance.ReturnToPool(damageText));
                 }
 
                 if (damageText.TryGetComponent<TextMeshProUGUI>(out var tmp))
                 {
                     tmp.text = Util.BigNumCalculate(Damage);
                 }
-
-                damageText.AddComponent<DamageText>();
             }
 
             monster.TakeDamage(Damage);
