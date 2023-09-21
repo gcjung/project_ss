@@ -21,6 +21,12 @@ public enum StageState
     InfinityWave
 }
 
+public enum Category1State
+{
+    Character,
+    Skill
+}
+
 public enum ItemType
 {
     Weapon,

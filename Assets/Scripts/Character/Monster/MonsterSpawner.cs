@@ -55,13 +55,11 @@ public class MonsterSpawner : MonoBehaviour
 
     public void SetMonster()
     {
-        IsWaveFinish = false;
-
         if (!slider.IsActive())
             slider.gameObject.SetActive(true);
 
         stageSlider.ResetSlider();
-        ClearWaveTrigger();
+        ResetSpawner();
 
         string monsterName = MonsterTemplate[mainScene.monsterId.ToString()][(int)MonsterTemplate_.Name];
         string bossName = MonsterTemplate[mainScene.bossId.ToString()][(int)MonsterTemplate_.Name];
@@ -106,19 +104,21 @@ public class MonsterSpawner : MonoBehaviour
                 {
                     FinishWave();
 
-                    StopAllCoroutines();    // Stop InfinitySpawnMonster, SpawnMonster
-                    infinitySpawnCoroutine = null;
+                    if (spawnCoroutine != null)
+                    {
+                        StopCoroutine(spawnCoroutine);
+                    }
+
+                    if (infinitySpawnCoroutine != null)
+                    {
+                        StopCoroutine(infinitySpawnCoroutine);
+                    }
 
                     Destroy(monsterPool.TrPool.gameObject); //오브젝트풀 파괴
                     Destroy(bossRoomButton.gameObject);
                 });
 
-                if (infinitySpawnCoroutine != null)
-                {
-                    StopCoroutine(infinitySpawnCoroutine);
-                }
-
-                infinitySpawnCoroutine = StartCoroutine(InfinitySpawnMonster());
+                infinitySpawnCoroutine = StartCoroutine(InfinitySpawnMonster());    //무한웨이브 시작
                 break;
         }
     }
@@ -173,12 +173,29 @@ public class MonsterSpawner : MonoBehaviour
         {
             yield return new WaitForSeconds(delayTime);
 
-            StartCoroutine(SpawnMonster());
+            spawnCoroutine = StartCoroutine(SpawnMonster());
 
             yield return new WaitUntil(() => IsWaveFinish);
 
             yield return new WaitForSeconds(extraDelayTime);
         }
+    }
+
+    public void ResetSpawner()
+    {
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+        }
+
+        if (infinitySpawnCoroutine != null)
+        {
+            StopCoroutine(infinitySpawnCoroutine);
+        }
+
+        IsSpawning = false;
+        IsWaveFinish = false;
+        WaveCount = 0;
     }
     public void OnSliderValueChanged(float value)
     {
@@ -186,25 +203,25 @@ public class MonsterSpawner : MonoBehaviour
         {
             //Debug.Log("웨이브1 실행");
             WaveCount++;    // 1
-            StartCoroutine(SpawnMonster());
+            spawnCoroutine = StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 0.4f) && WaveCount == 1)
         {
             //Debug.Log("웨이브2 실행");
             WaveCount++;    // 2
-            StartCoroutine(SpawnMonster());
+            spawnCoroutine = StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 0.6f) && WaveCount == 2)
         {
             //Debug.Log("웨이브3 실행");
             WaveCount++;    // 3
-            StartCoroutine(SpawnMonster());
+            spawnCoroutine = StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 0.8f) && WaveCount == 3)
         {
             //Debug.Log("웨이브4 실행");
             WaveCount++;    // 4
-            StartCoroutine(SpawnMonster());
+            spawnCoroutine = StartCoroutine(SpawnMonster());
         }
         else if (Mathf.Approximately(value, 1.0f) && WaveCount == 4)
         {
@@ -235,9 +252,5 @@ public class MonsterSpawner : MonoBehaviour
     {
         //Debug.Log("스테이지 클리어");
         mainScene.IsStageClear = true;
-    }
-    public void ClearWaveTrigger()
-    {
-        WaveCount = 0;
     }
 }

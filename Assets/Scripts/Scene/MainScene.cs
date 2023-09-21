@@ -151,7 +151,7 @@ public class MainScene : MonoBehaviour
 
         Debug.Log("메인씬 시작");
 
-        SetCurrentStageState(StageState.InfinityWave);
+        SetCurrentStageState(StageState.NormalWave);
 
         stageId = (int)GlobalManager.Instance.DBManager.GetUserDoubleData(UserDoubleDataType.CurrentStageId, 1);
         SetStage(stageId);  //스테이지 세팅
@@ -220,7 +220,7 @@ public class MainScene : MonoBehaviour
         var _playerCharacter = Resources.Load<Player>($"Player/{heroName}");   //플레이어 캐릭터 세팅
         playerCharacter = Instantiate(_playerCharacter, transform);
         playerCharacter.transform.position = playerSpawnPoint.position;
-        playerCharacter.AddComponent<PlayerController>();
+        PlayerController playerController = playerCharacter.AddComponent<PlayerController>();
 
         playerCharacter.SetHeroStatus(heroId);  //영웅 기본 스탯 세팅
 
@@ -487,9 +487,9 @@ public class MainScene : MonoBehaviour
           predicate: () => { return fadeFinish; },
           onFinish: () =>
           {
-              SetPlayer(heroId);
-              SetStage(stageId);
               spawner.SetMonster();
+              SetPlayer(heroId);
+              SetStage(stageId);            
           }
        );
     }
@@ -513,6 +513,7 @@ public class MainScene : MonoBehaviour
                 break;
         }
     }
+    private Category1State category1State;
     const int invisiblePosY = -1700;
     void OpenUI_Category1(GameObject clickButton)
     {
@@ -531,7 +532,15 @@ public class MainScene : MonoBehaviour
             if (active)
                 category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);         
             else
+            {
                 category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
+
+                if (category1State == Category1State.Character) // 비활성화 전 Character창이었다면 selectedHeroSlot을 초기화
+                {
+                    ResetSelectedSlot();
+                }
+            }
+                
 
             category1_UI.gameObject.SetActive(!active);
         }
@@ -588,6 +597,8 @@ public class MainScene : MonoBehaviour
     {
         Debug.Log("ShowUI_Character");
 
+        category1State = Category1State.Character;
+
         category1_UI.Find("Type1_Character").gameObject.SetActive(true);
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
 
@@ -634,12 +645,10 @@ public class MainScene : MonoBehaviour
             }
         }
 
-        //선택된 슬릇 초기화 <<<<<<<<< 수정해야됨
+        //선택된 슬릇 초기화
         if (selectedHeroSlot != null)
         {
-            selectedHeroSlot.SetSelected(false);
-            selectedHeroSlot = null;
-            disabledImage.gameObject.SetActive(true);
+            ResetSelectedSlot();
         }        
     }
 
@@ -681,11 +690,19 @@ public class MainScene : MonoBehaviour
         disabledImage.gameObject.SetActive(false);
     }
 
+    private void ResetSelectedSlot()
+    {
+        selectedHeroSlot.SetSelected(false);
+        selectedHeroSlot = null;
+        disabledImage.gameObject.SetActive(true);
+    }
 
     const int maxEquipSkillCount = 6;
     Transform[] equippedSkillSlot = null;
     void ShowUI_Skill(bool isFirst = false)
     {
+        category1State = Category1State.Skill;
+
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
 
         category1_UI.Find("Type2_Skill").gameObject.SetActive(true);
