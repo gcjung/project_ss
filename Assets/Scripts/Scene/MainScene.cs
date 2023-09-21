@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
 using System;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class MainScene : MonoBehaviour
 {
@@ -176,7 +177,7 @@ public class MainScene : MonoBehaviour
         lobbyEquipSkill_Image = new Image[skillPanel.childCount - 1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
         {
-            if(i == 0)
+            if (i == 0)
             {
                 skillPanel.GetChild(0).GetComponent<Button>().onClick.AddListener(() => { OnClick_AutoSkillBtn(); });
             }
@@ -279,11 +280,11 @@ public class MainScene : MonoBehaviour
     public void SetLobbyAutoSkill(bool isOn)
     {
         var autoSkillBtn = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel/Auto_Image");
-        
+
         if (isOn)
         {
             autoSkillBtn.Find("Text").GetComponent<TMP_Text>().text = "Auto\nON";
-            autoSkillBtn.Find("loop").gameObject.SetActive(true);  
+            autoSkillBtn.Find("loop").gameObject.SetActive(true);
         }
         else
         {
@@ -574,7 +575,7 @@ public class MainScene : MonoBehaviour
         category1_UI.Find("Type2_Skill").gameObject.SetActive(false);
     }
 
-    
+
     const int maxEquipSkillCount = 6;
     Transform[] equippedSkillSlot = null;
     void ShowUI_Skill(bool isFirst = false)
@@ -601,12 +602,14 @@ public class MainScene : MonoBehaviour
                 slot.Init(id);
 
                 // 스킬 아이콘 선택 시 (상세보기)
-                skillslot.GetComponent<Button>().onClick.AddListener(() => {
+                skillslot.GetComponent<Button>().onClick.AddListener(() =>
+                {
                     OpenUI_SkillDetail(slot, id);
                 });
 
                 // 간편 장착/해제 버튼
-                skillslot.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() => {
+                skillslot.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() =>
+                {
                     if (slot.State.HasFlag(SkillSlotState.Equipped))
                         OnClick_UnequipSkill(slot, id);
                     else
@@ -620,7 +623,7 @@ public class MainScene : MonoBehaviour
                 }
             }
 
-            
+
             Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
             equippedSkillSlot = new Transform[maxEquipSkillCount];
             for (int i = 0; i < maxEquipSkillCount; i++)
@@ -639,7 +642,7 @@ public class MainScene : MonoBehaviour
                     string[] icon = SkillTemplate[skillID][(int)SkillTemplate_.Icon].Split('/');
                     string spriteName = icon[0];
                     string atlasName = icon[1];
-                    
+
                     equippedSkillSlot[i].Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
                     equippedSkillSlot[i].Find("Image").GetComponent<Image>().gameObject.SetActive(true);
 
@@ -816,7 +819,7 @@ public class MainScene : MonoBehaviour
                 //skillController.equippedSkillInfo[i].SetSkillInfo(skillID);
                 skillController.SetEquipSkill(i, skillID);
                 skillController.StartSkillCooltime(i);
-                
+
                 break;
             }
         }
@@ -849,7 +852,7 @@ public class MainScene : MonoBehaviour
                 equippedSkillSlot[i].transform.Find("Unequip_Button").gameObject.SetActive(false);
                 equippedSkillSlot[i].GetComponent<Button>().onClick.RemoveAllListeners();
 
-                
+
                 skillController.StopSkillCooltime(i);
                 //skillController.equippedSkillInfo[i].SetSkillInfo();
                 break;
@@ -948,7 +951,7 @@ public class MainScene : MonoBehaviour
             //    bottomMenu.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
             //}
 
-            ShowUI_Gacha(0,true);
+            ShowUI_Gacha(0, true);
         }
         else
         {
@@ -988,7 +991,7 @@ public class MainScene : MonoBehaviour
                     break;
             }
         }
-        
+
     }
     void ShowUI_Gacha(int index, bool isFirst = false)
     {
@@ -1031,19 +1034,19 @@ public class MainScene : MonoBehaviour
                     skillGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
 
                 skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
-                skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() => 
+                skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
                 {
                     Debug.Log("11가차 버튼 누름");
-                    //Gacha(11);
-                    StartCoroutine(Gacha(GachaType.Skill, 11));
+                    Gacha(GachaType.Skill, 11);
+                    //StartCoroutine(Gacha(GachaType.Skill, 11));
                 });
 
                 skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
                 skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
                 {
                     Debug.Log("35가차 버튼 누름");
-                    //Gacha(35);
-                    StartCoroutine(Gacha(GachaType.Skill, 35));
+                    Gacha(GachaType.Skill, 35);
+                    //StartCoroutine(Gacha(GachaType.Skill, 35));
                 });
 
             }
@@ -1064,122 +1067,103 @@ public class MainScene : MonoBehaviour
     }
 
     Transform gachaPanel = null;
-    //void Gacha(int count)
-    //{
-    //    Debug.Log("GachaGacha");
-    //    if (gachaPanel == null)
-    //        gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
-    //    else
-    //        gachaPanel.gameObject.SetActive(true);
-
-    //    Transform grid = gachaPanel.Find("Grid");
-
-    //    string[] probability = new string[GachaTemplate["skill1"].Length - 1];
-    //    Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
-    //    Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
-        
-    //    foreach (var item in SkillTemplate)
-    //    {
-    //        string grade = item.Value[(int)SkillTemplate_.Grade];
-    //        string id = item.Value[(int)SkillTemplate_.SkillId];
-    //        if (!skillIDByGrade.ContainsKey(grade))
-    //        {
-    //            skillIDByGrade.Add(grade, new List<string>());
-    //            skillIDByGrade[grade].Add(id);
-    //        }
-    //        else
-    //        {
-    //            skillIDByGrade[grade].Add(id);
-    //        }
-    //    }
-
-    //    for (int i = 0; i < 35; i++)
-    //    {
-    //        //grid.GetChild(i).gameObject.SetActive(true);
-    //        Transform slot = grid.GetChild(i);
-    //        slot.gameObject.SetActive(false);
-
-    //        if (i < count)
-    //        {
-    //            Debug.Log("확률 계산시작 " + (i + 1) + "회");
-    //            GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
-
-    //            int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
-    //            string gachaID = skillIDByGrade[grade.ToString()][randomValue];
-    //            Debug.Log($"@@@@@@@@@@ grade : {grade}, randomValue : {randomValue}, result {gachaID} @@@@@");
-
-    //            string[] icon = SkillTemplate[gachaID][(int)SkillTemplate_.Icon].Split('/');
-    //            string spriteName = icon[0];
-    //            string atlasName = icon[1];
-    //            slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
-    //            slot.Find("BgGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
-    //            slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
-
-    //            //slot.gameObject.SetActive(true);
-    //        }
-    //        //else
-    //        //{
-    //        //    Transform slot = grid.GetChild(i);
-
-    //        //    slot.gameObject.SetActive(false);
-    //        //}
-
-    //    }
-    //    StartCoroutine(GachaEffect(count));
-    //}
-
-    IEnumerator Gacha(GachaType gachaType, int count)
+    void Gacha(GachaType gachaType, int count)
     {
         if (gachaPanel == null)
             gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
         else
             gachaPanel.gameObject.SetActive(true);
 
-        GetGachaExp(gachaType, count);
-
-        // key - 스킬등급, value - 스킬ID
-        Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
-        foreach (var item in SkillTemplate)
+        gachaPanel.Find("11GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+        gachaPanel.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
         {
-            string grade = item.Value[(int)SkillTemplate_.Grade];
-            string id = item.Value[(int)SkillTemplate_.SkillId];
-            if (!skillIDByGrade.ContainsKey(grade))
-            {
-                skillIDByGrade.Add(grade, new List<string>());
-                skillIDByGrade[grade].Add(id);
-            }
-            else
-            {
-                skillIDByGrade[grade].Add(id);
-            }
-        }
+            Gacha(gachaType, 11);
+        });
+        gachaPanel.Find("35GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+        gachaPanel.Find("35GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            Gacha(gachaType, 35);
+        });
 
         Transform grid = gachaPanel.Find("Grid");
-        for (int i = 0; i < 35; i++)
+        for (int i = 0; i < grid.childCount; i++)
         {
             Transform slot = grid.GetChild(i);
             slot.gameObject.SetActive(false);
         }
 
-        // 이 부분도 가챠레벨에 따라 다른 값을 받도록 변경해야됨.
-        string[] probability = new string[GachaTemplate["skill1"].Length - 1];
-        Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
+        string[] items = GetGachaItemID(gachaType, count);
+        // 여기에 진짜 얻은 코드 넣기
+        UpdateDBGachaItem(gachaType, items);
+        GetGachaExp(gachaType, count);
+        StartCoroutine(GachaEffect(items));
+    }
+    string[] GetGachaItemID(GachaType gachaType, int count)
+    {
+        Dictionary<string, List<string>> IDByGrade = new Dictionary<string, List<string>>();
+        // key - 스킬등급, value - 스킬ID
+        if (gachaType == GachaType.Skill)
+        {
+            foreach (var item in SkillTemplate)
+            {
+                string grade = item.Value[(int)SkillTemplate_.Grade];
+                string id = item.Value[(int)SkillTemplate_.SkillId];
+                if (!IDByGrade.ContainsKey(grade))
+                {
+                    IDByGrade.Add(grade, new List<string>());
+                    IDByGrade[grade].Add(id);
+                }
+                else
+                {
+                    IDByGrade[grade].Add(id);
+                }
+            }
+        }
+        else if (gachaType == GachaType.Item)
+        {
 
-        // 자료구조를 통해서 뭐 뽑은지 저장해놓고? => 마지막에 DB에 업데이트?
-        // 근데 뽑는순간에 1. 스킬을 얻고(DB업데이트) 2. 연출과 분리하기,,,  왜냐 --> 뽑기하자마자 꺼버리면 문제있음
+        }
 
+        string[] gachaData = new string[2];
+        if (gachaType == GachaType.Skill)
+        {
+            gachaData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
+        }
+        else if (gachaType == GachaType.Item)
+        {
+            gachaData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_ItemData).Split('@');
+        }
+
+        string key = $"{gachaType}{gachaData[0]}";
+
+        string[] probability = new string[GachaTemplate[key].Length - 1];
+        Array.Copy(GachaTemplate[key], 1, probability, 0, GachaTemplate[key].Length - 1);
+
+        string[] result = new string[count];
         for (int i = 0; i < count; i++)
         {
-            Transform slot = grid.GetChild(i);
-
             Debug.Log("확률 계산시작 " + (i + 1) + "회");
             GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
 
-            int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
-            string getSkillID = skillIDByGrade[grade.ToString()][randomValue];
-            Debug.Log($"grade : {grade}, randomValue : {randomValue}, result {getSkillID} @@@@@");
+            int randomValue = UnityEngine.Random.Range(0, IDByGrade[grade.ToString()].Count);
+            string getSkillID = IDByGrade[grade.ToString()][randomValue];
 
-            string[] icon = SkillTemplate[getSkillID][(int)SkillTemplate_.Icon].Split('/');
+            Debug.Log($"grade : {grade}, randomValue : {randomValue}, result {getSkillID} @@@@@");
+            result[i] = getSkillID;
+        }
+
+        return result;
+    }
+
+    IEnumerator GachaEffect(string[] items) // 아이템부분도 따로 처리해줘야함..
+    {
+        Transform grid = gachaPanel.Find("Grid");
+        for (int i = 0; i < items.Length; i++)
+        {
+            Transform slot = grid.GetChild(i);
+
+            string grade = SkillTemplate[items[i]][(int)SkillTemplate_.Grade];
+            string[] icon = SkillTemplate[items[i]][(int)SkillTemplate_.Icon].Split('/');
             string spriteName = icon[0];
             string atlasName = icon[1];
             slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
@@ -1187,11 +1171,11 @@ public class MainScene : MonoBehaviour
             slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
 
             Transform glowEffect = slot.Find("GlowEffect");
-            int childCount = glowEffect.childCount;
-            for (int j = 0; j < childCount; j++)
+            for (int j = 0; j < glowEffect.childCount; j++)
                 glowEffect.GetChild(j).GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
 
-            if ((int)GachaGrade.언커먼 <= (int)grade)
+            GachaGrade _grade = (GachaGrade)Enum.Parse(typeof(GachaGrade), grade);
+            if ((int)GachaGrade.레어 <= (int)_grade)
             {
                 DOTween.Sequence()
                     .OnStart(() =>
@@ -1211,15 +1195,144 @@ public class MainScene : MonoBehaviour
                 DOTween.Sequence()
                  .OnStart(() => { slot.localScale = Vector3.zero; })
                  .Append(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+
+                glowEffect.gameObject.SetActive(false);
             }
+
             slot.gameObject.SetActive(true);
 
             yield return CommonIEnumerator.WaitForEndOfFrame;
         }
-
-        
     }
+    #region 구버전가챠
+    //IEnumerator Gacha(GachaType gachaType, int count)
+    //{
+    //    if (gachaPanel == null)
+    //        gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
+    //    else
+    //        gachaPanel.gameObject.SetActive(true);
 
+    //    GetGachaExp(gachaType, count);
+
+    //    Transform grid = gachaPanel.Find("Grid");
+    //    for (int i = 0; i < 35; i++)
+    //    {
+    //        Transform slot = grid.GetChild(i);
+    //        slot.gameObject.SetActive(false);
+    //    }
+
+    //    // key - 스킬등급, value - 스킬ID
+    //    Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
+    //    foreach (var item in SkillTemplate)
+    //    {
+    //        string grade = item.Value[(int)SkillTemplate_.Grade];
+    //        string id = item.Value[(int)SkillTemplate_.SkillId];
+    //        if (!skillIDByGrade.ContainsKey(grade))
+    //        {
+    //            skillIDByGrade.Add(grade, new List<string>());
+    //            skillIDByGrade[grade].Add(id);
+    //        }
+    //        else
+    //        {
+    //            skillIDByGrade[grade].Add(id);
+    //        }
+    //    }
+
+
+
+    //    // 이 부분도 가챠레벨에 따라 다른 값을 받도록 변경해야됨.
+    //    string[] probability = new string[GachaTemplate["skill1"].Length - 1];
+    //    Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
+
+    //    // 자료구조를 통해서 뭐 뽑은지 저장해놓고? => 마지막에 DB에 업데이트?
+    //    // 근데 뽑는순간에 1. 스킬을 얻고(DB업데이트) 2. 연출과 분리하기,,,  왜냐 --> 뽑기하자마자 꺼버리면 문제있음
+
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        Transform slot = grid.GetChild(i);
+
+    //        Debug.Log("확률 계산시작 " + (i + 1) + "회");
+    //        GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
+
+    //        int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
+    //        string getSkillID = skillIDByGrade[grade.ToString()][randomValue];
+    //        Debug.Log($"grade : {grade}, randomValue : {randomValue}, result {getSkillID} @@@@@");
+
+    //        string[] icon = SkillTemplate[getSkillID][(int)SkillTemplate_.Icon].Split('/');
+    //        string spriteName = icon[0];
+    //        string atlasName = icon[1];
+    //        slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+    //        slot.Find("BgGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+    //        slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+    //        Transform glowEffect = slot.Find("GlowEffect");
+    //        int childCount = glowEffect.childCount;
+    //        for (int j = 0; j < childCount; j++)
+    //            glowEffect.GetChild(j).GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+    //        if ((int)GachaGrade.언커먼 <= (int)grade)
+    //        {
+    //            DOTween.Sequence()
+    //                .OnStart(() =>
+    //                {
+    //                    slot.localScale = Vector3.zero;
+    //                    glowEffect.localScale = Vector3.one;
+    //                })
+    //                .Join(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack))
+    //                .Join(glowEffect.DORotate(new Vector3(0, 0, 1800), 1.5f, RotateMode.FastBeyond360))
+    //                .Join(glowEffect.DOScale(new Vector3(1.7f, 1.7f, 1.7f), 2))
+    //                .Append(glowEffect.DOScale(Vector3.zero, 1.5f));
+
+    //            glowEffect.gameObject.SetActive(true);
+    //        }
+    //        else
+    //        {
+    //            DOTween.Sequence()
+    //             .OnStart(() => { slot.localScale = Vector3.zero; })
+    //             .Append(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+    //        }
+    //        slot.gameObject.SetActive(true);
+
+    //        yield return CommonIEnumerator.WaitForEndOfFrame;
+    //    }
+
+
+    //}
+    #endregion 구버전가챠
+    private void UpdateDBGachaItem(GachaType gachaType, string[] items)
+    {
+        if (gachaType == GachaType.Skill)
+        {
+            var skillAcquireData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                int skillID = int.Parse(items[i]) - 1;
+
+                string[] data = skillAcquireData[skillID].Split(',');   // format : 레벨,보유갯수
+                
+                int holdingCount = int.Parse(data[1]) + 1;
+                data[1] = $"{holdingCount}";
+                
+                skillAcquireData[skillID] = string.Join(',', data);
+            }
+
+            //string[] skillData = new string[SkillTemplate.Count];
+            //for (int i = 0; i < skillData.Length; i++)
+            //{
+            //    int skillLevel = 1;
+            //    int holdingCount = 0;
+            //    skillData[i] = $"{skillLevel},{holdingCount}";
+            //}
+
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', skillAcquireData));
+
+        }
+        else if (gachaType == GachaType.Item)
+        {
+
+        }
+    }
     void GetGachaExp(GachaType gachaType, int count)
     {
         string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
@@ -1245,32 +1358,9 @@ public class MainScene : MonoBehaviour
 
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.Gacha_SkillData, $"{level}@{currentValue}");
     }
-    IEnumerator GachaEffect(int count)
-    {
 
-        Transform grid = gachaPanel.Find("Grid");
-        for (int i = 0; i < count; i++)
-        {
-            Transform slot = grid.GetChild(i);
-            slot.gameObject.SetActive(false);
-
-            DOTween.Sequence()
-            .OnStart(() => { slot.transform.localScale = Vector3.zero; })
-            .Append(slot.transform.DOScale(1, 0.3f).SetEase(Ease.OutBack));
-
-            slot.gameObject.SetActive(true);
-            yield return CommonIEnumerator.WaitForEndOfFrame;
-        }
-
-
-    }
     GachaGrade CalcPercent(int[] arr)
     {
-        //for (int i = 0; i < arr.Length; i++)
-        //{
-        //    Debug.Log("확률 : " + arr[i]);
-        //}
-
         int[] acquisitionProbability = new int[Enum.GetValues(typeof(GachaGrade)).Length - 1];
         int threshold = 0;
         for (int i = 0; i < arr.Length; i++)
@@ -1278,9 +1368,9 @@ public class MainScene : MonoBehaviour
             threshold += arr[i];
             acquisitionProbability[i] = threshold;
         }
-
+        Debug.Log($"threshold : {threshold}");
         GachaGrade result = GachaGrade.None;
-        int randomValue =  UnityEngine.Random.Range(1, 10001);
+        int randomValue = UnityEngine.Random.Range(1, 10001);
         for (int i = 0; i < acquisitionProbability.Length; i++)
         {
             if (randomValue <= acquisitionProbability[i])
@@ -1288,11 +1378,10 @@ public class MainScene : MonoBehaviour
                 result = (GachaGrade)i;
                 //Debug.Log($"randomValue : {randomValue}, 확률 : {acquisitionProbability[i]}, result {result}");
                 //Debug.Log("확률 계산끝########");
-                
                 return result;
             }
         }
-        Debug.Log("확률 계산끝^^^^^^^^^^^^^");
+
         return result;
     }
     void ShowUI_Test(int index)
