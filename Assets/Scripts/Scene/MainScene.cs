@@ -541,7 +541,7 @@ public class MainScene : MonoBehaviour
 
                 if (category1State == Category1State.Character) // 비활성화 전 Character창이었다면 selectedHeroSlot을 초기화
                 {
-                    ResetSelectedSlot();
+                    ResetSelectedHeroSlot();
                 }
             }
                 
@@ -652,7 +652,7 @@ public class MainScene : MonoBehaviour
         //선택된 슬릇 초기화
         if (selectedHeroSlot != null)
         {
-            ResetSelectedSlot();
+            ResetSelectedHeroSlot();
         }        
     }
 
@@ -694,7 +694,7 @@ public class MainScene : MonoBehaviour
         disabledImage.gameObject.SetActive(false);
     }
 
-    private void ResetSelectedSlot()
+    private void ResetSelectedHeroSlot()
     {
         selectedHeroSlot.SetSelected(false);
         selectedHeroSlot = null;
