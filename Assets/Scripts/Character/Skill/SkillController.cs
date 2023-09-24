@@ -45,7 +45,7 @@ public class SkillController : MonoBehaviour
     {
         this.player = player;
 
-        var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill, "@@@@@").Split('@');
 
         equippedSkillInfo = new EquippedSkillInfo[maxEquippedSkill];
         for (int i = 0; i < maxEquippedSkill; i++)

@@ -42,6 +42,7 @@ public class ResourceLoader : MonoBehaviour
     {
         atlas = 0,
         prefab,
+        animator,
     }
 
 
@@ -55,6 +56,13 @@ public class ResourceLoader : MonoBehaviour
     {
         GameObject obj = assetBundleArr[(int)BundleType.prefab].LoadAsset(prefabName) as GameObject;
         //Debug.Log($"UI 에셋불러오기 : {obj.name}");
+        return obj;
+    }
+
+    public static RuntimeAnimatorController LoadAnimator(string prefabName)
+    {
+        var obj = assetBundleArr[(int)BundleType.prefab].LoadAsset(prefabName) as RuntimeAnimatorController;
+        
         return obj;
     }
     //public static GameObject LoadCharPrefab(string prefabName)

@@ -9,8 +9,9 @@ using Unity.VisualScripting;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
-//using static UnityEditor.Progress;
-//using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using System;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
+
 
 public class MainScene : MonoBehaviour
 {
@@ -121,7 +122,8 @@ public class MainScene : MonoBehaviour
     private TMP_Text gemText;
 
     private RectTransform category1_UI = null;  // 캐릭터, 장비
-    private RectTransform category2_UI = null;  //장비
+    private RectTransform category2_UI = null;  // 장비
+    private RectTransform category5_UI = null;  // 뽑기
     private Transform SkillDetail_Popup = null;
 
     private GameObject popupUI_0 = null;    // UI를 띄워줄 캔버스 레이어
@@ -173,7 +175,7 @@ public class MainScene : MonoBehaviour
         lobbyEquipSkill_Image = new Image[skillPanel.childCount - 1];
         for (int i = 0; i < skillPanel.childCount - 1; i++)
         {
-            if(i == 0)
+            if (i == 0)
             {
                 skillPanel.GetChild(0).GetComponent<Button>().onClick.AddListener(() => { OnClick_AutoSkillBtn(); });
             }
@@ -276,11 +278,11 @@ public class MainScene : MonoBehaviour
     public void SetLobbyAutoSkill(bool isOn)
     {
         var autoSkillBtn = mainUiPanel.transform.Find("UpSide_Panel/Skill_Panel/Auto_Image");
-        
+
         if (isOn)
         {
             autoSkillBtn.Find("Text").GetComponent<TMP_Text>().text = "Auto\nON";
-            autoSkillBtn.Find("loop").gameObject.SetActive(true);  
+            autoSkillBtn.Find("loop").gameObject.SetActive(true);
         }
         else
         {
@@ -506,15 +508,17 @@ public class MainScene : MonoBehaviour
                 OpenUI_Category2(button);
                 break;
             case 4:
-                OpenUI_Category4(button);
+                OpenUI_Category5(button);
                 break;
 
             default:
                 break;
         }
     }
+
     private Category1State category1State;
-    const int invisiblePosY = -1700;
+    const int invisiblePosY = -1900;
+
     void OpenUI_Category1(GameObject clickButton)
     {
         if (category1_UI == null)
@@ -725,12 +729,14 @@ public class MainScene : MonoBehaviour
                 slot.Init(id);
 
                 // 스킬 아이콘 선택 시 (상세보기)
-                skillslot.GetComponent<Button>().onClick.AddListener(() => {
+                skillslot.GetComponent<Button>().onClick.AddListener(() =>
+                {
                     OpenUI_SkillDetail(slot, id);
                 });
 
                 // 간편 장착/해제 버튼
-                skillslot.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() => {
+                skillslot.transform.Find("UpperRightImage").GetComponent<Button>().onClick.AddListener(() =>
+                {
                     if (slot.State.HasFlag(SkillSlotState.Equipped))
                         OnClick_UnequipSkill(slot, id);
                     else
@@ -744,7 +750,7 @@ public class MainScene : MonoBehaviour
                 }
             }
 
-            
+
             Transform equippedSkillGroup = category1_UI.Find("Type2_Skill/EquippedSkillGroup");
             equippedSkillSlot = new Transform[maxEquipSkillCount];
             for (int i = 0; i < maxEquipSkillCount; i++)
@@ -763,7 +769,7 @@ public class MainScene : MonoBehaviour
                     string[] icon = SkillTemplate[skillID][(int)SkillTemplate_.Icon].Split('/');
                     string spriteName = icon[0];
                     string atlasName = icon[1];
-                    
+
                     equippedSkillSlot[i].Find("Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
                     equippedSkillSlot[i].Find("Image").GetComponent<Image>().gameObject.SetActive(true);
 
@@ -940,7 +946,7 @@ public class MainScene : MonoBehaviour
                 //skillController.equippedSkillInfo[i].SetSkillInfo(skillID);
                 skillController.SetEquipSkill(i, skillID);
                 skillController.StartSkillCooltime(i);
-                
+
                 break;
             }
         }
@@ -973,7 +979,7 @@ public class MainScene : MonoBehaviour
                 equippedSkillSlot[i].transform.Find("Unequip_Button").gameObject.SetActive(false);
                 equippedSkillSlot[i].GetComponent<Button>().onClick.RemoveAllListeners();
 
-                
+
                 skillController.StopSkillCooltime(i);
                 //skillController.equippedSkillInfo[i].SetSkillInfo();
                 break;
@@ -987,26 +993,6 @@ public class MainScene : MonoBehaviour
             SkillDetail_Popup.gameObject.SetActive(false);
 
         GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.EquippedSkill, string.Join("@", equippedSkillData));
-    }
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.Alpha1))
-        //{
-        //    Debug.Log("1누름");
-        //    StopCoroutine(Co_SkillCooltime[0]);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Alpha2))
-        //{
-        //    Debug.Log("2누름");
-        //    StopCoroutine(Co_SkillCooltime[1]);
-        //}
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            Debug.Log("3누름");
-            GameObject obj = CommonFunction.GetPrefabInstance("Lazer_blue",transform);
-            
-            obj.transform.position = playerCharacter.transform.position + new Vector3();
-        }
     }
 
     private void OnClickUseSkill(int index)
@@ -1078,11 +1064,463 @@ public class MainScene : MonoBehaviour
     //    isSkillCooltime[index] = false;
     //}
     #endregion 테스트용
-    void OpenUI_Category4(GameObject clickButton)
+    void OpenUI_Category5(GameObject clickButton)
     {
+        if (category5_UI == null)
+        {
+            category5_UI = CommonFunction.GetPrefabInstance("Category5", popupUI_0.transform).GetComponent<RectTransform>();
+            category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+            category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
+
+            //Transform bottomMenu = category5_UI.Find("BottomBar/BottomMenu");
+            //for (int i = 1; i < bottomMenu.childCount; i++)
+            //{
+            //    bottomMenu.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
+            //}
+
+            ShowUI_Gacha(0, true);
+        }
+        else
+        {
+            bool active = category5_UI.gameObject.activeSelf;
+
+            if (active)
+                category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
+            else
+                category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
+
+            category5_UI.gameObject.SetActive(!active);
+        }
+
+        clickButton.transform.Find("Text").gameObject.SetActive(!category5_UI.gameObject.activeSelf);
+        clickButton.transform.Find("CloseImage").gameObject.SetActive(category5_UI.gameObject.activeSelf);
+
+        Transform parent = category5_UI.Find("BottomBar/BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            int index = i;
+            Button button = parent.GetChild(i).GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
+
+            switch (index)
+            {
+                case 0:
+                    button.onClick.AddListener(() => ShowUI_Gacha(index));
+                    break;
+                case 1:
+                    button.onClick.AddListener(() => ShowUI_Test(index));
+                    break;
+                case 2:
+                    button.onClick.AddListener(() => ShowUI_Test(index));
+                    break;
+                case 3:
+                    button.onClick.AddListener(() => ShowUI_Test(index));
+                    break;
+            }
+        }
 
     }
+    void ShowUI_Gacha(int index, bool isFirst = false)
+    {
+        if (isFirst)
+        {
+            Transform gachaUI = category5_UI.Find("Type1_Gacha");
+            string[] itemData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_ItemData, "1@0").Split('@');
+            {
+                int currentLevel = int.Parse(itemData[0]);
+                int holdingCount = int.Parse(itemData[1]);
 
+                //var t = LevelTemplate[itemData[0]][(int)LevelTemplate_.Skill_Item_RequiredQuantity];
+                var targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+                //int targetValue = int.Parse(LevelTemplate[itemData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+
+                Transform itemGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(0);
+                itemGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
+                itemGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
+                itemGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+                if (holdingCount != 0)
+                    itemGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+            }
+
+            string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
+            {
+                int currentLevel = int.Parse(skillData[0]);
+                int holdingCount = int.Parse(skillData[1]);
+
+                var targetValue = int.Parse(LevelTemplate[skillData[0]][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+
+                Transform skillGacha = gachaUI.Find("Scroll View/Viewport/Content").GetChild(1);
+                skillGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {currentLevel}";
+                skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{holdingCount}";
+                skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+                if (holdingCount == 0)
+                    skillGacha.Find("Slider").GetComponent<Slider>().value = 0;
+                else
+                    skillGacha.Find("Slider").GetComponent<Slider>().value = holdingCount / (float)targetValue;
+
+                skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+                skillGacha.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    Debug.Log("11가차 버튼 누름");
+                    Gacha(GachaType.Skill, 11);
+                    //StartCoroutine(Gacha(GachaType.Skill, 11));
+                });
+
+                skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+                skillGacha.Find("35GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    Debug.Log("35가차 버튼 누름");
+                    Gacha(GachaType.Skill, 35);
+                    //StartCoroutine(Gacha(GachaType.Skill, 35));
+                });
+
+            }
+        }
+        //TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
+
+        //transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
+        //transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
+        //transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;
+
+        Debug.Log("ShowUI_Gacha, index : " + index);
+        Transform parent = category5_UI.Find("BottomBar/BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            parent.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
+        }
+        parent.GetChild(index).Find("BtnOn").gameObject.SetActive(true);
+    }
+
+    Transform gachaPanel = null;
+    void Gacha(GachaType gachaType, int count)
+    {
+        if (gachaPanel == null)
+            gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
+        else
+            gachaPanel.gameObject.SetActive(true);
+
+        gachaPanel.Find("11GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+        gachaPanel.Find("11GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            Gacha(gachaType, 11);
+        });
+        gachaPanel.Find("35GachaBtn").GetComponent<Button>().onClick.RemoveAllListeners();
+        gachaPanel.Find("35GachaBtn").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            Gacha(gachaType, 35);
+        });
+
+        Transform grid = gachaPanel.Find("Grid");
+        for (int i = 0; i < grid.childCount; i++)
+        {
+            Transform slot = grid.GetChild(i);
+            slot.gameObject.SetActive(false);
+        }
+
+        string[] items = GetGachaItemID(gachaType, count);
+        // 여기에 진짜 얻은 코드 넣기
+        UpdateDBGachaItem(gachaType, items);
+        GetGachaExp(gachaType, count);
+        StartCoroutine(GachaEffect(items));
+    }
+    string[] GetGachaItemID(GachaType gachaType, int count)
+    {
+        Dictionary<string, List<string>> IDByGrade = new Dictionary<string, List<string>>();
+        // key - 스킬등급, value - 스킬ID
+        if (gachaType == GachaType.Skill)
+        {
+            foreach (var item in SkillTemplate)
+            {
+                string grade = item.Value[(int)SkillTemplate_.Grade];
+                string id = item.Value[(int)SkillTemplate_.SkillId];
+                if (!IDByGrade.ContainsKey(grade))
+                {
+                    IDByGrade.Add(grade, new List<string>());
+                    IDByGrade[grade].Add(id);
+                }
+                else
+                {
+                    IDByGrade[grade].Add(id);
+                }
+            }
+        }
+        else if (gachaType == GachaType.Item)
+        {
+
+        }
+
+        string[] gachaData = new string[2];
+        if (gachaType == GachaType.Skill)
+        {
+            gachaData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
+        }
+        else if (gachaType == GachaType.Item)
+        {
+            gachaData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_ItemData).Split('@');
+        }
+
+        string key = $"{gachaType}{gachaData[0]}";
+
+        string[] probability = new string[GachaTemplate[key].Length - 1];
+        Array.Copy(GachaTemplate[key], 1, probability, 0, GachaTemplate[key].Length - 1);
+
+        string[] result = new string[count];
+        for (int i = 0; i < count; i++)
+        {
+            Debug.Log("확률 계산시작 " + (i + 1) + "회");
+            GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
+
+            int randomValue = UnityEngine.Random.Range(0, IDByGrade[grade.ToString()].Count);
+            string getSkillID = IDByGrade[grade.ToString()][randomValue];
+
+            Debug.Log($"grade : {grade}, randomValue : {randomValue}, result {getSkillID} @@@@@");
+            result[i] = getSkillID;
+        }
+
+        return result;
+    }
+
+    IEnumerator GachaEffect(string[] items) // 아이템부분도 따로 처리해줘야함..
+    {
+        Transform grid = gachaPanel.Find("Grid");
+        for (int i = 0; i < items.Length; i++)
+        {
+            Transform slot = grid.GetChild(i);
+
+            string grade = SkillTemplate[items[i]][(int)SkillTemplate_.Grade];
+            string[] icon = SkillTemplate[items[i]][(int)SkillTemplate_.Icon].Split('/');
+            string spriteName = icon[0];
+            string atlasName = icon[1];
+            slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+            slot.Find("BgGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+            slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+            Transform glowEffect = slot.Find("GlowEffect");
+            for (int j = 0; j < glowEffect.childCount; j++)
+                glowEffect.GetChild(j).GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+            GachaGrade _grade = (GachaGrade)Enum.Parse(typeof(GachaGrade), grade);
+            if ((int)GachaGrade.레어 <= (int)_grade)
+            {
+                DOTween.Sequence()
+                    .OnStart(() =>
+                    {
+                        slot.localScale = Vector3.zero;
+                        glowEffect.localScale = Vector3.one;
+                    })
+                    .Join(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack))
+                    .Join(glowEffect.DORotate(new Vector3(0, 0, 1800), 1.5f, RotateMode.FastBeyond360))
+                    .Join(glowEffect.DOScale(new Vector3(1.7f, 1.7f, 1.7f), 2))
+                    .Append(glowEffect.DOScale(Vector3.zero, 1.5f));
+
+                glowEffect.gameObject.SetActive(true);
+            }
+            else
+            {
+                DOTween.Sequence()
+                 .OnStart(() => { slot.localScale = Vector3.zero; })
+                 .Append(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+
+                glowEffect.gameObject.SetActive(false);
+            }
+
+            slot.gameObject.SetActive(true);
+
+            yield return CommonIEnumerator.WaitForEndOfFrame;
+        }
+    }
+    #region 구버전가챠
+    //IEnumerator Gacha(GachaType gachaType, int count)
+    //{
+    //    if (gachaPanel == null)
+    //        gachaPanel = CommonFunction.GetPrefabInstance("GachaUI", popupUI_1.transform).transform;
+    //    else
+    //        gachaPanel.gameObject.SetActive(true);
+
+    //    GetGachaExp(gachaType, count);
+
+    //    Transform grid = gachaPanel.Find("Grid");
+    //    for (int i = 0; i < 35; i++)
+    //    {
+    //        Transform slot = grid.GetChild(i);
+    //        slot.gameObject.SetActive(false);
+    //    }
+
+    //    // key - 스킬등급, value - 스킬ID
+    //    Dictionary<string, List<string>> skillIDByGrade = new Dictionary<string, List<string>>();
+    //    foreach (var item in SkillTemplate)
+    //    {
+    //        string grade = item.Value[(int)SkillTemplate_.Grade];
+    //        string id = item.Value[(int)SkillTemplate_.SkillId];
+    //        if (!skillIDByGrade.ContainsKey(grade))
+    //        {
+    //            skillIDByGrade.Add(grade, new List<string>());
+    //            skillIDByGrade[grade].Add(id);
+    //        }
+    //        else
+    //        {
+    //            skillIDByGrade[grade].Add(id);
+    //        }
+    //    }
+
+
+
+    //    // 이 부분도 가챠레벨에 따라 다른 값을 받도록 변경해야됨.
+    //    string[] probability = new string[GachaTemplate["skill1"].Length - 1];
+    //    Array.Copy(GachaTemplate["skill1"], 1, probability, 0, GachaTemplate["skill1"].Length - 1);
+
+    //    // 자료구조를 통해서 뭐 뽑은지 저장해놓고? => 마지막에 DB에 업데이트?
+    //    // 근데 뽑는순간에 1. 스킬을 얻고(DB업데이트) 2. 연출과 분리하기,,,  왜냐 --> 뽑기하자마자 꺼버리면 문제있음
+
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        Transform slot = grid.GetChild(i);
+
+    //        Debug.Log("확률 계산시작 " + (i + 1) + "회");
+    //        GachaGrade grade = CalcPercent(Array.ConvertAll(probability, int.Parse));
+
+    //        int randomValue = UnityEngine.Random.Range(0, skillIDByGrade[grade.ToString()].Count);
+    //        string getSkillID = skillIDByGrade[grade.ToString()][randomValue];
+    //        Debug.Log($"grade : {grade}, randomValue : {randomValue}, result {getSkillID} @@@@@");
+
+    //        string[] icon = SkillTemplate[getSkillID][(int)SkillTemplate_.Icon].Split('/');
+    //        string spriteName = icon[0];
+    //        string atlasName = icon[1];
+    //        slot.Find("Skill_Image").GetComponent<Image>().sprite = CommonFunction.GetSprite_Atlas(spriteName, atlasName);
+    //        slot.Find("BgGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+    //        slot.Find("FrameGlow").GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+    //        Transform glowEffect = slot.Find("GlowEffect");
+    //        int childCount = glowEffect.childCount;
+    //        for (int j = 0; j < childCount; j++)
+    //            glowEffect.GetChild(j).GetComponent<Image>().color = Util.ConvertGradeToColor(grade.ToString());
+
+    //        if ((int)GachaGrade.언커먼 <= (int)grade)
+    //        {
+    //            DOTween.Sequence()
+    //                .OnStart(() =>
+    //                {
+    //                    slot.localScale = Vector3.zero;
+    //                    glowEffect.localScale = Vector3.one;
+    //                })
+    //                .Join(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack))
+    //                .Join(glowEffect.DORotate(new Vector3(0, 0, 1800), 1.5f, RotateMode.FastBeyond360))
+    //                .Join(glowEffect.DOScale(new Vector3(1.7f, 1.7f, 1.7f), 2))
+    //                .Append(glowEffect.DOScale(Vector3.zero, 1.5f));
+
+    //            glowEffect.gameObject.SetActive(true);
+    //        }
+    //        else
+    //        {
+    //            DOTween.Sequence()
+    //             .OnStart(() => { slot.localScale = Vector3.zero; })
+    //             .Append(slot.DOScale(1, 0.3f).SetEase(Ease.OutBack));
+    //        }
+    //        slot.gameObject.SetActive(true);
+
+    //        yield return CommonIEnumerator.WaitForEndOfFrame;
+    //    }
+
+
+    //}
+    #endregion 구버전가챠
+    private void UpdateDBGachaItem(GachaType gachaType, string[] items)
+    {
+        if (gachaType == GachaType.Skill)
+        {
+            var skillAcquireData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                int skillID = int.Parse(items[i]) - 1;
+
+                string[] data = skillAcquireData[skillID].Split(',');   // format : 레벨,보유갯수
+                
+                int holdingCount = int.Parse(data[1]) + 1;
+                data[1] = $"{holdingCount}";
+                
+                skillAcquireData[skillID] = string.Join(',', data);
+            }
+
+            //string[] skillData = new string[SkillTemplate.Count];
+            //for (int i = 0; i < skillData.Length; i++)
+            //{
+            //    int skillLevel = 1;
+            //    int holdingCount = 0;
+            //    skillData[i] = $"{skillLevel},{holdingCount}";
+            //}
+
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', skillAcquireData));
+
+        }
+        else if (gachaType == GachaType.Item)
+        {
+
+        }
+    }
+    void GetGachaExp(GachaType gachaType, int count)
+    {
+        string[] skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.Gacha_SkillData).Split('@');
+        int level = int.Parse(skillData[0]);
+        int currentValue = int.Parse(skillData[1]) + count;
+
+        int targetValue = int.Parse(LevelTemplate[level.ToString()][(int)LevelTemplate_.Gacha_RequiredQuantity]);
+        if (currentValue >= targetValue)
+        {
+            currentValue -= targetValue;
+            level += 1;
+        }
+
+        Transform skillGacha = category5_UI.Find("Type1_Gacha/Scroll View/Viewport/Content").GetChild((int)gachaType);
+        skillGacha.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {level}";
+        skillGacha.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{currentValue}";
+        skillGacha.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {targetValue}";
+
+        if (currentValue == 0)
+            skillGacha.Find("Slider").GetComponent<Slider>().value = 0;
+        else
+            skillGacha.Find("Slider").GetComponent<Slider>().value = currentValue / (float)targetValue;
+
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.Gacha_SkillData, $"{level}@{currentValue}");
+    }
+
+    GachaGrade CalcPercent(int[] arr)
+    {
+        int[] acquisitionProbability = new int[Enum.GetValues(typeof(GachaGrade)).Length - 1];
+        int threshold = 0;
+        for (int i = 0; i < arr.Length; i++)
+        {
+            threshold += arr[i];
+            acquisitionProbability[i] = threshold;
+        }
+        Debug.Log($"threshold : {threshold}");
+        GachaGrade result = GachaGrade.None;
+        int randomValue = UnityEngine.Random.Range(1, 10001);
+        for (int i = 0; i < acquisitionProbability.Length; i++)
+        {
+            if (randomValue <= acquisitionProbability[i])
+            {
+                result = (GachaGrade)i;
+                //Debug.Log($"randomValue : {randomValue}, 확률 : {acquisitionProbability[i]}, result {result}");
+                //Debug.Log("확률 계산끝########");
+                return result;
+            }
+        }
+
+        return result;
+    }
+    void ShowUI_Test(int index)
+    {
+        Debug.Log("index : " + index);
+        Transform parent = category5_UI.Find("BottomBar/BottomMenu");
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            parent.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
+        }
+        parent.GetChild(index).Find("BtnOn").gameObject.SetActive(true);
+    }
 
 
     public void GetGoods(double getGold = 0, double getGem = 0)
