@@ -10,7 +10,8 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
 using System;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
+using static UnityEditor.Progress;
+//using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 
 public class MainScene : MonoBehaviour
@@ -543,6 +544,10 @@ public class MainScene : MonoBehaviour
                 {
                     ResetSelectedHeroSlot();
                 }
+                else if(category1State == Category1State.Skill)
+                {
+                    ShowUI_Skill();
+                }
             }
                 
 
@@ -795,6 +800,26 @@ public class MainScene : MonoBehaviour
 
                 }
             }
+        }
+        else
+        {
+            Debug.Log("스킬슬롯을!!!! 업데이트하라");
+            Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
+            for (int i = 0; i < grid.childCount; i++)
+            {
+                //string id = item.Value[(int)SkillTemplate_.SkillId];
+                //string grade = item.Value[(int)SkillTemplate_.Grade];
+                //string icon = item.Value[(int)SkillTemplate_.Icon];
+
+                //GameObject skillslot = CommonFunction.GetPrefabInstance("SkillSlot", grid);
+
+                SkillSlot slot = grid.GetChild(i).GetComponent<SkillSlot>();
+                slot.UpdateSkillSlot();
+
+  
+     
+            }
+     
         }
 
     }

@@ -138,4 +138,33 @@ public class SkillSlot : MonoBehaviour
         SetSlot(State);
     }
 
+    public void UpdateSkillSlot()
+    {
+        var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+        string[] skillData = userSkillData[int.Parse(skillID) - 1].Split(',');
+        CurrentLevel = int.Parse(skillData[0]);    // 스킬 레벨
+        HoldingCount = int.Parse(skillData[1]);    // 보유 갯수
+
+        transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";
+
+        TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
+
+        transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
+        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
+        transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;
+
+        // 스킬 획득 못한 상태 (잠금)
+        if (CurrentLevel == 1 && HoldingCount == 0)
+            State = SkillSlotState.Lock;
+        else
+            State &= ~SkillSlotState.Lock;
+
+        // 업그레이드 가능 확인
+        if (HoldingCount >= TargetValue)
+            State |= SkillSlotState.Upgradeable;
+
+        SetSlot(State);
+    }
+
 }
