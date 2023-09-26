@@ -497,24 +497,49 @@ public class MainScene : MonoBehaviour
        );
     }
 
-
+    GameObject currentPopupUI = null;
+    GameObject currentCategoryBottomButton = null;
     private void OnClickCategory(int categoryType, GameObject button)
     {
         switch (categoryType)
         {
             case 0:
                 OpenUI_Category1(button);
+                TurnOffPreviousPopup(category1_UI.gameObject, button);
                 break;
             case 1:
                 OpenUI_Category2(button);
+                TurnOffPreviousPopup(category2_UI.gameObject, button);
                 break;
             case 4:
                 OpenUI_Category5(button);
+                TurnOffPreviousPopup(category5_UI.gameObject, button);
                 break;
 
             default:
                 break;
         }
+    }
+
+    void TurnOffPreviousPopup(GameObject obj, GameObject clickButton)
+    {
+        if (currentPopupUI != null && currentPopupUI.activeSelf)
+        {
+            if(currentPopupUI != obj) 
+                currentPopupUI.SetActive(false);
+        }
+
+        if (currentCategoryBottomButton != null)
+        {
+            if (currentCategoryBottomButton != clickButton)
+            {
+                currentCategoryBottomButton.transform.Find("Text").gameObject.SetActive(true);
+                currentCategoryBottomButton.transform.Find("CloseImage").gameObject.SetActive(false);
+            }
+        }
+
+        currentCategoryBottomButton = clickButton;
+        currentPopupUI = obj;
     }
 
     private Category1State category1State;
@@ -525,34 +550,27 @@ public class MainScene : MonoBehaviour
         if (category1_UI == null)
         {
             category1_UI = CommonFunction.GetPrefabInstance("Category1", popupUI_0.transform).GetComponent<RectTransform>();
-            category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
 
             ShowUI_Character(true);
             ShowUI_Skill(true);
         }
         else
         {
-            bool active = category1_UI.gameObject.activeSelf;
-
-            if (active)
-                category1_UI.anchoredPosition = new Vector2(0, invisiblePosY);         
-            else
+            if (category1State == Category1State.Character) // 비활성화 전 Character창이었다면 selectedHeroSlot을 초기화
             {
-                category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo);
-
-                if (category1State == Category1State.Character) // 비활성화 전 Character창이었다면 selectedHeroSlot을 초기화
-                {
-                    ResetSelectedHeroSlot();
-                }
-                else if(category1State == Category1State.Skill)
-                {
-                    ShowUI_Skill();
-                }
+                ResetSelectedHeroSlot();
             }
-                
+            else if (category1State == Category1State.Skill)
+            {
+                ShowUI_Skill();
+            }
 
-            category1_UI.gameObject.SetActive(!active);
+            category1_UI.gameObject.SetActive(!category1_UI.gameObject.activeSelf);
         }
+
+        DOTween.Sequence()
+        .OnStart(() => { category1_UI.anchoredPosition = new Vector2(0, invisiblePosY); })
+        .Append(category1_UI.DOAnchorPosY(0, 0.3f).SetEase(Ease.OutExpo));
 
         clickButton.transform.Find("Text").gameObject.SetActive(!category1_UI.gameObject.activeSelf);
         clickButton.transform.Find("CloseImage").gameObject.SetActive(category1_UI.gameObject.activeSelf);
@@ -803,23 +821,12 @@ public class MainScene : MonoBehaviour
         }
         else
         {
-            Debug.Log("스킬슬롯을!!!! 업데이트하라");
             Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
             for (int i = 0; i < grid.childCount; i++)
             {
-                //string id = item.Value[(int)SkillTemplate_.SkillId];
-                //string grade = item.Value[(int)SkillTemplate_.Grade];
-                //string icon = item.Value[(int)SkillTemplate_.Icon];
-
-                //GameObject skillslot = CommonFunction.GetPrefabInstance("SkillSlot", grid);
-
                 SkillSlot slot = grid.GetChild(i).GetComponent<SkillSlot>();
                 slot.UpdateSkillSlot();
-
-  
-     
             }
-     
         }
 
     }
@@ -1094,28 +1101,18 @@ public class MainScene : MonoBehaviour
         if (category5_UI == null)
         {
             category5_UI = CommonFunction.GetPrefabInstance("Category5", popupUI_0.transform).GetComponent<RectTransform>();
-            category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
-            category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
-
-            //Transform bottomMenu = category5_UI.Find("BottomBar/BottomMenu");
-            //for (int i = 1; i < bottomMenu.childCount; i++)
-            //{
-            //    bottomMenu.GetChild(i).Find("BtnOn").gameObject.SetActive(false);
-            //}
 
             ShowUI_Gacha(0, true);
         }
         else
         {
-            bool active = category5_UI.gameObject.activeSelf;
-
-            if (active)
-                category5_UI.anchoredPosition = new Vector2(0, invisiblePosY);
-            else
-                category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo);
-
-            category5_UI.gameObject.SetActive(!active);
+            category5_UI.gameObject.SetActive(!category5_UI.gameObject.activeSelf);
         }
+
+        DOTween.Sequence()
+        .OnStart(() => { category5_UI.anchoredPosition = new Vector2(0, invisiblePosY); })
+        .Append(category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo));
+
 
         clickButton.transform.Find("Text").gameObject.SetActive(!category5_UI.gameObject.activeSelf);
         clickButton.transform.Find("CloseImage").gameObject.SetActive(category5_UI.gameObject.activeSelf);
