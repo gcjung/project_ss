@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEditor;
 using System;
-using static UnityEditor.Progress;
+//using static UnityEditor.Progress;
 //using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 
@@ -649,7 +649,7 @@ public class MainScene : MonoBehaviour
                 // 영웅 아이콘 선택 시 선택된 슬릇 표시
                 heroSlot.GetComponent<Button>().onClick.AddListener(() =>
                 {
-                    ChangeSelectedSlot(slot);
+                    ChangeSelectedHeroSlot(slot);
                 });
             }
         }
@@ -684,7 +684,7 @@ public class MainScene : MonoBehaviour
         }
     }
 
-    private void ChangeSelectedSlot(HeroSlot slot)
+    private void ChangeSelectedHeroSlot(HeroSlot slot)
     {
         if (selectedHeroSlot != null)
         {

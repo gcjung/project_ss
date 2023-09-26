@@ -30,6 +30,7 @@ public enum UserStringDataType
 {
     EquippedSkill,
     SkillData,
+    HeroData,
     Gacha_ItemData,
     Gacha_SkillData,
 }
@@ -86,6 +87,7 @@ public class DBManager : Manager<DBManager>
         GetUserStringData(UserStringDataType.Gacha_SkillData, "1@0");
         GetUserStringData(UserStringDataType.Gacha_ItemData, "1@0");
         SetDB_SkillAcquireData();
+        SetDB_HeroAcquireData();
     }
 
     async void LoadGameData()
@@ -318,6 +320,22 @@ public class DBManager : Manager<DBManager>
         }
     }
 
+    void SetDB_HeroAcquireData()
+    {
+        var heroAcquireData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.HeroData).Split('@');
+
+        if (heroAcquireData.Length == 1)    // heroAcquireData 없을 경우
+        {
+            string heroData = string.Empty;
+
+            int heroId = 1;
+            int heroLevel = 1;
+
+            heroData = $"{heroId},{heroLevel}"; //heroId 1인 Farmer를 1레벨로 소유한 영웅에 추가
+
+            GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.HeroData, heroData);
+        }
+    }
     #region 제네릭 버전
     //public T GetUserData<T>(string key)
     //{
