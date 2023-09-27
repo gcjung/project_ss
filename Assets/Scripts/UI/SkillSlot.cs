@@ -120,8 +120,13 @@ public class SkillSlot : MonoBehaviour
 
     public void UpgradeSkill()
     {
+        var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+        
         CurrentLevel += 1;
         HoldingCount -= TargetValue;
+
+        userSkillData[int.Parse(skillID) - 1] = $"{CurrentLevel},{HoldingCount}";
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', userSkillData));
 
         transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
         transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";

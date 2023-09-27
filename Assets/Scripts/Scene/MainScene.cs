@@ -919,8 +919,6 @@ public class MainScene : MonoBehaviour
     void OnClick_UpgradeSkill(SkillSlot slot, string skillId)
     {
         slot.UpgradeSkill();
-        var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
-        userSkillData[int.Parse(skillId) - 1] = $"{slot.CurrentLevel},{slot.HoldingCount}";
 
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
         for (int i = 0; i < equippedSkillData.Length; i++)
@@ -932,8 +930,27 @@ public class MainScene : MonoBehaviour
             }
         }
 
-        SkillDetail_Popup.gameObject.SetActive(false);
-        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', userSkillData));
+        int level = slot.CurrentLevel;
+        int currentValue = slot.HoldingCount;
+        int requireQuantity = slot.TargetValue;
+
+        SkillDetail_Popup.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV. {level}";
+        SkillDetail_Popup.Find("Slider/CurrentValue_Text").GetComponent<TMP_Text>().text = $"{currentValue}";
+        SkillDetail_Popup.Find("Slider/TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {requireQuantity}";
+        SkillDetail_Popup.Find("Slider").GetComponent<Slider>().value = currentValue / (float)requireQuantity;
+        
+        if (slot.State.HasFlag(SkillSlotState.Upgradeable))
+        {
+            SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().interactable = true;
+            SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.white;
+        }
+        else
+        {
+            SkillDetail_Popup.Find("UpgradeButton").GetComponent<Button>().interactable = false;
+            SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.gray;
+        }
+        //SkillDetail_Popup.gameObject.SetActive(false);
+        
     }
     void OnClick_EquipSkill(SkillSlot slot, string skillID)
     {
@@ -1113,7 +1130,6 @@ public class MainScene : MonoBehaviour
         .OnStart(() => { category5_UI.anchoredPosition = new Vector2(0, invisiblePosY); })
         .Append(category5_UI.DOAnchorPosY(100, 0.3f).SetEase(Ease.OutExpo));
 
-
         clickButton.transform.Find("Text").gameObject.SetActive(!category5_UI.gameObject.activeSelf);
         clickButton.transform.Find("CloseImage").gameObject.SetActive(category5_UI.gameObject.activeSelf);
 
@@ -1140,7 +1156,6 @@ public class MainScene : MonoBehaviour
                     break;
             }
         }
-
     }
     void ShowUI_Gacha(int index, bool isFirst = false)
     {

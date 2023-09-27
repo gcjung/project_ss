@@ -372,12 +372,16 @@ public class DBManager : Manager<DBManager>
         
        return default(T);
     }
-    public async void UpdateFirebaseUserData<T>(string key, T value)
+    public void UpdateFirebaseUserData<T>(string key, T value)
     {
-        await uidRef.UpdateAsync(key, value).ContinueWith(task =>
+        uidRef.UpdateAsync(key, value).ContinueWith(task =>
         {
             //Debug.Log($"{key} : {value} Update");
         });
+        //await uidRef.UpdateAsync(key, value).ContinueWith(task =>
+        //{
+        //    //Debug.Log($"{key} : {value} Update");
+        //});
     }
 
 
