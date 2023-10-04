@@ -950,7 +950,7 @@ public class MainScene : MonoBehaviour
             SkillDetail_Popup.Find("UpgradeButton/ButtonImage").GetComponent<Image>().color = Color.gray;
         }
         //SkillDetail_Popup.gameObject.SetActive(false);
-        
+        CommonFunction.CreateNotification("스킬강화완료", popupUI_1.transform);
     }
     void OnClick_EquipSkill(SkillSlot slot, string skillID)
     {
