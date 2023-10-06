@@ -143,6 +143,38 @@ public class SkillSlot : MonoBehaviour
         SetSlot(State);
     }
 
+    public void UpgradeMaxSkill()
+    {
+        var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+        
+        while(HoldingCount >= TargetValue)
+        {
+            CurrentLevel += 1;
+            HoldingCount -= TargetValue;
+
+            TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
+        }
+
+
+        userSkillData[int.Parse(skillID) - 1] = $"{CurrentLevel},{HoldingCount}";
+        GlobalManager.Instance.DBManager.UpdateUserData(UserStringDataType.SkillData, string.Join('@', userSkillData));
+
+        transform.Find("CurrentValue_Text").GetComponent<TMP_Text>().text = $"{HoldingCount}";
+        transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{CurrentLevel}";
+
+        // 레벨업 목표 개수
+        //TargetValue = int.Parse(LevelTemplate[CurrentLevel.ToString()][(int)LevelTemplate_.Skill_Item_RequiredQuantity]);
+
+        transform.Find("TargetValue_Text").GetComponent<TMP_Text>().text = $"/ {TargetValue}";
+        transform.Find("Slider").GetComponent<Slider>().value = HoldingCount / (float)TargetValue;
+
+        if (HoldingCount < TargetValue)      // 보유개수가 레벨업 조건개수보다 적으면
+            State &= ~SkillSlotState.Upgradeable;
+
+        SetSlot(State);
+    }
+
     public void UpdateSkillSlot()
     {
         var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
