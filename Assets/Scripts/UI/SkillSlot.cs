@@ -143,7 +143,7 @@ public class SkillSlot : MonoBehaviour
         SetSlot(State);
     }
 
-    public void UpgradeMaxSkill()
+    public void MaxUpgradeSkill()
     {
         var userSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
 

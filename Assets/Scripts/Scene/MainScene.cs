@@ -575,6 +575,10 @@ public class MainScene : MonoBehaviour
         clickButton.transform.Find("Text").gameObject.SetActive(!category1_UI.gameObject.activeSelf);
         clickButton.transform.Find("CloseImage").gameObject.SetActive(category1_UI.gameObject.activeSelf);
 
+        Button allUpgradeSkillBtn =  category1_UI.Find("Type2_Skill/Upgrade_Button").GetComponent<Button>();
+        allUpgradeSkillBtn.onClick.RemoveAllListeners();
+        allUpgradeSkillBtn.onClick.AddListener(()=> OnClick_MaxUpgradeSkill());
+
         Transform parent = category1_UI.Find("BottomMenu");
         for (int i = 0; i < parent.childCount; i++)
         {
@@ -971,6 +975,29 @@ public class MainScene : MonoBehaviour
         //SkillDetail_Popup.gameObject.SetActive(false);
         CommonFunction.CreateNotification("스킬강화완료", popupUI_1.transform);
     }
+    void OnClick_MaxUpgradeSkill()
+    {
+        Transform grid = category1_UI.Find("Type2_Skill/Scroll View/Viewport/Grid");
+        for (int i = 0; i < grid.childCount; i++)
+        {
+            SkillSlot slot = grid.GetChild(i).GetComponent<SkillSlot>();
+            slot.MaxUpgradeSkill();
+        }
+
+        var skillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.SkillData).Split('@');
+
+        var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
+        for (int i = 0; i < equippedSkillData.Length; i++)
+        {
+            string skillID = equippedSkillData[i];
+            if (!string.IsNullOrEmpty(skillID))
+            {
+                string level = skillData[int.Parse(skillID) - 1].Split(',')[0];
+                equippedSkillSlot[i].transform.Find("Level_Text").GetComponent<TMP_Text>().text = $"LV{level}";
+            }
+        }
+    }
+
     void OnClick_EquipSkill(SkillSlot slot, string skillID)
     {
         var equippedSkillData = GlobalManager.Instance.DBManager.GetUserStringData(UserStringDataType.EquippedSkill).Split('@');
